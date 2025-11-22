@@ -1,0 +1,125 @@
+.imageUploadLabel {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: block;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    font-size: 11pt;
+    opacity: 1;
+    padding: 0px;
+}
+.imageUploadLabel p {
+    color: #b3b3b3;
+
+}
+
+    /* Minimal, non-invasive: tune sizes in your project */
+.dropZone {
+  border: 1px dashed #81818149;
+
+  border-radius: 4px;
+  padding: 14px;            /* adjust to your spacing scale */
+  background: #222;
+  cursor: pointer;
+  transition: .3s;
+  user-select: none;
+}
+
+.dropZone p {
+  margin: 0 0 6px 0;        /* keep tight like your current <p> spacing */
+}
+.dropZone small {
+  opacity: .7;
+}
+.dropZone.dragActive {
+    box-shadow: 0px 0px 0px 1px #b8b8b8; 
+    border: 1px solid #32323249;
+}
+.dropZone:focus {
+  outline: none;
+
+}
+.flexImageLabel{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.maxLabelText{
+  font-size: 8pt;
+  opacity: 0.3;
+}
+.selectedImageFilename{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 11pt;
+}
+.dropZone:focus {
+  outline: none;
+  box-shadow: none; /* ← this is the gray ring you see */
+
+}
+.hasFileSelected{
+    box-shadow: none; 
+    border: 1px solid #81818149;
+}
+.hasFileSelected.dropZone.dragActive {
+        box-shadow: 0px 0px 0px 1px #b8b8b8; 
+    border: 1px solid #81818149;
+}
+
+.containNoFileZone p {
+    margin: 0px;
+    text-align: center;
+}
+.acceptedFileTypeText{
+    font-size: 9pt;
+    opacity: .6;
+}
+.dndTop{
+    font-size: 10pt;
+    opacity: .9;
+}
+.containNoFileZone{
+    padding: 10px 0px;
+}
+.hasSelectedFileFlex{
+    display: flex;
+    justify-content: space-between;
+}
+.containRemovalButton{
+    width: 40px;
+}
+.containSelectedjoint{
+    width: calc(100% - 50px);
+
+    padding-top: 5px;
+
+}
+.selectedImageFilename {
+    margin: 0px;
+}
+.errorInput{
+    border: 1px solid #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d; 
+}
+.imgUp-emptyState {
+  padding: 10px 0;
+  text-align: center;
+}
+
+.imgUp-emptyTitle {
+  font-size: 10pt;
+  opacity: 0.9;
+  color: #d1d1d1;
+}
+
+.imgUp-fileTypes {
+  font-size: 9pt;
+  opacity: 0.6;
+  color: #d1d1d1;
+}

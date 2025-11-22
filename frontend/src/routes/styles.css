@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+@font-face {
+    font-family: 'HelvNeueBackup';
+    src: url('/helvneuepro5.otf') format('opentype');
+  }
+
+
+/* 
+  main color (white) - #eeeeee
+  light gray = cacaca
+  medium gray = 848484
+  hover = 7a7a7a
+  darkgray - 222222
+  black - #1b1b1b
+
+  labelgray - 4a4a4a
+
+  error Red - f94040 
+
+  royal blue = 0091ff
+  porsche chalk = a5a4ac
+*/
+
+html {
+    background-color: #222222;
+    padding: 0px;
+    margin: 0px;
+    color: rgba(255, 255, 255, 0.11);
+}
+body {
+    padding: 0px;
+    margin: 0px;
+    overflow-x: hidden;
+}
+
+a {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
+    transition: .3s;
+    text-decoration: none;
+}
+p {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.7em;
+    padding: 0px;
+    margin: 0px;
+}
+b {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+h1 {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 50pt;
+}
+h2 {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 40pt;
+    padding: 0px;
+    margin: 0px;
+}
+h3 {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 30pt;
+    padding: 0px;
+    margin: 0px;
+}
+h4 {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 24pt;
+    padding: 0px;
+    margin: 0px;
+}
+h5 {
+    color: #f7f7f7f7;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    font-size: 18pt;
+    padding: 0px;
+    margin: 0px;
+}
+button {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
+}
+
+li {
+    color: #323232;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.7em;
+    padding: 0px;
+    margin: 0px;
+    font-size: 11pt;
+    opacity: .8;
+}
+.inBagButton {
+    display: flex;
+    align-items: center;
+
+}
+.inBagButton p {
+    padding: 0px;
+    margin: 0px;
+    color:  #d6d6d6;
+    white-space: nowrap;
+    margin-left: 5px;
+}
+.wrapPoint {
+    width: 25px;
+    margin-left: 8px;
+    position: relative;
+}
+.minipoint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding-top: 5px;
+    animation: golefthard .5s infinite alternate;
+}
+.breadCrumbFlex {
+    display: flex;
+    justify-content: space-between;
+}
+@keyframes golefthard {
+    0% {
+        transform: translate(-50%, -50%) translateX(-3px);
+    }
+    100% {
+        transform: translate(-50%, -50%) translateX(0px);
+    }
+}
+@media (max-width: 750px){
+    h3 {
+        font-size: 20pt;
+    }
+
+}

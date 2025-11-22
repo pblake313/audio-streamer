@@ -1,0 +1,36 @@
+.backendBlockWrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px 10px 20px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    background-color: rgba(211, 211, 211, 0.048);
+}
+.backendBlockWrap p {
+    padding: 0px;
+    margin: 0px;
+    font-size: 10pt;
+}
+
+.holdLoader {
+    width: 50px;
+    height: 50px;
+    position: relative;
+}
+.wrapLo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.subBackText {
+    opacity: .8;
+    font-size: 8pt;
+}
+.loadText {
+    width: calc(100% - 65px);
+    white-space: nowrap;
+    overflow: hidden;
+}
+  

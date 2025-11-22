@@ -1,0 +1,88 @@
+.imgUp-labelRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.imgUp-label {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  color: #b3b3b3;
+}
+
+.imgUp-maxSize {
+  font-size: 8pt;
+  opacity: 0.3;
+}
+
+.imgUp-dropZone {
+  border: 1px dashed #81818149;
+  border-radius: 4px;
+  padding: 14px;
+  background: #222222;
+  cursor: pointer;
+  transition: 0.3s;
+  user-select: none;
+}
+
+.imgUp-dropZone p {
+  margin: 0 0 6px 0;
+}
+
+.imgUp-dropZone.imgUp-dragActive {
+  border: 1px solid #b8b8b8;
+  box-shadow: 0 0 0 1px #b8b8b8;
+}
+
+.imgUp-dropZone:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.imgUp-hasFile {
+  border: 1px solid #81818149;
+}
+
+.imgUp-selectedRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.imgUp-selectedName {
+  width: calc(100% - 50px);
+  padding-top: 5px;
+}
+
+.imgUp-fileName {
+  margin: 0;
+  font-size: 11pt;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.imgUp-removeBtn {
+  width: 40px;
+}
+
+.imgUp-emptyState {
+  padding: 10px 0;
+  text-align: center;
+}
+
+.imgUp-emptyTitle {
+  font-size: 10pt;
+  opacity: 0.9;
+  color: #d1d1d1;
+}
+
+.imgUp-fileTypes {
+  font-size: 9pt;
+  opacity: 0.6;
+  color: #d1d1d1;
+}
+
+.imgUp-error {
+  border: 1px solid #c30d0d;
+  box-shadow: 0 0 0 1px #c30d0d;
+}

@@ -1,0 +1,191 @@
+.wrapBeatFilter {
+    margin: auto;
+    padding: 0px 25px;
+    max-width: 1550px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+.miniBottomPad {
+    margin-bottom: 12px;
+}
+.wrapArtistSearch {
+    width: 450px;
+    position: relative;
+    height: 50px;
+}
+.newBeatsFetching {
+    margin: auto;
+    padding: 0px 25px;
+    max-width: 1550px;
+    height: 0px;
+    overflow: hidden;
+    transition: .3s;
+}
+.bpmSearchWrapper {
+    margin-left: 25px;
+}
+.moodSearchWrapper {
+    margin-left: 25px;
+}
+.wrapFilters {
+    width: fit-content;
+}
+.openLoadNewBeats {
+    height: 18px;
+}
+.wrapEntireBeatFilter {
+    position: sticky;
+    padding-top: 5px;
+    top: 38px;
+    z-index: 1;
+    background-color: #222222;
+}
+.mobileFilters {
+    display: none;
+}
+.wrapDesktopFilters {
+    display: flex;
+    align-items: center;
+}
+.mobileFilterButton {
+    height: fit-content;
+}
+.mobileActiveFilters {
+    display: none;
+}
+.desktopActiveFilters {
+    display: block;
+}
+.filtpadder {
+    height: 10px;
+}
+.showMobileFitlers {
+    background-color: #222222;
+}
+.flexFiltas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.mobBeatFilters {
+    display: block;
+    position: fixed;
+    top: 0px;
+    background-color: transparent;
+    right: 0px;
+    height: calc(100% );
+    z-index: 99;
+    overflow: hidden;
+    width: 0px;
+    padding: 0px;
+    opacity: 0;
+    transition: .3s;
+    background-color: #222222;
+    padding: 0px 25px;
+    padding-top: 25px;
+    width: calc(100% - 50px);
+    opacity: 1;
+}
+.showMobileFitlers{
+    display: none;
+}
+.mobBeatFilters {
+    display: none;
+}
+.miniMobileFilter {
+    display: none;
+}
+.mobArtS {
+    display: none;
+}
+@media(max-width: 950px){
+    .wrapBeatFilter {
+        justify-content: space-between;
+    }
+    .wrapDesktopFilters {
+        display: none;
+    }
+    .mobileFilters {
+        display: flex;
+    }
+    .showMobileFitlers {
+        display: block;
+    }
+    .wrapFilters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .wrapBeatFilter {
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+    .mobBeatFilters {
+        display: block;
+    }
+}
+@media (max-width: 650px) {
+    .wrapBeatFilter {
+        flex-direction: column;
+    }
+    .wrapArtistSearch {
+        width: 100%;
+    }
+    .mobileActiveFilters {
+        display: block;
+    }
+    .wrapFilters {
+        width: 100%;
+        margin-top: 10px;
+    }
+    .mobileFilters {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    .mobileActiveFilters {
+        width: calc(100% - 90px);
+    }
+    .desktopActiveFilters {
+        display: none;
+    }
+    .filtpadder {
+        display: none;
+    }
+    .miniMobileFilter {
+        display: block;
+        padding: 0px;
+        margin: 0px;
+        padding-top: 5px;
+        padding-left: 10px;
+        border: none;
+        opacity: .7;
+        transition: .3s;
+        background-color: transparent;
+        cursor: pointer;
+    }
+    .miniMobileFilter:hover {
+        opacity: 1;
+    }
+    .mobileFilterButton {
+        display: none;
+    }
+
+    .mobArtS {
+        display: block;
+    }
+    .wrapFilters {
+        padding-top: 0px;
+        margin-top: 0px;
+    }
+    .wrapArtistSearch {
+        height: fit-content;
+    }
+}
+@media (pointer: coarse){
+    .miniMobileFilter:hover {
+        opacity: .7;
+    }
+}

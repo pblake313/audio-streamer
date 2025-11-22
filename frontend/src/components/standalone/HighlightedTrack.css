@@ -1,0 +1,255 @@
+.wrapHighlightedTrack {
+    padding-top: 60px;
+    padding-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+}
+.insideHighlight {
+    max-width: 1550px;
+    margin: auto;
+    margin-top: 25px;
+    padding: 0px 25px 25px 25px;
+    display: flex;
+    justify-content: space-between;
+}
+.highlightedTrackBackground {
+    position: absolute;
+    min-width: 150%;
+    min-height: 150%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -2;
+    filter: blur(0px);
+    opacity: .1;
+    filter: blur(0px);
+}
+.topperGradient {
+    position: absolute;
+    z-index: -1;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 25%;
+    background: linear-gradient(to bottom, #222222, transparent);
+}
+.bommo {
+    position: absolute;
+    z-index: -1;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 45%;
+    background: linear-gradient(to top, #222222, transparent);
+}
+
+.artworkPlayPauseButton {
+    height: 320px;
+    width: 320px;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    outline: none;
+    border: none;
+}
+.highlightedTrackInfo {
+    width: calc(100% - 350px);
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+  
+.trackArtworkImage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+.trackStateFlex {
+    display: flex;
+    align-items: center;
+}
+.trackIcon {
+    margin-right: 15px;
+    width: 15px;
+    height: 15px;
+}
+
+.trackStateText p {
+    font-size: 9pt;
+    opacity: .6;
+}
+.highlightedTrackControls {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-top: 25px;
+    
+}
+
+.trackInfoBottom {
+    display: flex;  
+    justify-content: space-between;
+
+}
+.trackControls {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.containVisualizer {
+   width: calc(100% - 400px);;
+   position: relative;
+}
+.wPlayPlauser {
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-top: 2px;
+}
+.holdBeatArt {
+    display: flex;
+    justify-content: space-between;
+}
+
+.smallerTrackInfo {
+    display: none;
+}
+.keyandMode {
+    opacity: .5;
+    font-size: 11pt;
+}
+.wrapHighlightedTitle {
+    width: 100%;
+    overflow: hidden;
+    margin: 10px 0px 12px 0px;
+  }
+  
+  .wrapHighlightedTitle h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+.mobTrackIcon {
+    width: 15px;
+    height: 15px;
+    display: none;
+}
+
+@media(max-width: 1250px){
+    .smallerTrackInfo {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width:  calc(100% - 350px);
+    }
+    .highlightedTrackInfo .trackInfoTop {
+        display: none;
+    }
+    .highlightedTrackInfo .trackInfoBottom .trackControls {
+        display: none;
+    }
+    .insideHighlight {
+        flex-direction: column;
+
+    }
+    .trackControls {
+        width: 100%;
+    }
+    .highlightedTrackInfo {
+        width: 100%;
+    }
+    .containVisualizer {
+        width: 100%;
+        margin-top: 15px;
+    }
+    .wrapHighlightedTitle h2 {
+        font-size: 20pt;
+
+    }
+
+    .trackInfoTop {
+        margin-bottom: 35px;
+    }
+}
+@media(max-width: 900px){
+    .wrapHighlightedTrack {
+        padding-top: 55px;
+    }
+    .highlightedTrackBackground{
+        filter: blur(20px);
+    }
+}
+@media (max-width:850px){
+    .holdBeatArt {
+        flex-direction: column;
+        align-items: center;
+    }
+    .insideHighlight {
+        margin-top: 0px;
+    }
+    .smallerTrackInfo {
+        width: 100%;
+        margin: auto;
+        max-width: 500px;
+        margin-top: 15px;
+    }
+    .artworkPlayPauseButton {
+        height: auto;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        max-width: 500px;
+    }
+    .highlightedTrackBackground {
+        opacity: .35;
+    }
+    .highlightedTrackControls {
+        width: fit-content;
+        margin: auto;
+    }
+    .wPlayPlauser {
+        margin-left: 45px;
+        margin-right: 45px;
+        margin-top: 2px;
+    }
+    .trackControls{
+        margin-bottom: 0px;
+    }
+    .wrapHighlightedTitle {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    .wrapHighlightedTitle h2 {
+        font-size: 12pt;
+    }
+    .keyandMode {
+        font-size: 9pt;
+    }
+    .trackStateFlex  {
+        display: none;
+    }
+    .wrapHighlightedTitle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .trackIcon {
+        padding: 0px;
+        margin: 0px;
+    }
+    .mobTrackIcon {
+        display: block;
+    }
+}
+@media (max-width:575px){
+    .insideHighlight {
+        padding: 0px 15px;
+    }
+    .wrapHighlightedTitle {
+        overflow: visible;
+      }
+}

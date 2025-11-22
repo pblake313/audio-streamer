@@ -1,0 +1,24 @@
+.beatTagWrapper {
+    border-radius: 50px;
+    border: none;
+    width: fit-content;
+}
+.tagText{
+    font-size: 9pt;
+    padding: 2px 12px 0px 12px;
+    white-space: nowrap;
+}
+
+.wrapAudLoad{
+    width: 100px;
+    margin: auto;
+    padding-top: 30px;
+    margin-top: 35px;
+}
+@media(max-width: 600px){
+    .tagText{
+        font-size: 9pt;
+        padding: 0px 7px 0px 7px;
+
+    }
+}

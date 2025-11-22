@@ -1,0 +1,26 @@
+.wraplogopin {
+    width: fit-content;
+    margin: auto;
+    width: 150px;
+}
+.holdPIN {
+    width: fit-content;
+    margin: auto;
+    margin-top: 50px;
+    color: #f7f7f759;
+}
+.wrapPINForm {
+    width: 100%;
+    margin-bottom: 100px;
+    display: flex;
+    flex-direction: column;
+}
+.wrapPinErrorMessage{
+    margin-top: 50px;
+}
+
+@media (max-width: 600px){
+    .wrapPINForm {
+        top: 45%;
+    }
+}

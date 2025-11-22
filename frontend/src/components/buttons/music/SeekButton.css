@@ -1,0 +1,95 @@
+.seekerButton {
+    background-color: transparent;
+    border-radius: 50px;
+    position: relative;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    -webkit-tap-highlight-color: transparent;
+    /* Removes highlight on mobile */
+
+}
+
+.seekerButton:hover {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.176);
+}
+
+.seekerButton.activeSeeker:hover {
+    background-color: rgba(255, 255, 255, 0.559);
+
+}
+
+.iconWrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding-top: 3px;
+    padding-left: 3px;
+}
+
+.rotateIcon {
+    transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.activeSeeker {
+    background-color: rgba(255, 255, 255, 0.559);
+
+}
+
+.seekerButton:disabled {
+    opacity: .2;
+}
+
+.seekerButton:disabled:hover {
+    opacity: .2;
+}
+
+@media (max-width: 525px) {
+    .seekerButton:hover {
+        background-color: transparent;
+        opacity: 1;
+    }
+
+    .seekerButton:active {
+        background-color: transparent;
+    }
+
+    .seekerButton:focus {
+        background-color: transparent;
+    }
+}
+
+@media (pointer: coarse) {
+    .seekerButton:hover {
+        opacity: 1;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0);
+    }
+
+    .activeSeeker:focus {
+        background-color: transparent;
+    }
+}
+
+/* Disable ALL hover effects on touch devices */
+/* Disable hover behavior on touch devices, but keep active press animation */
+/* Touch devices: kill hover/focus, KEEP the activeSeeker flash */
+@media (hover: none) and (pointer: coarse) {
+    /* Don't let hover stick after tap */
+    .seekerButton:hover {
+        background-color: transparent;
+        opacity: 1;
+        box-shadow: none;
+    }
+
+    /* No focus highlight */
+    .seekerButton:focus {
+        background-color: transparent;
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* ✅ DO NOT touch .activeSeeker or :active
+       JS controls .activeSeeker for ~150ms, so you still get the short highlight */
+}

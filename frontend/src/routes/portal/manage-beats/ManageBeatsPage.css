@@ -1,0 +1,38 @@
+.containBeatPage {
+    max-width: 1550px;
+    padding: 0 25px;
+    margin: 75px auto 100px auto;
+}
+
+.goToAddButton {
+    margin: 0 auto 25px auto;
+    max-width: 500px;
+    width: 100%;
+}
+
+/* Responsive grid – all children same width */
+.adminBeatGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+    margin-top: 10px;
+}
+
+.wrapBeatChild {
+    width: 100%;
+    max-width: 100%;
+}
+
+@media(max-width: 780px) {
+    .adminBeatGrid {
+
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+        gap: 5px;
+    }
+}
+@media(max-width:575px){
+    .containBeatPage {
+        padding: 0 15px;
+    }
+}

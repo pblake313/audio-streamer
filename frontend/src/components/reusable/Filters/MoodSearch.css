@@ -1,0 +1,221 @@
+.wrapMoodFilter {
+    position: relative;
+    background-color: #222222;
+    z-index: 5;
+}
+.moodTopButton {
+    padding-top: 3px;
+    display: flex;
+    cursor: pointer;
+    transition: .3s;
+    border: none;
+    opacity: .7;
+    background-color: transparent;
+    align-items: center;
+}
+.moodTopButton:hover {
+    opacity: 1;
+}
+.moodOp {
+    color: #cacaca;
+}
+.rrMood {
+    transition: .3s;
+    height: 24px;
+    width: 24px;
+    position: relative;
+}
+.spinner {
+    transform: rotate(270deg);
+} 
+.moodList {
+    position: absolute;
+    top: calc(100% + 10px);
+    width: 200px;
+    border-radius: 6px;
+    overflow: hidden;
+    height: 0px;
+    transition: .3s;
+}
+.moodOpButton {
+    width: 100%;
+    border-radius: 0px;
+    border: none;
+    border-bottom: 1px solid #404040;
+    padding: 7px 20px ;
+    cursor: pointer;
+    background-color: #222222;
+}
+.moodOpButton:hover {
+    background-color: #313131;
+}
+
+.innerMood {
+    display: flex;
+    margin-top: 2px;
+    align-items: center;
+}
+.moodOp {
+    margin-left: 15px;
+}
+.moodOpen {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.219);
+    height: 250px;   
+    overflow-y: scroll;
+}
+.topButtonOn {
+    opacity: 1;
+}
+.incMooder {
+    background-color: #313131;
+}
+
+.moodOpButton:hover .innerMood .moodBox {
+    background-color: transparent;
+}
+.incMooder .innerMood .moodBox {
+    background-color: #f7f7f7;
+}
+.incMooder:hover .innerMood .moodBox {
+    background-color: #f7f7f7;
+}
+.moodBox {
+    height: 12px;
+    width: 12px;
+    border-radius: 3px;
+    border: 1px solid #404040;
+    margin-bottom: 2px;
+    position: relative;
+    overflow: hidden;
+}
+.wrapCheck {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    transition: .3s;
+}
+.incMooder .innerMood .moodBox .wrapCheck {
+    display: block;
+}
+
+
+.moodOpen::-webkit-scrollbar {
+    width: 5px; /* or whatever width you'd like */
+}
+.moodOpen::-webkit-scrollbar-track {
+    background: #222222;   
+    border-radius: 5px;
+}
+
+.moodOpen::-webkit-scrollbar-thumb {
+    background: #3088be;         
+    border-radius: 4px;       
+}
+
+.moodOpen::-webkit-scrollbar-thumb {
+    background: #848484;       
+}
+.screenBlocker {
+    position: fixed;
+    inset: 0; /* shorthand for top: 0; right: 0; bottom: 0; left: 0; */
+    background: transparent;
+    z-index: 3; /* higher than other elements, lower than your dropdown if needed */
+    pointer-events: all;
+  }
+  
+.mA {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    padding-right: 5px;
+    width: fit-content;
+    height: fit-content;
+    padding-left: 5px;
+    padding-top: 3px;
+    transition: .3s;
+}
+.mspin {
+    transform: translate(-50%, -50%) rotate(270deg);
+} 
+.mhead {
+    padding-top: 3px;
+}
+.moodTopOpen {
+    opacity: 1;
+}
+
+@media(max-width: 950px){
+    .moodList {
+        position: relative;
+        box-shadow: 0px 0px 0px transparent;
+        width: 100%;
+    }
+    .moodOpen {
+        height: 400px;   
+        max-height: calc(100vh - 460px);
+        width: 100%;
+        overflow-y: scroll;
+        box-shadow: 0px 0px 0px transparent;
+        box-shadow: none;
+    }
+    .moodTopButton {
+        width: calc(100%);
+        justify-content: space-between;
+        padding: 0px;
+        opacity: 1;
+    }
+    .wrapMoodFilter {
+        padding: 10px 0px;
+    }
+    .moodOpButton {
+        border-bottom: none;
+        padding: 3px 10px;
+    }
+    .mhead {
+        font-weight: bold;
+    }
+    .mhead {
+        font-size: 12pt;
+    }
+    .moodOp {
+        font-size: 11pt;
+    }
+}
+@media (pointer: coarse){
+    .moodTopButton:hover {
+        opacity: .7;
+    }
+    .moodOpButton:hover {
+        background-color: transparent;
+    }
+    .moodOpButton:hover .innerMood .moodBox {
+        background-color: transparent;
+    }
+}
+
+@media (pointer: coarse) and (max-width: 950px){
+    .moodTopButton:hover {
+        opacity: 1;
+    }
+}
+@media(max-width: 650px){
+    .screenBlocker {
+        display: none;
+    }
+}
+
+@media(pointer: coarse){
+    .moodOpButton:hover {
+        background-color: transparent;
+    }
+    .incMooder:hover {
+        background-color: #313131;
+
+    }
+    .incMooder:hover .innerMood .moodBox {
+        background-color: #f7f7f7;
+    }
+}

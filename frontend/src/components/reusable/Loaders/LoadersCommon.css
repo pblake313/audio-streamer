@@ -1,0 +1,358 @@
+.pageTopLoad {
+    padding-bottom: 105px;
+    overflow: hidden;
+    position: relative;
+}
+.highlightedTrackLoadArea {
+    padding: 0px 25px ;
+    max-width: 1550px;
+    margin: auto;
+    margin-top: 85px;
+    display: flex;
+
+}
+.wrapFakeTracks {
+    padding: 0px 25px;
+    max-width: 1550px;
+    margin: auto;
+}
+.fakeAlbum {
+    width: 300px;
+    height: 300px;
+    border-radius: 6px;
+}
+.ohidden {
+    overflow: hidden;
+}
+.addShadow {
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.123);
+
+}
+.trackInfS {
+    margin-left: 50px;
+    width: calc(100% - 350px);
+}
+.trackCFlex {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100%
+}
+.fakeTitle {
+    height: 50px;
+    margin-bottom: 25px;
+    max-width: 500px;
+    border-radius: 6px;
+}
+.fakeSub {
+    max-width: 250px;
+    border-radius: 6px;
+    height: 30px;
+    margin-bottom: 15px;
+}
+.fakeControls {
+    height: 40px;
+    max-width: 600px;
+    border-radius: 6px;
+}
+.fakeLoadBack {
+    position: absolute;
+    width: 100%;
+    opacity: .15;
+    filter: blur(25px);
+    z-index: -5;
+}
+.topGradient {
+    position: absolute;
+    height: 180px;
+    background: linear-gradient(to bottom, #222222, transparent); 
+    top: 0px;
+    z-index: -3;
+    width: 100%;
+}
+
+.loadAni {
+    position: relative;
+    background-color: #e9edf121; /* Base color */
+    width: 100%;  /* Adjust as needed */
+    height: 100%; /* Adjust as needed */
+    overflow: hidden;
+}
+  
+.loadAni::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Make this element twice as wide as the container */
+    width: 200%;
+    height: 100%;
+    /* Create a gradient for the shimmer */
+    background-image: linear-gradient(90deg, rgba(226, 227, 230, 0.233), rgba(190, 190, 190, 0.164), rgba(226, 227, 230, 0.308));
+    /* Ensure each half of the element contains the same gradient */
+    background-size: 50% 100%;
+    /* Animate the element using transform */
+    animation: shimmer 2s linear infinite;
+}
+.fakeTrackItem {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+.fakeMiniAlb {
+    height: 50px;
+    width: 50px;
+    border-radius: 6px;
+}
+.fakeTrackInfoItem {
+    width: calc(100% - 75px);
+    margin-left: 25px;
+    height: 50px;
+    border-radius: 6px;
+}
+  
+.wrapKitsLoadGrid {
+    padding: 0px 25px ;
+    max-width: 1550px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 25px;
+    margin-bottom: 100px;
+}
+.fakeSoundkitItem {
+    border-radius: 6px;
+
+}
+.fakeSoundCard {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1.3;
+}
+.fakeCardDetails {
+    height: 60px;
+    margin-top: 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+.doubSpan {
+    grid-column: span 1;
+
+}
+.kitIdPHEad {
+    padding-top: 130px;
+}
+.kitFakeTitle {
+    height: 45px;
+    margin: auto;
+    width: 270px;
+    margin-bottom: 25px;
+    border-radius: 6px;
+}
+.kitFakeSub {
+    height: 25px;
+    margin: auto;
+    width: 150px;
+    margin-bottom: 25px;
+    border-radius: 6px;
+
+}
+.kitFakeP {
+    max-width: 1550px;
+    margin: auto;
+    margin-top: 75px;
+    display: flex;
+    padding: 0px 25px;
+}
+.fakeCarder {
+    width: 400px;
+    aspect-ratio: 1 / 1.3;
+    border-radius: 6px;
+}
+.fakeSamples {
+    margin-left: 30px;
+    width: calc(100% - 810px);
+}
+.fakeDets {
+    margin-left: 30px;
+    width: 350px;
+}
+.fakeSampItem {
+    height: 80px;
+    width: 100%;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+.apparelGridLoader {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+.fakeApparelItem {
+    height: 600px;
+}
+.dgridspan {
+    grid-column: span 1;
+}
+.apparelItemLoadWrap {
+    display: flex;
+    height: 100vh;
+    max-height: 1050px;
+    margin-top: 75px;
+    padding: 0px 25px;
+    overflow: hidden;
+}
+.fakeAllPicsSlider {
+    width: 100px;
+
+}
+.fakeslidePic {
+    width: 100%;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    height: 130px;
+}
+.fakeMainI {
+    height: 100%;
+    width: calc(55% - 100px);
+    margin-left: 25px;
+}
+.fakeItemDesc {
+    margin-left: 25px;
+    width: calc(45% );
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 50px;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 1500px){
+    .wrapKitsLoadGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+@media (max-width: 1250px){
+    .fakeDets {
+        display: none;
+
+    }
+    .fakeSamples {
+        width: calc(100% - 425px);
+    }
+    .apparelGridLoader {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 1200px){
+    .wrapKitsLoadGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 1000px){
+    .apparelGridLoader {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .fakeAllPicsSlider {
+        display: none;
+    }
+    .fakeMainI {
+        width: calc(55%);
+        margin-left: 0px;
+    }
+}
+
+@media (max-width: 900px){
+    .kitFakeP {
+        flex-direction: column;
+    }
+    .fakeCarder {
+        width: 100%;
+        margin: auto;
+        max-width: 500px;
+        margin-bottom: 50px;
+    }
+    .fakeSamples {
+        width: 100%;
+        margin-left: 0px;
+    }
+    .kitIdPHEad {
+        display: none;
+    }
+}
+@media (max-width: 875px){
+    .apparelItemLoadWrap {
+        padding: 0px;
+    }
+}
+@media (max-width: 850px) {
+    .highlightedTrackLoadArea {
+        flex-direction: column;
+    }
+    .fakeAlbum{
+        margin: auto;
+        margin-bottom: 15px;
+        width: 100%;
+        height: 100%;
+        max-width: 500px;
+        aspect-ratio: 1 / 1;
+    }
+    .trackInfS {
+        margin: auto;
+        margin: 0px;
+        width: 100%;
+
+    }
+    .trackCFlex {
+        width: 100%;
+        margin: auto;
+        max-width: 500px;
+    }
+    .fakeSub {
+        margin-bottom: 25px;
+        width: 100%;
+        max-width: 100%;
+    }
+}
+@media (max-width: 750px){
+    .wrapKitsLoadGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .fakeApparelItem {
+        height: 350px;
+    }
+    .apparelItemLoadWrap {
+        flex-direction: column;
+
+    }
+    .fakeMainI {
+        width: 100%;
+    }
+    .fakeItemDesc {
+        margin-top: 50px;
+        width: calc(100% - 50px);
+        padding: 0px 25px;
+        margin-left: 0px;
+    }
+
+}
+@media (max-width: 600px){
+    .dgridspan {
+        grid-column: span 2;
+        height: 600px;
+    }
+}
+@media (max-width: 525px){
+    .doubSpan {
+        grid-column: span 2;
+        
+    }
+}

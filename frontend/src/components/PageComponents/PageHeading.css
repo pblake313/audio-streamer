@@ -1,0 +1,50 @@
+.pageStandardWrap {
+    text-align: center;
+    padding: 0px 0px;
+    padding-top: 90px;
+    display: block;
+    height: fit-content;
+}
+.pageStandardSub {
+    font-size: 11pt;
+    opacity: .7;
+}
+.shoppingATitle {
+    font-weight: normal;
+    margin-top: 50px;
+}
+
+.wrapBottomUp {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    height: fit-content;
+    padding-bottom: 90px;
+}
+.noPageBottomPad {
+    padding-bottom: 0px;
+}
+.noTopPd {
+    padding-top: 0px;
+}
+.noTopPd .shoppingATitle {
+    margin-top: 0px;
+}
+.wrapPHButton{
+    margin: auto;
+    max-width: 250px;
+    margin-top: 25px;
+}
+@media (max-width: 750px){
+    .shoppingATitle {
+        font-size: 20pt;
+    }
+    .pageStandardSub {
+        font-size: 10pt;
+    }
+}
+@media (max-width: 750px){
+    .wrapPHButton {
+        max-width: 100%;
+    }
+}

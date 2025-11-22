@@ -1,0 +1,78 @@
+
+/* container */
+.textInputContainer {
+    position: relative;
+}
+
+
+
+/* input */
+.textInput {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    width: 250px;
+    padding: 13px;
+    border: 1px solid #81818149;
+    border-radius: 4px;
+    width: calc(100% - 28px);
+    background-color: #222222;
+    color: #d1d1d1;
+    transition: .3s;
+    font-size: 11pt;
+}
+
+.textInput:focus {
+    outline: none;
+    box-shadow: 0px 0px 0px 1px #b8b8b8; 
+
+}
+.textInput::placeholder {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.textInput:-webkit-autofill,
+.textInput:-webkit-autofill:hover, 
+.textInput:-webkit-autofill:focus, 
+.textInput:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 50px #232528 inset !important; /* Change the color to match your form's background */
+    -webkit-text-fill-color: #b7bbc3 !important; /* Change the text color */
+}
+
+.textInput:-webkit-autofill {
+    -webkit-text-fill-color: blue;
+    transition: background-color 5000s ease-in-out 0s;
+}
+.error .textInput {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d; 
+}
+
+
+.error .textInput:focus {
+    outline: none;
+    box-shadow: 0px 0px 0px 1px #b8b8b8; 
+    border-color: #81818149;
+}
+
+/* label */
+.textLabel {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: block;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    font-size: 11pt;
+    opacity: 1;
+    padding: 0px;
+    color: #b3b3b3;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.textLabel p {
+    color: #b3b3b3;
+}
+.charval{
+    font-size: 8pt;
+    opacity: .4;
+}

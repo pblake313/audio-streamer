@@ -1,0 +1,200 @@
+  /* communal button styles */
+  .boxab {
+    width: fit-content;
+    display: block;
+    position: relative;
+    transition: .3s;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    background-color: transparent;
+    -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
+}
+.boxab:hover .innaFlex .fixa {
+    transition: .3s;
+}
+.fixa {
+    white-space: nowwrap;
+    transition: .3s;
+    padding: 0px;
+    padding-top: 3px;
+    margin: 0px;
+}
+.innaFlex {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    transition: .3s;
+}
+.wrapTheIcon {
+    margin-right: 10px;
+}
+
+.tightPad {
+    padding: 5px 10px;
+    height: fit-content;
+}
+
+/* stockButton button */
+.stockButton {
+    background-color: #404040;
+    border: 1px solid #404040;
+}
+.stockButton:hover {
+    background-color: #555555;
+
+}
+.stockButton .innaFlex .fixa {
+    color: white;
+}
+.ghostButton:hover {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.176);
+}
+.ghostButton .innaFlex  {
+    opacity: .7;
+}
+.ghostButton:hover .innaFlex {
+    opacity: 1;
+}
+
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+.lightHouse {
+    background-color: #494949;
+}
+.lightHouse:hover {
+    background-color: #585858;
+}
+.whiteButton {
+    background-color: #eeeeee;
+    border: 1px solid #6f6f6f9c;
+}
+.whiteButton:hover {
+    background-color: #2e2e2e;
+    border: 1px solid #2e2e2e;
+}
+.whiteButton:hover p {
+    color: white;
+}
+.whiteButton:disabled{
+    opacity: .2;
+}
+.whiteButton:disabled {
+    cursor: auto;
+    background-color: transparent;
+    border: 1px solid #2222229c;
+}
+.whiteButton:disabled p {
+    color: #222222;
+}
+.whiteLightning {
+    background-color: #eeeeee;
+    border: 1px solid #cacaca;
+}
+.whiteLightning:hover {
+    border: 1px solid #cacaca;
+    background-color: #cacaca;
+}
+.whiteLightning:disabled{
+    opacity: .2;
+}
+.whiteLightning:disabled {
+    cursor: auto;
+    background-color: transparent;
+    border: 1px solid #2222229c;
+}
+.whiteLightning:disabled p {
+    color: #222222;
+}
+.fullWidth {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+.noButtonPadding {
+    padding: 0px;
+}
+.noButtonPadding:hover {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0);
+}
+.opacityIncrease {
+    box-shadow: none;
+    opacity: .7;
+}
+.opacityIncrease:hover {
+    box-shadow: none;
+    opacity: 1;
+}
+.stayWhite {
+    background-color: #ffffffd8;
+    border: 1px solid #ffffffd8;
+}
+.stayWhite p {
+    color: #222222;
+}
+.stayWhite:hover {
+    background-color: #fff;
+    border: 1px solid #fff;
+}
+
+.stayWhite:disabled{
+    opacity: .2;
+}
+.stayWhite:disabled {
+    cursor: auto;
+    background-color: #fff;
+    border: 1px solid #fff;
+}
+
+.stayWhite:disabled p {
+    color: #222222;
+}
+.ghostButton:hover:disabled {
+    cursor: auto;
+    box-shadow: none;
+    opacity: .7;
+}
+.danger p {
+    color: #c30d0d;
+}
+
+.stockButton:disabled p {
+    color: #f7f7f7;
+}
+@media (pointer: coarse) {
+    .ghostButton:hover {
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0);
+        opacity: 1;
+    }
+    .lightHouse:hover {
+        background-color: #cbcbcb;
+    }
+    .whiteButton:hover {
+        background-color: transparent;
+        border: 1px solid #9595959c;
+    }
+    .stockButton:hover {
+        background-color: #393939;
+    }
+    .whiteButton:hover p {
+        color: #222222;
+    }
+    .ghostButton .innaFlex  {
+        opacity: .9;
+    }
+    .opacityIncrease{
+        opacity: 1;
+    }
+
+}

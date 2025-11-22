@@ -1,0 +1,107 @@
+.audioStreamWrapper {
+    position: fixed;
+    z-index: 99999;
+    width: 100%;
+    bottom: 0px;
+    background-color: #222222;
+    height: 78px;
+    overflow: visible;
+    transition: .5s;
+}
+.innerAudio {
+    margin: auto;
+    max-width: 1550px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 25px 8px 25px;
+
+}
+.bottomArt {
+    width: 55px;
+    height: 55px;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    border: none;
+    padding: 0;
+}
+
+.miniArt {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;       /* <-- the important missing part */
+}
+.streamInfoFlex {
+    width: calc(100% - 85px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.streamTrackControls {
+    display: flex;
+    align-items: center;
+}
+.wplays {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.wrapSeeka {
+    margin-top: 2px;
+}
+
+.hideStreamPlayer {
+    height: 0px;
+    overflow: hidden;
+    transition: .5s;
+}
+.closeSplit {
+    margin: 0px 25px;
+    width: 1px;
+    height: 25px;
+    background-color: #f7f7f7;
+}
+.mplays {
+    display: none;
+}
+
+@media (max-width: 675px){
+    .wrapSeeka {
+        display: none;
+    }
+    .wplays {
+        margin: 0px;
+        display: none;
+    }
+    .closeSplit {
+        margin-left: 8px;
+        margin-right: 11px;
+        opacity: .3;
+    }
+    .mplays {
+        display: block;
+        margin-top: 3px;
+    }
+    .mtI {
+        width: calc(100% - 140px);
+    }
+    .mtI p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .streamInfoFlex {
+        width: calc(100% - 65px);
+    }
+    .buffForPlayer{
+        padding-bottom: 20px;
+    }
+}
+@media (max-width: 575px){
+    .innerAudio {
+        padding: 8px 15px 12px 15px;
+
+        
+    }
+}

@@ -1,0 +1,121 @@
+.containStartInfo {
+    max-width: 600px;
+    margin: auto;
+    position: relative;
+}
+
+.wrapPinForm {
+    padding-top: 50px;
+    height: calc(100vh - 300px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.projectInfoLink {
+    opacity: .3;
+    text-decoration: none;
+    color: #f7f7f7;
+    font-size: 10pt;
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
+    transition: .3s;
+}
+
+.wrapGitLinkAndDetails {
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+}
+
+.lmoreText {
+    white-space: nowrap;
+}
+
+.moreInfoLink {
+    text-decoration: none;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* ----------- Learn More text (hidden initially) ----------- */
+.learnMore {
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    margin-right: 0;
+    transform: translateX(6px);
+    transition:
+        opacity .3s ease,
+        max-width .3s ease,
+        margin-right .3s ease,
+        transform .3s ease;
+}
+
+/* ----------- Flex container for text + arrow ----------- */
+.flexMoreInfo {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    margin: auto;
+    margin-top: 10px;
+    transition: .4s;
+}
+
+/* ----------- Arrow (always bouncing) ----------- */
+.wrapRighta {
+    padding-top: 5px;
+    margin-left: 0;
+    display: inline-block;
+    animation: arrowBounceX 1s ease-in-out infinite;
+}
+
+.contiainTheIcon {
+    width: 55px;
+    display: flex;
+    justify-content: center;
+    transition: .3s;
+}
+
+/* ----------- Hover animations (desktop / devices with hover) ----------- */
+.moreInfoLink:hover .learnMore {
+    opacity: 1;
+    max-width: 200px;
+    margin-right: 10px;
+    transform: translateX(0);
+}
+
+.moreInfoLink:hover .contiainTheIcon {
+    width: 35px;
+}
+
+/* ----------- Arrow bounce animation ----------- */
+@keyframes arrowBounceX {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(6px);
+    }
+}
+
+/* ----------- Always show Learn More on touch devices ----------- */
+@media (hover: none) {
+    .learnMore {
+        opacity: 1;
+        max-width: 200px;
+        margin-right: 10px;
+        transform: translateX(0);
+    }
+
+    /* optional: keep icon in its smaller state always on touch */
+    .contiainTheIcon {
+        width: 35px;
+    }
+}

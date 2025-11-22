@@ -1,0 +1,439 @@
+.trackButton {
+    display: flex;
+    align-items: center;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    border-radius: 5px;
+    width: 100%;
+    text-align: left;
+    padding: 1px;
+    margin-bottom: 6px;
+    position: relative;
+    transition: .3s;
+    justify-content: space-between;
+
+}
+.artworkWrapper {
+    height: 65px;
+    width: 65px;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+}
+.playingOverArt {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.555);
+}
+
+.wplay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.flexDaysOld {
+    display: flex;
+    align-items: center;
+}
+.mobileDestinations {
+    display: none;
+}
+.trackButton:hover {
+    cursor: pointer;
+    background-color: #85858513;
+}
+.artworkImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.allButArt {
+    width: calc(100% - 85px);
+    display: flex;
+    align-items: center;
+}
+.smallText {
+    font-size: 10pt;
+    padding: 0px;
+    margin: 0px;
+    color: rgb(140, 140, 140);
+}
+.tjoint {
+    padding: 0px;
+    margin: 0px;
+    font-size: 12pt;
+    white-space: nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.titleWrap {
+    overflow: hidden;
+    width: calc(20%);
+}
+.titleWrap p {
+    white-space: nowrap;
+}
+
+.taggerflexer {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    width: calc(30%);
+    gap: 8px;
+}
+.futureDestinationsWrapper {
+    width: 20%;
+}
+.destinationFlex {
+    display: flex;
+    align-items: center;
+}
+.wrapb {
+    overflow: hidden;
+    width: calc(15%);
+
+}
+.ratingJ {
+    width: calc(100% - 50px);
+    display: flex;
+    align-items: center;
+
+}
+.mobileDays {
+    opacity: .5;
+    font-size: 8pt;
+    margin-left: 5pt;
+    display: none;
+}
+.moreInfoC {
+    width: 15%;
+    display: flex;
+    justify-content: space-between;
+}
+.wrappamo {
+    margin-right: 5px;
+}
+.trackWrap {
+    display: flex;
+    width: 100px;
+    flex-direction: row-reverse;
+}
+
+.wrapMoreJoint {
+    width: 50px;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.finnaTag {
+    padding: 0px;
+    margin: 0px;
+    color: rgb(145, 145, 145);
+    font-size: 9pt;
+    margin-right: 8px;
+    padding: 3px 10px 2px 10px;
+    border-radius: 50px;
+    background-color: transparent;
+    border: 1px solid #424242f1;
+    white-space: nowrap;
+    background-color: transparent;
+}
+
+.wrappricer {
+    width: 100px;
+}
+.mobileAddCart {
+    display: none;
+}
+
+.mobBeatPrice {
+    display: none;
+}
+
+
+.dontshowhighlight {
+    background-color: transparent;
+}
+.dontshowhighlight:hover {
+    background-color: transparent;
+}
+
+.moreButtonCity {
+    padding: 0px;
+    margin: 0px;
+    padding-top: 2px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    opacity: .7;
+    transition: .3s;
+}
+.moreButtonCity:hover {
+    opacity: 1;
+}
+
+.MoreOpTop {
+    padding: 10px;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid lightgray;
+}
+.morOPBack {
+    position: absolute;
+    filter: blur(35px);
+    opacity: .15;
+    top: 50%;
+    left: 50%;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+.moreOpIn{
+    display: flex;
+    align-items: center;
+
+
+}
+.moreOpArtWrap {
+    height: 35px;
+    width: 35px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.fullerTitle {
+    width: calc(100% - 45px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 10px;
+}
+.wrapOpper {
+    display: flex;
+    justify-content: space-between;
+    position: sticky;
+    top: 330px;
+    background-color: #f7f7f7;
+    z-index: 6;
+    height: 0px;    
+}
+.moreOptionsWrapper {
+    width: 210px;
+    border-radius: 6px;
+    background-color: #f7f7f7;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.261);
+    z-index: 6;
+    right: 0px;
+    bottom: 0px;
+    position: absolute;
+    overflow: hidden;
+}
+.mobTagsFlex {
+    display: none;
+}
+.evenButton {
+    background-color: hsla(0, 0%, 56%, 0.02);
+
+}
+.editBeatInfoBox {
+    width: 100%;
+    text-align: left;
+    margin-top: 10px;
+    overflow: visible;
+}
+.moreIconButton {
+    border: none;
+    padding: 11px 8px 8px 8px;
+    margin: 0px;
+    background-color: transparent;
+    cursor: pointer;
+    border-radius: 4px;
+    transform: rotate(90deg);
+    transition: .3s;
+}
+.moreIconButton:hover {
+    background-color: rgba(255, 255, 255, 0.192);
+    transition: .3s;
+
+}
+.ppoverlay {
+    opacity: 0;
+}
+.trackButton:hover .artworkWrapper .ppoverlay {
+    opacity: 1;
+}
+.selTrackItem{
+    /* background-color: rgba(255, 217, 0, 0.596); */
+}
+.trackButton:hover .artworkWrapper .selTrackItem {
+    opacity: 0;
+}
+.hiderJ {
+    opacity: 0;
+}
+.wrapNoteLoader{
+    padding: 50px 0px 20px 0px;
+
+}
+.wl{
+    margin: auto;
+}
+@media (max-width: 1300px) {
+    .mobileDestinations {
+        display: block;
+    }
+    .futureDestinationsWrapper {
+        display: none;
+    }
+    .titleWrap {
+        width: 30%;
+    }
+    .taggerflexer {
+        width: 40%;
+    color: #b8b8b8;
+
+    }
+}
+@media(max-width: 1125px) {
+    .wrapb {
+        display: none;
+    }
+    .moreInfoC {
+        width: 30%;
+
+    }
+    .titleWrap {
+        width: calc(50% - 65px);
+    }
+}
+@media(max-width: 850px) {
+    .taggerflexer {
+        display: none;
+    }
+    .titleWrap {
+        width: calc(100% - 80px);
+        margin-right: 15px;
+    }
+    .trackButton {
+        width: calc(100% + 5px);
+    }
+    .moreOptionsWrapper {
+        right: 5px;
+    }
+    .mobTagsFlex {
+        display: flex;
+        gap: 8px;
+    }   
+    .smallText {
+        display: none;
+    }
+    .finnaTag {
+        font-size: 8pt;
+        padding: 1px 5px 0px 5px;
+    }
+    .mobileDays {
+        display: inline-block;
+
+    }
+
+}
+@media(max-width: 650px){
+    .trackWrap {
+        display: none;
+    }
+    .ratingJ {
+        width: 0px;
+        overflow: hidden;
+    }
+    .moreInfoC {
+        width: 50px;
+    }
+    .moreButtonCity {
+        transform: rotate(90deg);
+        padding-top: 11px;
+    }
+    .playingOverArt {
+        display: block;
+    }
+    .spacefilla {
+        display: none;   
+    }
+    .wrapOpper {
+        top: 300px;
+    }
+    .artworkWrapper {
+        height: 60px;
+        width: 60px;
+    }
+    .allButArt {
+        width: calc(100% - 70px);
+    }
+    .titleWrap {
+        padding-left: 10px;
+    }
+    .finnaTag {
+        font-size: 7pt;
+    }
+}
+@media(max-width: 600px){
+    .wrapSaveButton{
+        width: 100%;
+    }
+}
+@media (max-width: 575px){
+    .hideout {
+        display: none;
+    }
+}
+@media(max-width: 500px) {
+
+    .trackWrap {
+        width: 80px;
+    }
+    .titleWrap {
+        width: calc(100% - 60px);
+        margin-right: 15px;
+    }
+    .wrapMoreJoint {
+        width: 25px;
+        padding-left: 5px;
+    }
+
+}
+@media(pointer: coarse) {
+    .trackButton:hover {
+        cursor: pointer;
+        background-color: transparent;
+    }
+    .evenButton:hover {
+        background-color: hsla(0, 0%, 89%, 0.02);
+
+    }
+    .ppoverlay {
+        display: none;
+    }
+
+    .selTrackItem {
+        opacity: 1;
+    }
+    .trackButton:hover .artworkWrapper .selTrackItem {
+        opacity: 1;
+    }
+    .goHide {
+        opacity: 0;
+        display: none;
+    }
+
+}

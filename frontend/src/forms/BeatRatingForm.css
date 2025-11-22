@@ -1,0 +1,51 @@
+.beatRatingFormWrap {
+    margin-bottom: 15px;
+}
+
+.starButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .starIcon {
+    width: 100%;
+    height: 100%;
+    transition: fill 0.2s ease;
+  }
+
+.starRow {
+    width: fit-content;
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+.beatRatingFlex {
+    display: flex;
+    margin-top: 20px;
+}
+.ratingArt {
+    border-radius: 4px;
+    height: 65px;
+    width: 65px;
+    overflow: hidden;
+    padding: 0px;
+    border: none;
+    cursor: pointer;
+    margin: 0px;
+    margin-right: 15px;
+
+}
+.containRatingJoint {
+    display: flex;
+    align-items: center;
+    margin: auto;
+}
+.ratea {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}

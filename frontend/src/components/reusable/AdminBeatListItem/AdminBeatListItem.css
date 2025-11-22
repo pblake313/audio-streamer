@@ -1,0 +1,144 @@
+/* Artwork wrapper */
+.aworkwrap {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    transition: .3s;
+}
+
+/* Artwork image */
+.artworkImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    transition: .3s;
+}
+
+/* Desktop beat card */
+.adwrapbeat {
+    border-radius: 5px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background-color: transparent;
+    text-align: left;
+    text-decoration: none;
+    padding: 0;
+    position: relative;
+    display: block;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+/* hover shadow only for desktop */
+.adwrapbeat:hover .aworkwrap {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.27);
+}
+
+/* Beat title */
+.adBeatTitle {
+    font-size: 10pt;
+    margin-top: 5px;
+    color: #222222;
+    opacity: .8;
+    transition: .3s;
+}
+
+/* container for text */
+.admintrackerwrap {
+    width: 100%;
+    position: relative;
+}
+
+/* text ellipsis */
+.wrapT {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* MOBILE ITEM */
+.mobileAdWRap {
+    display: none;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0px;
+    position: relative;
+}
+
+
+/* mobile layout adjustments */
+.rightSMobile {
+    width: calc(100% - 70px);
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 15px;
+    
+}
+.rightSMobile p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mobileMore{
+    position: absolute;
+    top: 50%;
+    right: 25px;
+    transform: rotate(90deg) translate(-50%, -50%);
+
+}
+
+/* Responsive styles */
+@media (max-width: 780px) {
+    .adwrapbeat {
+        display: none;
+    }
+
+    .mobileAdWRap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 5px;
+        overflow: hidden;
+        background-color: #222222;
+        cursor: pointer;
+        border: none;
+    }
+
+    .mobileAdWRap:hover {
+        background-color: rgba(211, 211, 211, 0.096);
+    }
+
+    .aworkwrap {
+        height: 50px;
+        width: 50px;
+    }
+}
+
+/* disable hover effects on touch devices */
+@media (pointer: coarse) {
+    .adwrapbeat:hover {
+        background-color: transparent;
+    }
+
+    .mobileAdWRap,
+    .mobileAdWRap:hover,
+    .mobileAdWRap:focus {
+        background-color: transparent;
+    }
+}
+
+.evenItem{
+    background-color: rgba(141, 141, 141, 0.075);
+}

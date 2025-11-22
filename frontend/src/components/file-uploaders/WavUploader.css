@@ -1,0 +1,108 @@
+.waveUploadButton {
+    border: 1px solid #cacaca;
+    background-color: transparent;
+    width: 100%;
+    padding:  13px 18px;
+    border-radius: 5px;
+    color: #6e6e6e;
+    text-align: left;
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: .3s;
+}
+.waveUploadButton:hover {
+    border-color: #7a7a7a;
+}
+
+.nompuploadtext {
+    color: #848484;
+    margin: 0px;
+    padding: 0px;
+    margin-left: 8px;
+    font-size: 9pt;
+    margin-top: 2px;
+}
+.songPreviewWrap {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.waveprev {
+    width: calc(100% - 80px);
+    overflow: hidden;
+}
+
+.wavError {
+    border-color: #f94040;
+}
+.wavError:hover {
+    border-color: #f94040;
+}
+
+.umptext {
+    white-space: nowrap;
+    margin: 0px;
+    padding: 0px;
+    text-overflow: ellipsis;
+    width: calc(100% - 20px);
+    overflow: hidden;
+    font-size: 9pt;
+}
+
+.wavError .wfle .nompuploadtext {
+    color: #f94040;
+}
+.wavError .wavlab {
+    color: #f94040;
+}
+
+.waver-container {
+    width: calc(100% - 5px);
+    height: 40px;
+    border: none;
+    padding: 0px;
+}
+
+.wavePWRap {
+    width: 35px;
+}
+.wrapWavContain {
+    width: calc(100% - 20px);
+}
+.flexThePlayer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.playpausUp {
+    border-radius: 50%;
+    overflow: hidden;
+    height:35px;
+    width:35px;
+    cursor: pointer;
+    position: relative;
+    border: none;
+}
+.wrapPPIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.openForWave {
+    padding:  13px 10px 13px 18px;
+}
+.waveUploadButton.wavError {
+    border-color: #f94040;
+}
+.waveUploadButton.wavError .uploaderLabel {
+    color: #f94040
+}
+.waveUploadButton.wavError .upbutFl .nompuploadtext{
+    color: #f94040
+}
