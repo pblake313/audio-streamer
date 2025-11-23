@@ -156,7 +156,10 @@
                     {/if}
 
                 {:else}
-                    <SpinLoader></SpinLoader>
+                        <div style="margin: auto; max-width: 150px; width: 100%">
+                            <AudioLoader backgroundColor={'#222222'}></AudioLoader>
+                        </div>
+                        
                 {/if}
             </div>
             {#if formErrorMessage}
