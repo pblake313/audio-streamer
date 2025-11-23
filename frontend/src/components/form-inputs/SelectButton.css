@@ -211,3 +211,17 @@
     }
 
 
+@media (hover: none) {
+    .actualSelectButton {
+        outline: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .actualSelectButton:focus,
+    .actualSelectButton:focus-visible,
+    .actualSelectButton:active {
+        outline: none;
+        box-shadow: 0px 0px 0px 1px #b8b8b8; /* if you want a custom focus state */
+        border-color: #81818149;
+    }
+}

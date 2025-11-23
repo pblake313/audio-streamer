@@ -6,13 +6,15 @@ const router = Router()
 // this route is /secure
 
 
+
+//  this uses a "stream token" to authenticate
 import stream from './Streaming/stream'
 router.use('/stream', stream)
 
 
 
-
 router.use(secureMiddleWare) // make sure we use access token or refresh it if we have a valid refresh token.
+
 
 
 router.use('/get-authorized-user', (req: Request, res: Response) =>{
@@ -22,11 +24,6 @@ router.use('/get-authorized-user', (req: Request, res: Response) =>{
 
 import beats from './Beats/beats'
 router.use('/beats', beats)
-
-router.get('/test', (req: Request, res: Response) => {
-    console.log('works!')
-    return res.status(200).send({message: 'ok 4 now.'})
-})
 
 
 export default router

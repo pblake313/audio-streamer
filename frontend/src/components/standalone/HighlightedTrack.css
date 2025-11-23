@@ -4,6 +4,7 @@
     position: relative;
     overflow: hidden;
 }
+
 .insideHighlight {
     max-width: 1550px;
     margin: auto;
@@ -43,7 +44,7 @@
     background: linear-gradient(to top, #222222, transparent);
 }
 
-.artworkPlayPauseButton {
+.artPlayPause {
     height: 320px;
     width: 320px;
     border-radius: 5px;
@@ -51,7 +52,37 @@
     position: relative;
     outline: none;
     border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent; /* iOS tap highlight */
+        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
+
 }
+
+.artPlayPause:focus,
+.artPlayPause:focus-visible,
+.artPlayPause:active {
+    outline: none;
+    box-shadow: none;
+    border: none;
+}
+
+/* Make sure the img fills cleanly, no inline gaps */
+.trackArtworkImage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    display: block;
+    border: none;
+}
+
+
 .highlightedTrackInfo {
     width: calc(100% - 350px);
     display: flex;
@@ -67,6 +98,7 @@
     height: 100%;
     width: 100%;
     object-fit: cover;
+    border: none;
 }
 .trackStateFlex {
     display: flex;
@@ -139,6 +171,16 @@
     height: 15px;
     display: none;
 }
+.audioError{
+    color:  red;
+    opacity: 1;
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    padding: 0px 5px;
+    border-radius: 5px;
+}
+
 
 @media(max-width: 1250px){
     .smallerTrackInfo {
@@ -198,11 +240,18 @@
         max-width: 500px;
         margin-top: 15px;
     }
-    .artworkPlayPauseButton {
+    .artPlayPause {
         height: auto;
         width: 100%;
         aspect-ratio: 1 / 1;
         max-width: 500px;
+        border: none;
+        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
+
+    }
+    .trackArtworkImage:focus {
+        border: none;
+        outline: none;
     }
     .highlightedTrackBackground {
         opacity: .35;

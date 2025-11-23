@@ -41,7 +41,7 @@ const corsOptions: cors.CorsOptions = {
   },
   credentials: true,
   optionsSuccessStatus: 200,
-  exposedHeaders: ['x-access-token']
+exposedHeaders: ["x-access-token", "x-stream-token"],
 };
 
 app.use(cors(corsOptions));

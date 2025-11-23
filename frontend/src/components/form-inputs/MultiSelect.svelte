@@ -2,10 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import Checkmark from '../reusable/Checkmark.svelte';
 	import './MultiSelect.css';
-	import DownArrow from '../svg/Icons/DownArrow.svelte';
-    import RightArrowIcon from '../Icons/RightArrowIcon.svelte';
-    import FolderNextIcon from '../svg/Icons/FolderNextIcon.svelte';
-    import FolderNext from '../Icons/FolderNext.svelte';
+	import FolderNext from '../Icons/FolderNext.svelte';
 
 	export let options: string[] = [];
 	export let label: string = `Enter 'Label'`;
@@ -16,6 +13,9 @@
 
 	// similar props/flags as SelectButton
 	export let id: string = `multi-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+	// NEW: auto-close behavior flag
+	export let useAutoClose: boolean = false;
 
 	let isOpen = false;
 	let openUp = false;
@@ -58,6 +58,11 @@
 		}
 
 		onChange?.(selected);
+
+		if (useAutoClose) {
+			isOpen = false;
+			optionsHeight = 0;
+		}
 	}
 
 	function handleClickOutside(event: MouseEvent) {
@@ -87,6 +92,7 @@
 		window.removeEventListener('scroll', scrollHandler);
 	});
 </script>
+
 
 <div class="selectButtonContainer wrapAllMulti" class:gotop={isOpen} bind:this={wrapper}>
 	<label class="selectButtonLabel" for={id}>

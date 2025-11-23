@@ -64,6 +64,12 @@
 </script>
 
 
+<svelte:head>
+    <title>Manage Tracks</title>
+</svelte:head>
+
+
+
 {#if !$fetchBeatsAttempted}
     <DashboardLoader></DashboardLoader>
 {:else}

@@ -39,8 +39,6 @@
                 }
             );
 
-            console.log('[NotePadForm] response:', response);
-
             if (response.updatedBeat) {
                 // let parent close modal if it wants
                 if (onRatingUpdated) {
@@ -95,6 +93,7 @@
             onChange={handleDestinationsChange}
             options={destinationOptions}
             selected={localFutureDestinations}
+            useAutoClose={true}
         />
 
         <div class="editBeatArea">

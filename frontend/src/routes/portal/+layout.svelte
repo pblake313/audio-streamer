@@ -3,7 +3,6 @@
     import { browser } from "$app/environment";
     import AudioStreamer from "../../components/standalone/AudioStreamer.svelte";
     import Nav from "../../components/standalone/Nav/Nav.svelte";
-    import NotificationsList from "../../components/standalone/Notificaitons/NotificationsList.svelte";
     import { user } from "../../stores/UserStore";
     import { autoLoginAttempted } from "../../helpers/Auth/authFunctions";
 
@@ -20,6 +19,5 @@
     <slot />
 
     <AudioStreamer />
-    <NotificationsList />
 
 {/if}

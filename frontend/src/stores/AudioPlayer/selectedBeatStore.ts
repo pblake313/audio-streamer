@@ -1,20 +1,41 @@
+// src/stores/AudioPlayer/selectedBeatStore.ts
 import { get, writable } from "svelte/store";
 import type { Beat } from "../../lib/types/Beats";
-import { audioPlayerUrl } from "../AudioPlayerStore";
+import { audioPlayerState, audioPlayerUrl } from "../AudioPlayerStore";
 import { beats } from "./beatArrayStore";
+import { getAuthenticatedUser } from "../../helpers/Auth/authFunctions";
+import { streamToken } from "../tokenStore";
 
 const backendLink = import.meta.env.VITE_BACKEND_URL;
+
 const selectedBeat = writable<Beat | null>(null);
 
 // Select a specific beat
 function selectNewBeat(beat: Beat) {
     selectedBeat.set(beat);
-    setAudioUrl(beat);
+    // fire-and-forget async URL setup that authenticates first
+    void setAudioUrl(beat);
 }
 
-// Set audio URL based on beat ID
-function setAudioUrl(beat: Beat) {
-    audioPlayerUrl.set(`${backendLink}/secure/stream/stream-beat/${beat.id}`);
+// 👇 Now async: authenticate before setting stream URL
+async function setAudioUrl(beat: Beat) {
+    try {
+
+        const st = get(streamToken)
+        
+        // This will hit /secure/get-authorized-user, run secureMiddleWare,
+        // refresh tokens if needed, enforce IP, etc.
+        await getAuthenticatedUser();
+
+        // Only after a successful auth check do we set the audio URL
+        audioPlayerUrl.set(
+            `${backendLink}/secure/stream/stream-beat/${beat.id}?stream=${st}`
+        );
+    } catch (err) {
+        console.error("Failed to authenticate before setting audio URL:", err);
+        // Optionally: clear URL on auth failure
+        audioPlayerUrl.set(null);
+    }
 }
 
 // Select the next beat in the list
@@ -64,5 +85,5 @@ export {
     selectedBeat,
     selectNewBeat,
     selectNextBeat,
-    selectPreviousBeat 
+    selectPreviousBeat
 };
