@@ -7,7 +7,7 @@
 
 
 <style>
-        .wrapHollow{
+    .wrapHollow{
         width: 100%;
         margin: auto;
         position: relative;
@@ -20,7 +20,14 @@
         height: calc(100% - 20px);
         width: calc(100% - 15px);
         z-index: -2;
+    }
 
+    @media(max-width: 500px){
+        .containLoader {
+            height: calc(100% - 10px);
+            width: calc(100% - 8px);
+
+        }
     }
 </style>
         <!-- <HollowLogo></HollowLogo> -->

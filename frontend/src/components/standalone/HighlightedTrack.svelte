@@ -17,6 +17,7 @@
     import AudioRange from "./AudioRange.svelte";
     import SpinLoader from "../reusable/Loaders/SpinLoader.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
+    import FullPageLoader from "../reusable/Loaders/PageLoaders/FullPageLoader.svelte";
 
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
@@ -112,6 +113,8 @@
                         <div class="wrapHighlightedTitle">
                             <h2>{$selectedBeat.beatTitle}</h2>
 
+                         
+
                             {#if $audioPlayerState === "Playing" || $audioPlayerState === "Loading"}
                                 <div class="mobTrackIcon">
                                     {#if $audioPlayerState === "Playing"}
@@ -127,6 +130,7 @@
                             {/if}
                         </div>
 
+             
                         <p class="keyandMode">
                             {$selectedBeat.key} {$selectedBeat.mode} - {$selectedBeat.bpm} BPM
                         </p>
@@ -150,6 +154,9 @@
                                 />
 
                                 <div class="wPlayPlauser">
+
+
+
                                     <PlayPauseButton
                                         playOrPause={playOrPauseIcon}
                                         isDisabled={
@@ -158,15 +165,26 @@
                                         }
                                         on:togglePlayPause={() => {
                                             resetTrackTimer();
-                                            $audioPlayerState === "Playing"
-                                                ? pauseTrack()
-                                                : playTrack();
+
+                                            if ($audioPlayerState === "Playing") {
+                                                // Normal pause
+                                                pauseTrack();
+                                            } else {
+                                                // First intentional tap: mark as user gesture
+                                                if (!$userTapped) {
+                                                    userTapped.set(true);
+                                                }
+
+                                                // Now actually try to play
+                                                playTrack();
+                                            }
                                         }}
                                         color={"#f7f7f7"}
                                         playIconHeight={"22px"}
                                         pauseIconHeight={"20px"}
                                         height={"50px"}
                                     />
+
                                 </div>
 
                                 <SeekButton
@@ -258,6 +276,7 @@
                                 />
 
                                 <div class="wPlayPlauser">
+
                                     <PlayPauseButton
                                         playOrPause={playOrPauseIcon}
                                         isDisabled={
@@ -266,15 +285,26 @@
                                         }
                                         on:togglePlayPause={() => {
                                             resetTrackTimer();
-                                            $audioPlayerState === "Playing"
-                                                ? pauseTrack()
-                                                : playTrack();
+
+                                            if ($audioPlayerState === "Playing") {
+                                                // Normal pause
+                                                pauseTrack();
+                                            } else {
+                                                // First intentional tap: mark as user gesture
+                                                if (!$userTapped) {
+                                                    userTapped.set(true);
+                                                }
+
+                                                // Now actually try to play
+                                                playTrack();
+                                            }
                                         }}
                                         color={"#f7f7f7"}
                                         playIconHeight={"22px"}
                                         pauseIconHeight={"20px"}
                                         height={"50px"}
                                     />
+
                                 </div>
 
                                 <SeekButton
