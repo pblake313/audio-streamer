@@ -87,6 +87,11 @@
         outline: none;
         box-shadow: none;
     }
+    .seekerButton:disabled:focus {
+        background-color: transparent;
+        outline: none;
+        box-shadow: none;
+    }
 
     /* ✅ DO NOT touch .activeSeeker or :active
        JS controls .activeSeeker for ~150ms, so you still get the short highlight */
