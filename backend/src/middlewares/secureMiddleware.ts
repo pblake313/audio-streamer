@@ -22,7 +22,7 @@ const secureMiddleWare = async (req: Request, res: Response, next: NextFunction)
         const streamToken = sign(
             { ip: normalizedIp },
             process.env.STREAM_SECRET,
-            { expiresIn: "60s" }
+            { expiresIn: "10s" }
         );
 
         res.setHeader("x-stream-token", streamToken);
