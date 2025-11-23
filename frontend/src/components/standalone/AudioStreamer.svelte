@@ -76,8 +76,7 @@
 
     $: isOnBeatsRoute = $page.url.pathname === "/portal";
 
-    $: hideStreamPlayer =
-        (!$scrolledTwoFifty && isOnBeatsRoute) || $audioPlayerState === "Idle";
+    $: hideStreamPlayer = (!$scrolledTwoFifty && isOnBeatsRoute) || $audioPlayerState === "Idle";
 </script>
 
 {#if $selectedBeat}
