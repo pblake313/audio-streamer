@@ -18,16 +18,14 @@ function selectNewBeat(beat: Beat) {
 }
 
 // 👇 Now async: authenticate before setting stream URL
-async function setAudioUrl(beat: Beat) {
+export async function setAudioUrl(beat: Beat) {
     try {
 
-        const st = get(streamToken)
-        
-        // This will hit /secure/get-authorized-user, run secureMiddleWare,
-        // refresh tokens if needed, enforce IP, etc.
-        await getAuthenticatedUser();
+        await getAuthenticatedUser(); // get a new stream token
 
-        // Only after a successful auth check do we set the audio URL
+        const st = get(streamToken) // get the new stream token
+        
+        // set the new url.
         audioPlayerUrl.set(
             `${backendLink}/secure/stream/stream-beat/${beat.id}?stream=${st}`
         );

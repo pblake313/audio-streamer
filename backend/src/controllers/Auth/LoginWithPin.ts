@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { getClientIp } from "../../helpers/ip";
+import { createWrongPinDocument, deleteWrongPinDocByIP, getWrongPinDocByIP, incrementLastPinDoc } from "../../helpers/WrongPin";
 
 export async function loginWithPin(req: Request, res: Response) {
 	try {
@@ -39,10 +40,83 @@ export async function loginWithPin(req: Request, res: Response) {
 				{ expiresIn: "30s" }
 			);
 
+
+            // delete wrong pin doc.
+
+            await deleteWrongPinDocByIP(ip)
+
 			return res.status(200).send({ accessToken });
 		} else {
-			console.log("🔴 pin mismatch :(");
-			return res.status(401).send({ message: "Invalid PIN" });
+
+            console.log("🟠 pin mismatch :(");
+
+            // create a wrong pin doc.
+            console.log(ip)
+
+            const pastWrongPinDoc = await getWrongPinDocByIP(ip)
+
+            if (pastWrongPinDoc) {
+                console.log('🔵 We have a past pin doc')
+
+                if (pastWrongPinDoc.blocked) {
+                    // 🔍 Normalize lastTouched into a JS Date (handles Firestore Timestamp or Date)
+                    const lastTouched =
+                        pastWrongPinDoc.lastTouched instanceof Date
+                            ? pastWrongPinDoc.lastTouched
+                            : pastWrongPinDoc.lastTouched.toDate();
+
+                    const now = new Date();
+                    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+                    const diffMs = now.getTime() - lastTouched.getTime();
+
+                    if (diffMs >= sevenDaysMs) {
+                        console.log('🟢 Block expired — resetting wrong pin doc for IP:', ip);
+                        await createWrongPinDocument(ip);
+
+                        return res.status(401).send({
+                            message: 'Invalid PIN',
+                            attemptsRemaining: 4, // back to "first wrong attempt" state
+                            blocked: false
+                        });
+                    } else {
+                        console.log('🔴 User is still blocked for IP:', ip);
+
+                        const blockedUntil = new Date(
+                            lastTouched.getTime() + sevenDaysMs
+                        );
+
+                        return res.status(401).send({
+                            message: 'Too many invalid attempts. Try again later.',
+                            blocked: true,
+                            blockedUntil // you can .toISOString() this if you want
+                        });
+                    }
+                }
+
+
+                const updatedPinDoc = await incrementLastPinDoc(ip);
+
+                // Convert Firestore Timestamp or JS Date into a JS Date
+                const lastTouched = updatedPinDoc.lastTouched instanceof Date
+                    ? updatedPinDoc.lastTouched
+                    : updatedPinDoc.lastTouched.toDate();
+
+                // 7 days after lastTouched
+                const blockedUntil = new Date(lastTouched.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+                return res.status(401).send({
+                    message: 'Invalid PIN',
+                    attemptsRemaining: 5 - updatedPinDoc.attempts,
+                    blocked: updatedPinDoc.blocked,
+                    blockedUntil
+                });
+
+            } else {
+                console.log('🟣 need to create a past pin doc')
+                await createWrongPinDocument(ip)
+                return res.status(401).send({message: 'Invalid PIN', attemptsRemaining: 4})
+            }
+
 		}
 	} catch (err: any) {
 		console.error(err);

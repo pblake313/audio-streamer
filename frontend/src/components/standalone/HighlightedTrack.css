@@ -112,7 +112,6 @@
 
 .trackStateText p {
     font-size: 9pt;
-    opacity: .6;
 }
 .highlightedTrackControls {
     display: flex;
@@ -172,15 +171,25 @@
     display: none;
 }
 .audioError{
-    color:  red;
     opacity: 1;
-    background-color: red;
-    color: white;
+    background-color: transparent;
     font-weight: bold;
     padding: 0px 5px;
     border-radius: 5px;
+    height: fit-content;
+    margin-top: 1px;
+    font-size: 9pt;
+    padding: 8px 0px;
+    color:  red;
+
 }
 
+.retryOnError{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+
+}
 
 @media(max-width: 1250px){
     .smallerTrackInfo {
@@ -292,6 +301,9 @@
     }
     .mobTrackIcon {
         display: block;
+    }
+    .retryOnError {
+        padding-bottom: 15px;
     }
 }
 @media (max-width:575px){

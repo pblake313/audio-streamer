@@ -12,9 +12,7 @@ import stream from './Streaming/stream'
 router.use('/stream', stream)
 
 
-
 router.use(secureMiddleWare) // make sure we use access token or refresh it if we have a valid refresh token.
-
 
 
 router.use('/get-authorized-user', (req: Request, res: Response) =>{

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { loginWithPin } from "../controllers/Auth/LoginWithPin";
+import { checkBlockStatus } from "../controllers/Auth/CheckBlockStatus";
 
 const router = Router();
 
@@ -16,5 +17,8 @@ router.get('/logout', async (req, res)=> {
         res.status(200).send({message: 'logout successful'})
     }
 })
+
+
+router.get('/check-ip', checkBlockStatus)
 
 export default router;

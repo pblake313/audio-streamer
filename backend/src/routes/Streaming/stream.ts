@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import admin from 'firebase-admin';
-import { verify, TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 
 const router = Router();
 
@@ -26,9 +26,12 @@ router.get('/stream-beat/:beatId', async (req, res) => {
 
     // verify stream token.... stream token only lasts 1 minute, and because this is a streaming url, it cannot throw detailed errors...
     try {
+
         verify(streamToken as string, process.env.STREAM_SECRET!);
         
     } catch (err) {
+        console.log(err)
+
         return res.status(500).json({ error: 'Token verification failed' });
     }
 
