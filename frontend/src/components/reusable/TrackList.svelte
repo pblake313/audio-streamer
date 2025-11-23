@@ -7,6 +7,7 @@
     import SpinLoader from './Loaders/SpinLoader.svelte';
     import AddTrackPointer from '../pointers/AddTrackPointer.svelte';
     import TrackListItem from '../list-items/Tracks/TrackListItem.svelte';
+    import { audioPlayerState } from '../../stores/AudioPlayerStore';
 
 
     let loadingNewBeats: boolean = false
@@ -62,5 +63,5 @@
 
 
 
-
+<p>{$audioPlayerState}</p>
 
