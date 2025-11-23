@@ -86,11 +86,17 @@ if (audio) {
 		lastAudioTime = audio?.currentTime ?? 0;
 	});
 
-	audio.addEventListener("pause", () => {
-		if (!audio?.ended) {
-			audioPlayerState.set("Paused");
-		}
-	});
+    audio.addEventListener("pause", () => {
+        if (!audio) return;
+        if (audio.ended) return;
+
+        // If we've been "stopped" (currentTime at 0), treat this as Idle.
+        if (audio.currentTime === 0) {
+            audioPlayerState.set("Idle");
+        } else {
+            audioPlayerState.set("Paused");
+        }
+    });
 
 	// When user scrubs / seeks, treat as activity & reset timeout
 	audio.addEventListener("seeking", () => {
