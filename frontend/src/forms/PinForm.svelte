@@ -129,7 +129,7 @@
 
 
         {#if $checkIpErrorMesssage}
-            <div class="pinError">
+            <div class="pinError" in:fade={{duration: 300}}>
                 <br>
                 <p>{$checkIpErrorMesssage}</p>
             </div>
@@ -156,7 +156,7 @@
                     {/if}
 
                 {:else}
-                        <div style="margin: auto; max-width: 150px; width: 100%">
+                        <div style="margin: auto; max-width: 150px; width: 100%" in:fade={{duration: 300}}>
                             <AudioLoader backgroundColor={'#222222'}></AudioLoader>
                         </div>
                         
@@ -176,7 +176,7 @@
    
 
     {:else}
-        <div class="wrapIpChecker">
+        <div class="wrapIpChecker" in:fade={{duration: 300}}>
             <p style="opacity: .5; font-size: 9pt;">Hang tight. Validating.</p>
             <br>
             <AudioLoader backgroundColor={'#222222'}></AudioLoader>

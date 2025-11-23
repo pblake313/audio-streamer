@@ -40,10 +40,8 @@
 
 .seekerButton:disabled {
     opacity: .2;
-}
+    transition: opacity 0.4s ease 1s; 
 
-.seekerButton:disabled:hover {
-    opacity: .2;
 }
 
 @media (max-width: 525px) {
