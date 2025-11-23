@@ -8,6 +8,10 @@
     margin: auto;
     margin-top: 50px;
     color: #f7f7f759;
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
 }
 .wrapPINForm {
     width: 100%;

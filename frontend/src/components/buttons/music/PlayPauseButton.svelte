@@ -46,10 +46,10 @@
         </div>
 
         <!-- PAUSE -->
-        <div class="wrappause" class:transpar={playOrPause !== "pause"}>
+        <div class="wrappause" class:transpar={playOrPause === "play"}>
             <PauseIcon
                 color={color}
-                height={playOrPause === "pause" ? pauseIconHeight : "0px"}
+                height={playOrPause !== "play" ? pauseIconHeight : "0px"}
             />
         </div>
     </div>
@@ -61,26 +61,21 @@
         border-radius: 50px;
         position: relative;
         cursor: pointer;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        margin: 0 5px;
+        transition: 0.4s;
+        margin: 0px 5px;
         border: none;
-        -webkit-tap-highlight-color: transparent;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0);
+        color: #2222227e;
+        -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
     }
-
     .ppbutton:hover {
-        background-color: rgba(255, 255, 255, 0.176);
+        background-color: rgba(100, 100, 100, 0.199);
     }
-
     .ppbutton.active:hover {
-        background-color: rgba(255, 255, 255, 0.55);
+        background-color: rgba(255, 255, 255, 0.199);
     }
-
     .active {
-        background-color: rgba(255, 255, 255, 0.55);
-    }
-
-    .showRing {
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        background-color: rgba(255, 255, 255, 0.559);
     }
 
     .iconWrap {
@@ -90,42 +85,43 @@
         transform: translate(-50%, -50%);
     }
 
-    .wrapplay,
-    .wrappause {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-        transition:
-            opacity 0.25s ease,
-            transform 0.25s ease,
-            height 0.25s ease;
-        will-change: opacity, transform, height;
+    .showRing {
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
     }
 
     .wrapplay {
         padding-left: 5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+
+    .wrappause {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 1;
     }
 
     .transpar {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-        pointer-events: none;
+        color: #00ff00; /* same as old, you can change this if you want */
     }
 
     .ppbutton:disabled {
-        opacity: 0.4;
-        cursor: default;
-        transition: opacity 0.5s ease 1s; /* duration: .5s, delay: 1s */
-    }
-    .ppbutton:disabled:hover {
         opacity: 0.2;
-        background-color: transparent;
+        transition: opacity 0.4s ease 1s; 
+
     }
+
 
     @media (pointer: coarse) {
         .ppbutton:hover {
+            opacity: 1;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0);
             background-color: transparent;
         }
     }
