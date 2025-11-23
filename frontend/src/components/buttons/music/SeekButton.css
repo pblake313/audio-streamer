@@ -5,21 +5,27 @@
     border: none;
     cursor: pointer;
     transition: 0.4s;
-    -webkit-tap-highlight-color: transparent;
-    /* Removes highlight on mobile */
-
+    -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
 }
 
-.seekerButton:hover {
+/* ========================================= */
+/* HOVER (only if NOT disabled)              */
+/* ========================================= */
+.seekerButton:not(:disabled):hover {
     opacity: 1;
     background-color: rgba(255, 255, 255, 0.176);
 }
 
-.seekerButton.activeSeeker:hover {
+.seekerButton:not(:disabled).activeSeeker:hover {
     background-color: rgba(255, 255, 255, 0.559);
-
 }
 
+/* Flash state from JS */
+.activeSeeker {
+    background-color: rgba(255, 255, 255, 0.559);
+}
+
+/* Icon positioning */
 .iconWrap {
     position: absolute;
     top: 50%;
@@ -33,19 +39,20 @@
     transform: translate(-50%, -50%) rotate(180deg);
 }
 
-.activeSeeker {
-    background-color: rgba(255, 255, 255, 0.559);
-
-}
-
+/* ========================================= */
+/* DISABLED STATE                            */
+/* (delay kept EXACTLY as you had it)        */
+/* ========================================= */
 .seekerButton:disabled {
-    opacity: .2;
-    transition: opacity 0.4s ease 1s; 
-
+    opacity: 0.2;
+    transition: opacity 0.4s ease 1s; /* kept */
 }
 
+/* ========================================= */
+/* SMALL SCREENS                             */
+/* ========================================= */
 @media (max-width: 525px) {
-    .seekerButton:hover {
+    .seekerButton:not(:disabled):hover {
         background-color: transparent;
         opacity: 1;
     }
@@ -59,10 +66,13 @@
     }
 }
 
+/* ========================================= */
+/* TOUCH DEVICES (coarse pointer)            */
+/* ========================================= */
 @media (pointer: coarse) {
-    .seekerButton:hover {
+    .seekerButton:not(:disabled):hover {
         opacity: 1;
-        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0);
     }
 
     .activeSeeker:focus {
@@ -70,12 +80,14 @@
     }
 }
 
-/* Disable ALL hover effects on touch devices */
-/* Disable hover behavior on touch devices, but keep active press animation */
-/* Touch devices: kill hover/focus, KEEP the activeSeeker flash */
+/* ========================================= */
+/* TOUCH DEVICES WITH NO HOVER               */
+/* (Safari + iOS sticky-hover fix)           */
+/* ========================================= */
 @media (hover: none) and (pointer: coarse) {
+
     /* Don't let hover stick after tap */
-    .seekerButton:hover {
+    .seekerButton:not(:disabled):hover {
         background-color: transparent;
         opacity: 1;
         box-shadow: none;
@@ -87,12 +99,12 @@
         outline: none;
         box-shadow: none;
     }
+
     .seekerButton:disabled:focus {
         background-color: transparent;
         outline: none;
         box-shadow: none;
     }
 
-    /* ✅ DO NOT touch .activeSeeker or :active
-       JS controls .activeSeeker for ~150ms, so you still get the short highlight */
+    /* DO NOT touch activeSeeker or :active */
 }
