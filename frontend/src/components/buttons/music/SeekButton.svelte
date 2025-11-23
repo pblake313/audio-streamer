@@ -24,7 +24,7 @@
             svgElement.classList.add("is-clicked");
             setTimeout(() => {
                 svgElement.classList.remove("is-clicked");
-            }, 500); // Matches the duration of your animation
+            }, 400); // Matches the duration of your animation
         }
 
         isActive = true;

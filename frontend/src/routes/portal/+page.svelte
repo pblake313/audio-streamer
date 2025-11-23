@@ -68,6 +68,11 @@
 
 </script>
 
+<svelte:head>
+    <title>{$selectedBeat?.beatTitle || 'Listen'}</title>
+</svelte:head>
+
+
 <style>
     .wrapTrackList {
         margin: auto;

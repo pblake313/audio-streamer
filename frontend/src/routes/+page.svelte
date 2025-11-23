@@ -17,6 +17,11 @@
 </script>
 
 
+<svelte:head>
+    <title>Audio Streamer - PATTSWAY</title>
+</svelte:head>
+
+
 
 
 <div class="containStartInfo">

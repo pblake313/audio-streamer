@@ -29,7 +29,12 @@
     });
 
 
-  </script>
+</script>
+
+
+<svelte:head>
+    <title>Edit Track - {beatCopy?.beatTitle || 'PATTSWAY'}</title>
+</svelte:head>
 
 
 {#if $isFetchingBeatToEdit}

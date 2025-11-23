@@ -10,7 +10,6 @@
     padding: 1px;
     margin-bottom: 6px;
     position: relative;
-    transition: .3s;
     justify-content: space-between;
 
 }
@@ -46,7 +45,7 @@
 }
 .trackButton:hover {
     cursor: pointer;
-    background-color: #85858513;
+    background-color: #272727;
 }
 .artworkImage {
     position: absolute;
@@ -60,6 +59,7 @@
     width: calc(100% - 85px);
     display: flex;
     align-items: center;
+    gap: 12px;
 }
 .smallText {
     font-size: 10pt;
@@ -101,7 +101,6 @@
 .wrapb {
     overflow: hidden;
     width: calc(15%);
-
 }
 .ratingJ {
     width: calc(100% - 50px);
@@ -244,7 +243,7 @@
     display: none;
 }
 .evenButton {
-    background-color: hsla(0, 0%, 56%, 0.02);
+    background-color: #252525;
 
 }
 .editBeatInfoBox {
@@ -290,6 +289,32 @@
 .wl{
     margin: auto;
 }
+.flexDaysOld {
+    position: relative;
+}
+.daysOldFader {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 15px;
+    background: linear-gradient(to right, #38383800, #222);
+    transition: .5s;
+}
+
+.evenfade{
+    background: linear-gradient(to right, #38383800, #252525);
+    transition: .3s;
+}
+
+.trackButton:hover .allButArt .titleWrap .flexDaysOld .daysOldFader {
+    background: linear-gradient(to right, #38383800, #272727);
+}
+.trackButton:hover .allButArt .titleWrap .flexDaysOld .evenfade {
+    background: linear-gradient(to right, #38383800, #272727);
+
+}
+
 @media (max-width: 1300px) {
     .mobileDestinations {
         display: block;
@@ -379,6 +404,7 @@
     }
     .allButArt {
         width: calc(100% - 70px);
+        gap: 0px;
     }
     .titleWrap {
         padding-left: 10px;
@@ -434,6 +460,14 @@
     .goHide {
         opacity: 0;
         display: none;
+    }
+
+    .trackButton:hover .allButArt .titleWrap .flexDaysOld .daysOldFader {
+        background: linear-gradient(to right, #38383800, #222);
+    }
+    .trackButton:hover .allButArt .titleWrap .flexDaysOld .evenfade {
+        background: linear-gradient(to right, #38383800, #252525);
+
     }
 
 }

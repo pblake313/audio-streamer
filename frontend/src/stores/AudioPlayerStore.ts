@@ -174,7 +174,16 @@ function playTrackInternal(resetTimer: boolean) {
 		if (resetTimer) {
 			resetTrackTimer(); // only for manual actions
 		}
-		a.play().catch((err) => {
+		a.play().catch((err: any) => {
+			// Browsers will throw AbortError when a new load interrupts a pending play()
+			// (for example, when the src changes quickly). That isn't a real failure.
+			if (err?.name === "AbortError") {
+				console.debug(
+					"Play aborted due to a new load request; ignoring AbortError."
+				);
+				return;
+			}
+
 			console.error("Error playing audio:", err);
 			audioPlayerState.set("Error");
 		});
@@ -205,6 +214,9 @@ function restartTrack() {
 }
 
 function previousTrack() {
+	const allTracks = get(beats);
+	if (!allTracks || allTracks.length === 0) return;
+
 	userTapped.set(true);
 	resetTrackTimer(); // user action
 	selectPreviousBeat();

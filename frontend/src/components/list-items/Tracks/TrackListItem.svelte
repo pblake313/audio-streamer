@@ -22,7 +22,6 @@
     import { isUpdatingBeatFromModal } from '../../../stores/BeatUpdatingStore';
     import { fade } from 'svelte/transition';
 
-
     export let isEven: boolean = false
     export let beat: Beat;
     export let selectedMoreBeat: Beat | null = null
@@ -59,41 +58,40 @@
     function resetSelectedMoreBeat(){
         selectedMoreBeat = null
     }
-function getDaysAgo(uploadDate: { _seconds: number; _nanoseconds: number }): string {
-        // Validate input
-        if (
-            !uploadDate ||
-            typeof uploadDate._seconds !== 'number' ||
-            isNaN(uploadDate._seconds)
-        ) {
-            return '-';
-        }
+    function getDaysAgo(uploadDate: { _seconds: number; _nanoseconds: number }): string {
+            // Validate input
+            if (
+                !uploadDate ||
+                typeof uploadDate._seconds !== 'number' ||
+                isNaN(uploadDate._seconds)
+            ) {
+                return '-';
+            }
 
-        const uploaded = new Date(uploadDate._seconds * 1000);
+            const uploaded = new Date(uploadDate._seconds * 1000);
 
-        // Validate constructed date
-        if (isNaN(uploaded.getTime())) {
-            return '-';
-        }
+            // Validate constructed date
+            if (isNaN(uploaded.getTime())) {
+                return '-';
+            }
 
-        const now = new Date();
-        const diffInMs = now.getTime() - uploaded.getTime();
-        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+            const now = new Date();
+            const diffInMs = now.getTime() - uploaded.getTime();
+            const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-        if (isNaN(diffInDays)) return '-';
+            if (isNaN(diffInDays)) return '-';
 
-        if (diffInDays === 0) return 'Uploaded Today';
-        if (diffInDays === 1) return 'Uploaded Yesterday';
+            if (diffInDays === 0) return 'Uploaded Today';
+            if (diffInDays === 1) return 'Uploaded Yesterday';
 
-        return `${diffInDays} Days Old`;
-}
-
-
+            return `${diffInDays} Days Old`;
+    }
 </script>
 
     
 <button type="button" class="trackButton" class:evenButton={isEven} on:click={selectAndPlay}>
 
+    <!-- artwork -->
     <div class="artworkWrapper">
         <img class="artworkImage" src="{beat.artworkUrl}" alt="pattsway | {beat.beatTitle}">
 
@@ -143,6 +141,7 @@ function getDaysAgo(uploadDate: { _seconds: number; _nanoseconds: number }): str
         </div>
     </div>
 
+    <!-- all track minus art -->
     <div class="allButArt">
         <div class="titleWrap">
             <p class="tjoint">{beat.beatTitle} <span class="mobileDays">  {getDaysAgo(beat.uploadDate)}</span></p>
@@ -150,37 +149,37 @@ function getDaysAgo(uploadDate: { _seconds: number; _nanoseconds: number }): str
                 <p class="smallText" style="margin-right: 8px;">{getDaysAgo(beat.uploadDate)} </p>
                 <div class="mobileDestinations">
                   
-                        <div class="destinationFlex">
+                    <div class="destinationFlex">
+                        
+                        {#if beat.notepad}
+                            <div style="margin-right: 8px;  margin-top: 2px;">
+                                <NotepadIcon></NotepadIcon>
+                            </div>
+                        {/if}
+
+                        {#if beat.futureDestinations && beat.futureDestinations.length >= 1}
+                            {#each sortedDestinations as destination}
                             
-                            {#if beat.notepad}
-                                <div style="margin-right: 8px;">
-                                    <NotepadIcon></NotepadIcon>
-                                </div>
-                            {/if}
+                                {#if destination === 'Pattsway'}
+                                    <div style="margin-right: 9px; ">
+                                        <Logo width={'60px'} color={'#f7f7f7'}></Logo>
+                                    </div>
+                                {/if}
+                                {#if destination === 'Youtube'}
+                                    <div style="margin-right: 9px; margin-top: 2px;">
+                                        <YoutubeLogo height={'20px'}></YoutubeLogo>
+                                    </div>
+                                {/if}
+                                {#if destination === 'SoundCloud'}
+                                    <div style="margin-right: 9px; margin-top: 2px;">
+                                        <SoundcloudLogo height={'20px'}></SoundcloudLogo>
+                                    </div>
+                                {/if}
+                            {/each}
+                        {/if}
 
-                            {#if beat.futureDestinations && beat.futureDestinations.length >= 1}
-                                {#each sortedDestinations as destination}
-                                
-                                    {#if destination === 'Pattsway'}
-                                        <div style="margin-right: 9px;">
-                                            <Logo width={'60px'} color={'#f7f7f7'}></Logo>
-                                        </div>
-                                    {/if}
-                                    {#if destination === 'Youtube'}
-                                        <div style="margin-right: 9px;">
-                                            <YoutubeLogo height={'20px'}></YoutubeLogo>
-                                        </div>
-                                    {/if}
-                                    {#if destination === 'SoundCloud'}
-                                        <div style="margin-right: 9px;">
-                                            <SoundcloudLogo height={'20px'}></SoundcloudLogo>
-                                        </div>
-                                    {/if}
-                                {/each}
-                            {/if}
-
-                        </div>
-           
+                    </div>
+        
                 </div>
 
                 <div class="mobTagsFlex">
@@ -194,10 +193,12 @@ function getDaysAgo(uploadDate: { _seconds: number; _nanoseconds: number }): str
                         <BeatTag tagText={beat.tagTwo}></BeatTag>
                     {/if}
                 </div> 
+
+
+                <div class="daysOldFader" class:evenfade={isEven}></div>
             </div>
     
         </div>
-
      
         <div class="futureDestinationsWrapper">
                 <div class="destinationFlex">
@@ -249,9 +250,11 @@ function getDaysAgo(uploadDate: { _seconds: number; _nanoseconds: number }): str
             {/if}
    
         </div>
+
         <div class="wrapb">
             <p class="smallText">{beat.key} {beat.mode} - {beat.bpm} BPM</p>
         </div>
+
         <div class="moreInfoC">
             <div class="ratingJ">
                 {#each Array(beat.rating) as _}

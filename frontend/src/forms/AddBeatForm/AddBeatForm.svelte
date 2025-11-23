@@ -40,8 +40,6 @@
     let artworkFile: File | null = null;
     let mp3File: File | null = null;
 
-    $: console.log(customTagColor)
-
     // temporary things for preview
     let temporaryArtUrl: string | null = null;
     let temporaryMp3Url: string | null = null;
@@ -110,7 +108,7 @@
                 body: formData
             })
 
-            console.log(response)
+            // console.log(response)
 
             if (response.newBeat){
                 upsertBeat(response.newBeat)
@@ -124,7 +122,7 @@
         } catch (error: any) {
 
             if (error.message) pushNotification(error.message || 'An unknown error has occurred.', 'Error', false, 5000, 'Add Beat Error')
-            console.log(error)
+            // console.log(error)
         } finally {
             isLoading = false;
             beatUploadStatus = null;

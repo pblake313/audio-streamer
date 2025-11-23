@@ -7,6 +7,12 @@ import GitHubLink from "../../components/PageComponents/GitHubLink.svelte";
 </script>
 
 
+
+<svelte:head>
+    <title>Audio Streamer - Project Details</title>
+</svelte:head>
+
+
 <style>
     .containProjectDetails{
         max-width: 1200px;
@@ -18,9 +24,6 @@ import GitHubLink from "../../components/PageComponents/GitHubLink.svelte";
     h2 {
         font-size: 16pt;
         margin-bottom: 5px;
-    }
-    h3 {
-        font-size: 12pt;
     }
     p {
         font-size: 12pt;
@@ -34,7 +37,7 @@ import GitHubLink from "../../components/PageComponents/GitHubLink.svelte";
         top: 0px;
         display: flex;
         justify-content: space-evenly;
-        padding: 5px 0px;
+        padding: 10px 0px;
         background-color: #222222;
         z-index: 5;
 

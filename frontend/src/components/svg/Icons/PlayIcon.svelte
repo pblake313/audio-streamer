@@ -34,7 +34,7 @@
 
 <style>
     .animated-svg {
-        transition: height 0.3s ease, fill 0.3s ease;
+        transition: height 0.5s ease, fill 0.5s ease;
         display: block;
     }
 </style>
