@@ -43,7 +43,7 @@ import GitHubLink from "../../components/PageComponents/GitHubLink.svelte";
 
     }
     .wrapProjDeets{
-        padding: 25px;
+        padding: 15px;
     }
     .wrapGotoLoginButton{
         width: 100%;
@@ -52,13 +52,14 @@ import GitHubLink from "../../components/PageComponents/GitHubLink.svelte";
     }
     .stickyGotoLoginWrap{
         position: fixed;
-        width: calc(100% - 50px);
+        width: calc(100% - 30px);
         bottom: 0px;
         left: 0px;
         display: flex;
         justify-content: space-evenly;
-        padding: 15px 25px;
+        padding: 15px 15px;
         background-color: #222222;
+        border-top: 1px solid rgba(211, 211, 211, 0.301);
     }
     @media(max-width: 600px){
         .wrapGotoLoginButton{

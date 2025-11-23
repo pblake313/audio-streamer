@@ -58,11 +58,6 @@ app.use('/secure', secure)
 // for users who have successfully entered the pin.
 
 
-// --- OLD ROUTES ---
-import prot from './routes/protected';
-app.use('/old-protected', prot);
 
-import authorize from './routes/authorize';
-app.use('/authorize', authorize);
 
 export default app;
