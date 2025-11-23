@@ -26,6 +26,7 @@ router.get('/stream-beat/:beatId', async (req, res) => {
 
     // verify stream token.... stream token only lasts 1 minute, and because this is a streaming url, it cannot throw detailed errors...
     try {
+
         verify(streamToken as string, process.env.STREAM_SECRET!);
         
     } catch (err) {

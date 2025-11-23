@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore";
+    import { selectedBeat, setAudioUrl } from "../../stores/AudioPlayer/selectedBeatStore";
     import "./HighlightedTrack.css";
     import {
         audioPlayerState,
@@ -16,6 +16,7 @@
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import AudioRange from "./AudioRange.svelte";
     import SpinLoader from "../reusable/Loaders/SpinLoader.svelte";
+    import BoxButton from "../buttons/BoxButton.svelte";
 
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
@@ -24,6 +25,7 @@
     $: if ($audioPlayerState !== "Loading" && $audioPlayerState !== "Buffering") {
         playOrPauseIcon = $audioPlayerState === "Playing" ? "pause" : "play";
     }
+    let isRetrying: boolean = false
 </script>
 
 {#if $selectedBeat}
@@ -56,6 +58,32 @@
                 </button>
 
                 <div class="smallerTrackInfo">
+                    {#if $audioPlayerState === "Error"}
+
+                        <div class="retryOnError">
+                            <p class="audioError">Load Audio Error</p>
+                            <BoxButton 
+                                buttonText={'Retry Load Stream'} 
+                                buttonStyle={'stayWhite'}
+                                tightPad={true}
+                                buttonIcon={isRetrying ? 'loading': null}
+                                on:click={async()=> {
+                                    try {
+                                        isRetrying = true
+                                        await setAudioUrl($selectedBeat)
+                                        playTrack()
+                                    } finally{
+                                        isRetrying = false
+                                    }
+                                
+                                }}
+                                fontSize={'9pt'} 
+                            ></BoxButton>
+
+
+                        </div>
+                    {/if}
+
                     <div class="trackInfoTop">
                         <!-- track state -->
                         <div class="trackStateFlex">
@@ -74,8 +102,7 @@
                             <div class="trackStateText">
                                 {#if $audioPlayerState === "Idle"}
                                     <p>Waiting</p>
-                                {:else if $audioPlayerState === "Error"}
-                                    <p class="audioError">Load Audio Error</p>
+                      
                                 {:else}
                                     <p>{$audioPlayerState}</p>
                                 {/if}
@@ -150,6 +177,8 @@
                                     }}
                                 />
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -174,7 +203,27 @@
                                 <p>Waiting</p>
 
                             {:else if $audioPlayerState === "Error"}
-                                <p class="audioError">Load Audio Error</p>
+                                <div class="retryOnError">
+                                    <p class="audioError">Load Audio Error</p>
+                                    <BoxButton 
+                                        buttonText={'Retry Load Stream'} 
+                                        buttonStyle={'stayWhite'}
+                                        tightPad={true}
+                                        buttonIcon={isRetrying ? 'loading': null}
+                                        on:click={async()=> {
+                                            try {
+                                                isRetrying = true
+                                                await setAudioUrl($selectedBeat)
+                                                playTrack()
+                                            } finally{
+                                                isRetrying = false
+                                            }
+                                        }}
+                                        fontSize={'9pt'} 
+                                    ></BoxButton>
+
+
+                                </div>
                             {:else}
                                 <p>{$audioPlayerState}</p>
                             {/if}
@@ -236,6 +285,7 @@
                                     }}
                                 />
                             </div>
+
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,7 @@ function selectNewBeat(beat: Beat) {
 }
 
 // 👇 Now async: authenticate before setting stream URL
-async function setAudioUrl(beat: Beat) {
+export async function setAudioUrl(beat: Beat) {
     try {
 
         await getAuthenticatedUser(); // get a new stream token
