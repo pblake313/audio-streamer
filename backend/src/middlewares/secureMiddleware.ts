@@ -1,7 +1,7 @@
 // src/middleware/secureMiddleWare.ts
 import { NextFunction, Request, Response } from "express";
 import {JsonWebTokenError, JwtPayload, sign, TokenExpiredError, verify} from "jsonwebtoken";
-import { getClientIp, normalizeIp } from "../helpers/ip";
+import { getClientIp, normalizeIp } from "../helpers/IpHelpers";
 import { ForceLogoutError } from "../errors/ForceLogoutError";
 
 

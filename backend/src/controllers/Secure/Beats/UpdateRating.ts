@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { updateBeat } from "../../helpers/beats";
+import { updateBeat } from "../../../helpers/UpdateBeatHelper";
 
 export async function updateBeatRating(req: Request, res: Response) {
 
