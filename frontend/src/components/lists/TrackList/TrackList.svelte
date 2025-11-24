@@ -40,7 +40,9 @@
     <div class="wrapOnlyButton">
         {#if loadingNewBeats}
             <div in:fade={{duration: 300, delay: 200}}>
-                <SpinLoader></SpinLoader>
+                <div style="padding: 50px; 0px">
+                    <SpinLoader></SpinLoader>
+                </div>
             </div>
         {:else}
             <div in:fade={{ duration: 500, delay: 200 }} out:fade={{duration: 200}}>

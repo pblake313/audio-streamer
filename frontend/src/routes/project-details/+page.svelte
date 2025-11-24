@@ -20,6 +20,8 @@
 <style>
     .containProjectDetails{
         margin: auto;
+        max-width: 100%;
+        overflow: hidden;
     }
     h1 {
         font-size: 28pt;
