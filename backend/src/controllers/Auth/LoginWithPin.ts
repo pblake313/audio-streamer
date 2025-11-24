@@ -1,7 +1,7 @@
 // src/routes/auth/loginWithPin.ts
 import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
-import { getClientIp } from "../../helpers/ip";
+import { getClientIp } from "../../helpers/IpHelpers";
 import { createWrongPinDocument, deleteWrongPinDocByIP, getWrongPinDocByIP, incrementLastPinDoc } from "../../helpers/WrongPin";
 
 export async function loginWithPin(req: Request, res: Response) {

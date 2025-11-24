@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getClientIp } from "../../helpers/ip";
+import { getClientIp } from "../../helpers/IpHelpers";
 import { getWrongPinDocByIP } from "../../helpers/WrongPin";
 
 export async function checkBlockStatus(req: Request, res: Response){

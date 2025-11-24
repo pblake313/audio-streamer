@@ -50,10 +50,10 @@ app.use(cookieParser());
 
 
 // new
-import auth from './routes/auth'
+import auth from './routes/Auth/auth'
 app.use('/auth', auth)
 
-import secure from './routes/secure'
+import secure from './routes/Secure/secure'
 app.use('/secure', secure)
 // for users who have successfully entered the pin.
 

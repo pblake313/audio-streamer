@@ -3,6 +3,7 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import app from './src/app'; // your Express app
 
+
 // Hard default to 3000, but allow override via env if you want
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -31,6 +32,7 @@ server.on('error', (err: NodeJS.ErrnoException) => {
   }
   process.exit(1);
 });
+
 
 // Start listening
 server.listen(PORT, () => {
