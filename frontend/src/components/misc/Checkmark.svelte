@@ -1,5 +1,5 @@
 <script lang="ts">
-    import CheckIcon from "../svg/Icons/CheckIcon.svelte";
+    import CheckIcon from "../Icons/svg/CheckIcon.svelte";
 
     export let isChecked: boolean = false
 </script>

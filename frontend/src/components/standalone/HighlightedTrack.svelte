@@ -11,7 +11,7 @@
         smartPreviousTrack,
         userTapped
     } from "../../stores/AudioPlayerStore";
-    import SoundPlaying from "../svg/Icons/SoundPlaying.svelte";
+    import SoundPlaying from "../Icons/svg/SoundPlaying.svelte";
     import SeekButton from "../buttons/music/SeekButton.svelte";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import AudioRange from "../misc/AudioRange.svelte";

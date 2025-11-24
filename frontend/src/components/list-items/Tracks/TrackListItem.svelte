@@ -1,6 +1,6 @@
 <script lang="ts">
     import "./TrackListItem.css";
-    import SoundPlaying from "../../svg/Icons/SoundPlaying.svelte";
+    import SoundPlaying from "../../Icons/svg/SoundPlaying.svelte";
     import {
         selectedBeat,
         selectNewBeat,
@@ -14,14 +14,10 @@
     } from "../../../stores/AudioPlayerStore";
     import { get } from "svelte/store";
     import BeatRatingForm from "../../../forms/BeatRatingForm.svelte";
-    import MoreIcon from "../../svg/Icons/MoreIcon.svelte";
-    import StarIcon from "../../svg/Icons/StarIcon.svelte";
-    import PlayIcon from "../../svg/Icons/PlayIcon.svelte";
-    import PauseIcon from "../../svg/Icons/PauseIcon.svelte";
-    import SoundcloudLogo from "../../svg/Logos/SoundcloudLogo.svelte";
-    import YoutubeLogo from "../../svg/Logos/YoutubeLogo.svelte";
-    import NotepadIcon from "../../svg/Icons/NotepadIcon.svelte";
-    import Logo from "../../svg/Logos/Logo.svelte";
+    import MoreIcon from "../../Icons/svg/MoreIcon.svelte";
+    import StarIcon from "../../Icons/svg/StarIcon.svelte";
+    import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
+    import NotepadIcon from "../../Icons/svg/NotepadIcon.svelte";
     import type { Beat } from "../../../lib/types/Beats";
     import NotePadForm from "../../../forms/NotePadForm.svelte";
     import { isUpdatingBeatFromModal } from "../../../stores/BeatUpdatingStore";
@@ -30,6 +26,10 @@
     import AudioLoader from "../../loaders/AudioLoader.svelte";
     import BeatTag from "../../misc/BeatTag.svelte";
     import Modal from "../../misc/Modal.svelte";
+    import PlayIcon from "../../Icons/svg/PlayIcon.svelte";
+    import Logo from "../../Icons/Logos/Logo.svelte";
+    import YoutubeLogo from "../../Icons/Logos/YoutubeLogo.svelte";
+    import SoundcloudLogo from "../../Icons/Logos/SoundcloudLogo.svelte";
 
     export let isEven: boolean = false;
     export let beat: Beat;

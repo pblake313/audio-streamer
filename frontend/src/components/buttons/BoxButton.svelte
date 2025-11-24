@@ -1,14 +1,10 @@
 <script lang="ts">
     import "./BoxButton.css";
-    import CloseIcon from "../svg/Icons/CloseIcon.svelte";
-    import FilterIcon from "../svg/Icons/FilterIcon.svelte";
-    import MinusIcon from "../svg/Icons/MinusIcon.svelte";
-    import MoreIcon from "../svg/Icons/MoreIcon.svelte";
-    import ShareIcon from "../svg/Icons/ShareIcon.svelte";
-    import TrashIcon from "../svg/Icons/TrashIcon.svelte";
-    import DownloadIcon from "../svg/Icons/DownloadIcon.svelte";
+    import CloseIcon from "../Icons/svg/CloseIcon.svelte";
+    import MoreIcon from "../Icons/svg/MoreIcon.svelte";
     import SpinLoader from "../loaders/SpinLoader.svelte";
     import AddIcon from "../Icons/svg/AddIcon.svelte";
+    import TrashIcon from "../Icons/svg/TrashIcon.svelte";
 
     export let buttonText: string = "Enter Button Text";
     export let buttonStyle:
@@ -22,14 +18,11 @@
         | "danger" = "stockButton";
     export let buttonIcon:
         | "add"
-        | "share"
         | "close"
         | "minus"
         | "trash"
         | "loading"
-        | "filter"
         | "more"
-        | "download"
         | null = null; // icons to select from
     export let tightPad: boolean = false; // makes the button smaller
     export let shaking: boolean = false; //  prop for shaking animation
@@ -63,33 +56,13 @@
                         ></CloseIcon>
                     </div>
                 {/if}
-                {#if buttonIcon === "minus"}
-                    <div style="margin-top: 3px;">
-                        <MinusIcon color={iconColor}></MinusIcon>
-                    </div>
-                {/if}
                 {#if buttonIcon === "trash"}
                     <div style="margin-top: 3px;">
                         <TrashIcon color={iconColor} height={"18px"}
                         ></TrashIcon>
                     </div>
                 {/if}
-                {#if buttonIcon === "filter"}
-                    <div style="margin-top: 8px;">
-                        <FilterIcon color={"f7f7f7"}></FilterIcon>
-                    </div>
-                {/if}
-                {#if buttonIcon === "download"}
-                    <div style="margin-top: 3px;">
-                        <DownloadIcon height={"20px"} color={iconColor}
-                        ></DownloadIcon>
-                    </div>
-                {/if}
-                {#if buttonIcon === "share"}
-                    <div style="margin-top: 3px;">
-                        <ShareIcon height={"16px"}></ShareIcon>
-                    </div>
-                {/if}
+
                 {#if buttonIcon === "more"}
                     <div style="margin-top: 3px;">
                         <MoreIcon

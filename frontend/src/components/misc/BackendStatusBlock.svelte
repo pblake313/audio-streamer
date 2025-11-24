@@ -1,7 +1,7 @@
 <script lang="ts">
     import FileLoader from "../loaders/FileLoader.svelte";
 import FileWaiting from "../loaders/FileWaiting.svelte";
-import SuccessIcon from "../svg/Icons/SuccessIcon.svelte";
+import SuccessIcon from "../Icons/svg/SuccessIcon.svelte";
     import './BackendStatusBlock.css'
 
     export let title = 'Enter Title';

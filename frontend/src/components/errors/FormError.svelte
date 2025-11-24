@@ -1,5 +1,5 @@
 <script lang="ts">
-    import AlertIcon from "../svg/Icons/AlertIcon.svelte";
+    import AlertIcon from "../Icons/svg/AlertIcon.svelte";
 
     export let errorMessage: string | null = null
     export let errorTitle: string | null = null  

@@ -6,9 +6,7 @@
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
     import TrackListItem from "../../list-items/Tracks/TrackListItem.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";
-    import AudioLoader from "../../loaders/AudioLoader.svelte";
     import SpinLoader from "../../loaders/SpinLoader.svelte";
-
 
     let loadingNewBeats: boolean = false;
 
@@ -28,9 +26,6 @@
         }
     }
 </script>
-
-
-
 
 
 {#if $beats.length === 0}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import HollowLogo from "../svg/Logos/HollowLogo.svelte";
+    import HollowLogo from "../Icons/Logos/HollowLogo.svelte";
     import AudioLoader from "./AudioLoader.svelte";
 </script>
 

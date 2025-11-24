@@ -1,6 +1,6 @@
 <script lang="ts">
-    import CloseIcon from "../svg/Icons/CloseIcon.svelte";
-    import ThickCloseIcon from "../svg/Icons/ThickCloseIcon.svelte";
+    import CloseIcon from "../Icons/svg/CloseIcon.svelte";
+    import ThickCloseIcon from "../Icons/svg/ThickCloseIcon.svelte";
 
     export let buttonStyle: "standard" | "ghost" = "standard";
     export let tightPad: boolean = false;

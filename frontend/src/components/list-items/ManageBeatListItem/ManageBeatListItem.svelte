@@ -2,7 +2,7 @@
     import "./ManageBeatListItem.css";
     import { goto } from "$app/navigation";
     import type { Beat } from "../../../lib/types/Beats";
-    import MoreIcon from "../../svg/Icons/MoreIcon.svelte";
+    import MoreIcon from "../../Icons/svg/MoreIcon.svelte";
     export let beat: Beat;
 
     export let isEven: boolean = false;

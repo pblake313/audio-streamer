@@ -2,7 +2,6 @@
     import { fade } from "svelte/transition";
     import PinInput from "../components/form-inputs/PinInput.svelte";
     import FormError from "../components/errors/FormError.svelte";
-    import Logo from "../components/svg/Logos/Logo.svelte";
     import { publicFetch } from "../helpers/Fetchers/publicFetch";
     import './PinForm.css'
     import { accessToken, streamToken } from "../stores/tokenStore";
@@ -12,6 +11,7 @@
     import { user } from "../stores/UserStore";
     import { checkIp, checkIpErrorMesssage, isCheckingIp, userBlockedMessage } from "../stores/IPStore";
     import AudioLoader from "../components/loaders/AudioLoader.svelte";
+    import Logo from "../components/Icons/Logos/Logo.svelte";
 
     let formErrorMessage: string | null = null;
     let isLoading: boolean = false;
