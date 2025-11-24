@@ -1,8 +1,12 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import BoxButton from "../../components/buttons/BoxButton.svelte";
-import GitHubLink from "../../components/links/GitHubLink.svelte";
-
+    import Toggler from "../../components/buttons/Toggler.svelte";
+    import GitHubLink from "../../components/links/GitHubLink.svelte";
+    import DesktopScreenshotSwiper from "../../components/swipers/DesktopScreenshotSwiper.svelte";
+    import MobileScreenshotSwiper from "../../components/swipers/MobileScreenshotSwiper.svelte";
+   
+    export let slideType: 'mobile' | 'desktop' = 'desktop'
 
 </script>
 
@@ -15,19 +19,23 @@ import GitHubLink from "../../components/links/GitHubLink.svelte";
 
 <style>
     .containProjectDetails{
-        max-width: 1200px;
         margin: auto;
     }
     h1 {
-        font-size: 22pt;
+        font-size: 28pt;
     }
     h2 {
-        font-size: 16pt;
-        margin-bottom: 5px;
+        font-size: 24pt;
+        margin-bottom: 10px;
     }
     p {
         font-size: 12pt;
         opacity: .6;
+    }
+    .wrapProjectInfo{
+        max-width: 1250px;
+        padding: 0px 25px;
+        margin: auto;
     }
     .wrapGit{
         width: fit-content;
@@ -42,29 +50,28 @@ import GitHubLink from "../../components/links/GitHubLink.svelte";
         z-index: 5;
 
     }
-    .wrapProjDeets{
-        padding: 15px;
-    }
+
     .wrapGotoLoginButton{
         width: 100%;
         max-width: 250px;
+        margin: auto;
+        margin-top: 50px;
+        margin-bottom: 150px;
 
     }
-    .stickyGotoLoginWrap{
-        position: fixed;
-        width: calc(100% - 30px);
-        bottom: 0px;
-        left: 0px;
-        display: flex;
-        justify-content: space-evenly;
-        padding: 15px 15px;
-        background-color: #222222;
-        border-top: 1px solid rgba(211, 211, 211, 0.301);
+    @media(max-width: 500px){
+        h2 {
+            font-size: 18pt;
+        }
     }
-    @media(max-width: 600px){
+    @media(max-width: 650px){
         .wrapGotoLoginButton{
-            width: 100%;
+            width: calc(100% - 30px);
             max-width: 100%;
+            padding: 0px 15px;
+        }
+        .wrapProjectInfo{
+            padding: 0px 15px;
         }
     }
 </style>
@@ -74,6 +81,7 @@ import GitHubLink from "../../components/links/GitHubLink.svelte";
         <GitHubLink></GitHubLink>
     </div>
 
+
     <div class="wrapProjDeets">
 
         <h1 style="text-align: center;">Project Details</h1>
@@ -81,78 +89,100 @@ import GitHubLink from "../../components/links/GitHubLink.svelte";
 
         <div style="height: 75px;"></div>
 
-        <!-- PROJECT SUMMARY -->
-        <h2>Project Summary</h2>
-        <p>
-            A secure audio-streaming platform designed to protect digital content from 
-            direct access or downloads. Streams are fully controlled by the backend, and 
-            no public URLs or file references ever reach the client.
-        </p>
-        <br>
+                <!-- PROJECT SUMMARY -->
+        <div class="wrapProjectInfo">
+            <h2>Project Summary</h2>
 
+            <p>
+                A secure, token-gated audio streaming system built to protect unreleased music. All audio is streamed through a locked backend pipeline—no public URLs, no exposed storage, and no way for users to access or download the original files. Every request is IP-checked, token-signed, and fully validated.
+                <br><br>
+                The frontend never receives real file links, only a short-lived stream token used for controlled, chunked playback. Audio plays in real time but cannot be saved or cached, turning the app into a private listening vault.
+                <br><br>
+                Access is intentionally minimal: one PIN-locked user can unlock the library and preview tracks from anywhere without ever exposing the source files to the public.
+            </p>
 
-        <h2>Purpose</h2>
-        <p>
-            This platform was designed specifically for music producers who want a secure, 
-            on-the-go way to test their tracks without exposing the original audio files. 
-            It acts as a private streaming vault: all audio is stored remotely and can be 
-            played from anywhere, but never downloaded or accessed directly. The site operates with a single authorized user. Only one PIN grants full 
-            access to the entire system, ensuring that the library remains private and 
-            completely locked down from the public. 
-        </p>
+        </div>
 
-        <br>
+        <div style="height: 50px;"></div>
 
-        <!-- STREAMING -->
-        <h2>Streaming</h2>
-        <p>
-            Audio is delivered using <strong>chunked HTTP streaming</strong> from 
-            Firebase Storage through controlled Express endpoints. The client receives 
-            data in buffered segments, never the full file, preventing downloads, direct 
-            access, or URL scraping. This ensures audio playback is smooth while keeping 
-            the source file fully protected.
-        </p>
-        <br>
+        <div class="wrapProjectInfo">
 
-        <!-- AUTH -->
-        <h2>Auth</h2>
-        <p>
-            Users authenticate using a combination of <strong>IP verification</strong> 
-            and a temporary <strong>PIN login</strong>. Only approved devices can log in, 
-            and all authentication flows run through the backend — preventing unauthorized 
-            access even if someone attempts to spoof requests.
-        </p>
+            <div class="photosButtonsFlex">
+                <div class="headingSide">
+                    <h2>Project Photos</h2>
+                </div>
 
-        <br>
-
-        <!-- FRONTEND -->
-        <h2>Frontend</h2>
-        <p>
-            Built with <strong>Svelte</strong>, featuring a custom, protected audio player, 
-            reactive stores, animations, and clean session handling. The frontend never 
-            receives a direct link to the audio file — it streams only what the backend 
-            provides through secure endpoints.
-        </p>
-
-        <br>
-
-        <!-- BACKEND -->
-        <h2>Backend</h2>
-        <p>
-            Powered by <strong>Node.js</strong> and <strong>Express</strong>, the backend 
-            controls all authentication, streaming, and session logic. Audio is served 
-            using <strong>chunked HTTP streaming</strong> from Firebase Storage, ensuring 
-            users cannot download or extract the original audio files. All routes enforce 
-            IP/PIN validation and token-based access.
-        </p>
-
-        <div style="height: 75px;"></div>
-        <div class="stickyGotoLoginWrap">
-            <div class="wrapGotoLoginButton">
-                <BoxButton buttonText={'Go To Login'} fullWidth={true} on:click={()=> {goto('/')}}></BoxButton>
+                <Toggler value={slideType} onToggle={(v) => {slideType = v}}></Toggler>
             </div>
         </div>
-    
+
+        {#if slideType === 'desktop'}
+            <DesktopScreenshotSwiper></DesktopScreenshotSwiper>
+        {:else}
+            <MobileScreenshotSwiper></MobileScreenshotSwiper>
+        {/if}
+            
+        <div style="height: 50px;"></div>
+
+        <div class="wrapProjectInfo">
+
+            <h2>Purpose</h2>
+            <p>
+                This platform was built for music producers who need a safe way to review mixes and unreleased tracks without ever exposing the original audio files. It acts as a private streaming vault: the entire library lives in secure cloud storage, can be played from anywhere, and is never downloadable or directly accessible. A single, trusted user unlocks the app, keeping the catalog completely hidden from the public.
+            </p>
+
+            <br>
+
+            <h2>Technologies</h2>
+            <p>
+                Built with a modern, security-focused stack:
+                <br><br>
+                <strong>Frontend:</strong> SvelteKit, custom audio player, reactive stores, secure fetch wrappers.<br>
+                <strong>Backend:</strong> Node.js, Express, middleware-driven auth, range-based streaming.<br>
+                <strong>Cloud:</strong> Firebase Admin SDK, Firebase Storage, token-secured stream endpoints.<br>
+                <strong>Security:</strong> IP verification, PIN-gated access, JWT stream tokens, rate-limited login attempts.
+            </p>
+
+            <br>
+
+
+            <!-- STREAMING -->
+            <h2>Streaming</h2>
+            <p>
+                Audio is delivered through a controlled <strong>chunked HTTP streaming</strong> pipeline. The frontend receives only a short-lived, IP-bound stream token, which is passed to an Express endpoint that reads from Firebase Storage using range requests. The browser never sees a public file URL, and only ever buffers what it needs to play — not the full file — which prevents downloads, scraping, or direct access.
+            </p>
+            <br>
+
+            <!-- AUTH -->
+            <h2>Auth</h2>
+            <p>
+                Access is gated behind a <strong>PIN-based login</strong> combined with <strong>IP verification</strong>. The backend tracks failed attempts and can temporarily block abusive IPs, while successful logins receive short-lived tokens tied to the requesting client. All auth logic lives on the server, so even if someone inspects the network layer, they still can’t bypass the gate or reach the underlying audio files.
+            </p>
+
+            <br>
+
+            <!-- FRONTEND -->
+            <h2>Frontend</h2>
+            <p>
+                The frontend is built with <strong>SvelteKit</strong> and uses reactive stores, custom UI components, and a protected audio player that only ever talks to secured backend endpoints. It never handles raw storage URLs or loose blobs — every play action goes through the stream token flow. The project details view includes desktop and mobile screenshot swipers to showcase the experience across devices.
+            </p>
+
+            <br>
+
+            <!-- BACKEND -->
+            <h2>Backend</h2>
+            <p>
+                The backend runs on <strong>Node.js</strong> and <strong>Express</strong>, using Firebase Admin to read audio from cloud storage and serve it via secure, range-based streaming. Middleware handles IP normalization, token verification, PIN checks, and block logic before any stream is allowed. Every route that touches audio is locked behind this pipeline, ensuring that streaming is possible, but raw file access is not.
+            </p>
+
+        </div>
+
+
+
+        <div class="wrapGotoLoginButton">
+            <BoxButton buttonText={'Go To Login'} fullWidth={true} on:click={()=> {goto('/')}}></BoxButton>
+        </div>
+
     </div>
 
 </div>
