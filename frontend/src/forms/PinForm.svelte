@@ -1,18 +1,17 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import PinInput from "../components/form-inputs/PinInput.svelte";
-    import FormError from "../components/reusable/FormError.svelte";
-    import SpinLoader from "../components/reusable/Loaders/SpinLoader.svelte";
+    import FormError from "../components/errors/FormError.svelte";
     import Logo from "../components/svg/Logos/Logo.svelte";
     import { publicFetch } from "../helpers/Fetchers/publicFetch";
     import './PinForm.css'
-    import { accessToken } from "../stores/tokenStore";
+    import { accessToken, streamToken } from "../stores/tokenStore";
     import { goto } from "$app/navigation";
-    import { autoLogin, getAuthenticatedUser } from "../helpers/Auth/authFunctions";
+    import { getAuthenticatedUser } from "../helpers/Auth/authFunctions";
     import { onMount } from "svelte";
     import { user } from "../stores/UserStore";
     import { checkIp, checkIpErrorMesssage, isCheckingIp, userBlockedMessage } from "../stores/IPStore";
-    import AudioLoader from "../components/reusable/Loaders/AudioLoader.svelte";
+    import AudioLoader from "../components/loaders/AudioLoader.svelte";
 
     let formErrorMessage: string | null = null;
     let isLoading: boolean = false;
@@ -45,7 +44,9 @@
                 body: JSON.stringify({ pin })
             });
 
-            console.log(response);
+            if (response.streamToken){
+                streamToken.set(response.streamToken)
+            }
 
             if (response.accessToken) {
                 accessToken.set(response.accessToken);

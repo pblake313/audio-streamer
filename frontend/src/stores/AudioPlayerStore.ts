@@ -12,7 +12,7 @@ import {
 } from "./AudioPlayer/beatArrayStore";
 
 // How many seconds before we show the "Still Listening?" popup
-const LISTEN_TIMEOUT_SECONDS = 60 * 30; // tweak as you want -- 30 minutes.
+const LISTEN_TIMEOUT_SECONDS = 60 * 30; 
 
 // =========================
 // Audio element initialization
@@ -293,9 +293,6 @@ export function resetTrackTimer() {
 	lastAudioTime = audio?.currentTime ?? 0;
 }
 
-// =========================
-// Exports
-// =========================
 export {
 	nextTrack,
 	playTrack,

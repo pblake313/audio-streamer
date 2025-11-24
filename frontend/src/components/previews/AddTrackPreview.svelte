@@ -1,7 +1,6 @@
 <script lang="ts">
-    import BeatTag from '../reusable/BeatTag.svelte';
-    import HollowLoader from '../reusable/Loaders/HollowLoader.svelte';
-    import Logo from '../svg/Logos/Logo.svelte';
+    import BeatTag from '../misc/BeatTag.svelte';
+import Logo from '../svg/Logos/Logo.svelte';
     import SoundcloudLogo from '../svg/Logos/SoundcloudLogo.svelte';
     import YoutubeLogo from '../svg/Logos/YoutubeLogo.svelte';
 import './AddTrackPreview.css'

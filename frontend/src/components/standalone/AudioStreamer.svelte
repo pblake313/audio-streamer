@@ -15,7 +15,7 @@
         useAutoPlay
     } from "../../stores/AudioPlayerStore";
     import { get } from "svelte/store";
-    import AudioRange from "./AudioRange.svelte";
+    import AudioRange from "../misc/AudioRange.svelte";
     import "./AudioStreamer.css";
     import SeekButton from "../buttons/music/SeekButton.svelte";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
@@ -23,10 +23,10 @@
     import { onMount } from "svelte";
     import { page } from "$app/stores";
 
-    import Modal from "../reusable/Modal.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
     import CloseButton from "../buttons/CloseButton.svelte";
     import { goto } from "$app/navigation";
+    import Modal from "../misc/Modal.svelte";
 
     // 👇 Track last URL we've applied to the audio element
     let lastUrl: string | null = null;

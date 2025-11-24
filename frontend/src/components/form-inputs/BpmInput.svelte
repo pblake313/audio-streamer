@@ -1,5 +1,5 @@
 <script lang="ts">
-    import FormInputErrorText from './FormInputErrorText.svelte';
+    import FormInputErrorText from '../errors/FormInputErrorText.svelte';
     import './BpmInput.css'
 
     export let id: string | null = `${Date.now()}-${Math.random()}`;

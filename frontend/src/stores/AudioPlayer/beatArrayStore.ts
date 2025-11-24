@@ -1,12 +1,7 @@
 import { get, writable } from "svelte/store";
 import type { Beat } from "../../lib/types/Beats";
-import { pushNotification } from "../NotificationStore";
 import { selectedBeat, selectNewBeat } from "./selectedBeatStore";
-import { protectedFetch } from "../../helpers/ProtectedFetches/protectedFetch";
-import type { FetchBeatsResponse } from "../../helpers/ProtectedFetches/protectedFetchResponseTypes";
 import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
-
-const backendLink = import.meta.env.VITE_BACKEND_URL;
 
 const beatPagesFetched = writable<Number[]>([])
 const allBeatPagesFetched = writable<boolean>(false)
@@ -18,7 +13,6 @@ const beatFetchError = writable<string | null>(null)
 const beats = writable<Beat[]>([]);
 
 // Fetch beats from the backend
-
 
 async function fetchBeats(pageToFetch: number = 1) {
     beatFetchError.set(null)
@@ -39,7 +33,7 @@ async function fetchBeats(pageToFetch: number = 1) {
 
     try {
 
-        const result = await authorizedFetch<FetchBeatsResponse>(`/secure/beats/get-live-beats/${pageToFetch}`, {
+        const result = await authorizedFetch(`/secure/beats/get-live-beats/${pageToFetch}`, {
             method: 'GET'
         })
 
@@ -120,13 +114,11 @@ function upsertBeat(newBeat: Beat) {
     });
 }
 
-
 function removeBeatFromArray(beatId: string) {
     beats.update((currentBeats) =>
         currentBeats.filter((beat) => beat.id !== beatId)
     );
 }
-
 
 function getNextBeatPageToFetch(): number {
     const fetchedPages = get(beatPagesFetched) as number[];

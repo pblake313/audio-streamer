@@ -40,12 +40,18 @@ export async function loginWithPin(req: Request, res: Response) {
 				{ expiresIn: "30s" }
 			);
 
+            const streamToken = sign(
+                { ip },
+                process.env.STREAM_SECRET || "",
+                { expiresIn: "10s" }
+            );
+
 
             // delete wrong pin doc.
 
             await deleteWrongPinDocByIP(ip)
 
-			return res.status(200).send({ accessToken });
+			return res.status(200).send({ accessToken, streamToken });
 		} else {
 
             console.log("🟠 pin mismatch :(");

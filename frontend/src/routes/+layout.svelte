@@ -1,10 +1,10 @@
 <script lang="ts">
     import './styles.css';
     import { attemptingAutoLogin, autoLogin, autoLoginAttempted } from '../helpers/Auth/authFunctions';
-    import FullPageLoader from '../components/reusable/Loaders/PageLoaders/FullPageLoader.svelte';
     import { fade } from 'svelte/transition';
     import { onMount } from 'svelte';
     import NotificationsList from '../components/standalone/Notificaitons/NotificationsList.svelte';
+    import FullPageLoader from '../components/loaders/PageLoaders/FullPageLoader.svelte';
 
 
     onMount( async ()=> {
