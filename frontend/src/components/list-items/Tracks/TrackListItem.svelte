@@ -210,7 +210,7 @@
                 <div class="mobTagsFlex">
                     {#if beat.customTag}
                         <BeatTag
-                            tagColor={`#${beat.customTagColor}` || "#353535"}
+                            tagColor={`#${beat.customTagColor || 'f7f7f7'}` || "#353535"}
                             tagText={beat.customTag}
                             tagTextColor={"#222222"}
                         ></BeatTag>
@@ -261,9 +261,9 @@
         <div class="taggerflexer">
             {#if beat.customTag}
                 <BeatTag
-                    tagColor={`#${beat.customTagColor}` || "#353535"}
-                    tagTextColor={beat.customTagColor ? "#222222" : "#f7f7f7"}
+                    tagColor={`#${beat.customTagColor || 'f7f7f7'}` || "#353535"}
                     tagText={beat.customTag}
+                    tagTextColor={"#222222"}
                 ></BeatTag>
             {/if}
             {#if beat.tagOne}
