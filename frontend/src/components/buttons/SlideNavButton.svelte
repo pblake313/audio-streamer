@@ -1,13 +1,15 @@
 
 <script lang="ts">
-    import Pointer from "../svg/Icons/Pointer.svelte";
+    import RightArrowIcon from "../Icons/svg/RightArrowIcon.svelte";
+
 
     export let nextPrev : 'next' | 'previous' = 'next'
+    export let isDisabled: boolean = false
 </script>
 
-<button class="slideNavButton" on:click>
+<button class="slideNavButton" on:click disabled={isDisabled}>
     <div class="wrapInnerP" class:roto={nextPrev === 'previous'}>
-        <Pointer height={'16px'}></Pointer>
+        <RightArrowIcon height={'16px'} color={'#222222'}></RightArrowIcon>
     </div>
 </button>
 
@@ -23,9 +25,10 @@
         border: none;
         cursor: pointer;
         transition: .3s;
+        background-color: rgba(211, 211, 211, 0.548);
     }
     .slideNavButton:hover {
-        background-color: #c6c6c657;
+        background-color: lightgray;
 
     }
     .wrapInnerP {
@@ -39,9 +42,12 @@
     .roto{
         transform: translate(-50%, -50%) rotate(180deg);
     }
+    .slideNavButton:disabled {
+        opacity: .2;
+    }
     @media(pointer: coarse){
         .slideNavButton:hover {
-            background-color: transparent;
+            background-color: rgba(211, 211, 211, 0.548);
 
         }
     }

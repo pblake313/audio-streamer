@@ -42,8 +42,8 @@
             </div>
             <div class="contiainTheIcon">
                 <div class="wrapRighta">
-                    <RightArrowIcon></RightArrowIcon>
-                </div>
+                    <RightArrowIcon color={'#f7f7f7'}></RightArrowIcon>
+                </div> 
             </div>
 
         </div>
