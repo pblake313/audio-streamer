@@ -86,6 +86,7 @@
         gap: 0.7rem;
         width: 100%;
         margin: auto;
+        max-width: 450px;
     }
 
     .pin-box {

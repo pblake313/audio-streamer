@@ -1,12 +1,9 @@
 <script lang="ts">
     import { pushNotification } from "../stores/NotificationStore";
     import './BeatRatingForm.css'
-    import SpinLoader from "../components/reusable/Loaders/SpinLoader.svelte";
     import type { Beat } from "../lib/types/Beats";
     import { authorizedFetch } from "../helpers/Fetchers/authorizedFetch";
     import { upsertBeat } from "../stores/AudioPlayer/beatArrayStore";
-    import AudioLoader from "../components/reusable/Loaders/AudioLoader.svelte";
-    import { fade } from "svelte/transition";
     import { isUpdatingBeatFromModal } from "../stores/BeatUpdatingStore";
   
     // Beat to rate

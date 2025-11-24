@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import BoxButton from "../../components/buttons/BoxButton.svelte";
-import GitHubLink from "../../components/PageComponents/GitHubLink.svelte";
+import GitHubLink from "../../components/links/GitHubLink.svelte";
 
 
 </script>

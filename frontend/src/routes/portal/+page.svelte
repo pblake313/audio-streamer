@@ -1,7 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import FullPageLoader from '../../components/reusable/Loaders/PageLoaders/FullPageLoader.svelte';
-    import TrackList from '../../components/reusable/TrackList.svelte';
     import HighlightedTrack from '../../components/standalone/HighlightedTrack.svelte';
     import { fetchBeats, fetchBeatsAttempted } from '../../stores/AudioPlayer/beatArrayStore';
     import { selectedBeat } from '../../stores/AudioPlayer/selectedBeatStore';
@@ -9,7 +7,8 @@
     import { navStyle } from '../../stores/navstore';
     import { get } from 'svelte/store';
     import { pushNotification } from '../../stores/NotificationStore';
-    import SpinLoader from '../../components/reusable/Loaders/SpinLoader.svelte';
+    import SpinLoader from '../../components/loaders/SpinLoader.svelte';
+    import TrackList from '../../components/lists/TrackList/TrackList.svelte';
 
 
     let fetchBeatsErrorOccurred: boolean = false

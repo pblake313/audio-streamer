@@ -1,8 +1,8 @@
 <script lang="ts">
-  import SpinLoader from "../../reusable/Loaders/SpinLoader.svelte";
-import AddIcon from "../../svg/Icons/AddIcon.svelte";
-  import CartIcon from "../../svg/Icons/CartIcon.svelte";
-  import PauseIcon from "../../svg/Icons/PauseIcon.svelte";
+  import AddIcon from "../../Icons/svg/AddIcon.svelte";
+import SpinLoader from "../../loaders/SpinLoader.svelte";
+import CartIcon from "../../svg/Icons/CartIcon.svelte";
+  import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
 import PlayIcon from "../../svg/Icons/PlayIcon.svelte";
 import ShareIcon from "../../svg/Icons/ShareIcon.svelte";
 

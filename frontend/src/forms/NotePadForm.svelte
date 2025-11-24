@@ -1,8 +1,6 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import BoxButton from '../components/buttons/BoxButton.svelte';
-    import MultiSelect from '../components/form-inputs/MultiSelect.svelte';
-    import TextArea from '../components/form-inputs/TextArea.svelte';
     import { authorizedFetch } from '../helpers/Fetchers/authorizedFetch';
     import { destinationOptions } from '../lib/selectoptions';
     import type { Beat } from '../lib/types/Beats';
@@ -10,6 +8,8 @@
     import { isUpdatingBeatFromModal } from '../stores/BeatUpdatingStore';
     import { pushNotification } from '../stores/NotificationStore';
     import './NotePadForm.css';
+    import MultiSelect from '../components/form-inputs/select/MultiSelect.svelte';
+    import TextArea from '../components/form-inputs/text/TextArea.svelte';
 
     export let beat: Beat;
     export let onRatingUpdated: (() => void) | undefined;

@@ -1,7 +1,7 @@
 // src/stores/AudioPlayer/selectedBeatStore.ts
 import { get, writable } from "svelte/store";
 import type { Beat } from "../../lib/types/Beats";
-import { audioPlayerState, audioPlayerUrl } from "../AudioPlayerStore";
+import { audioPlayerUrl } from "../AudioPlayerStore";
 import { beats } from "./beatArrayStore";
 import { getAuthenticatedUser } from "../../helpers/Auth/authFunctions";
 import { streamToken } from "../tokenStore";

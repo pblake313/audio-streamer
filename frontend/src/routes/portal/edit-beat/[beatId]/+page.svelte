@@ -1,12 +1,10 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import Loader from '../../../../components/reusable/Loaders/SpinLoader.svelte'
     import EditBeatForm from '../../../../forms/EditBeatForm/EditBeatForm.svelte';
     import type { Beat } from '../../../../lib/types/Beats';
     import { beatToEdit, fetchSingleBeat, isFetchingBeatToEdit } from '../../../../stores/EditBeatStore';
-    import DashboardLoader from '../../../../components/reusable/Loaders/PageLoaders/DashboardLoader.svelte';
-    import { get } from 'svelte/store';
+    import DashboardLoader from '../../../../components/loaders/PageLoaders/DashboardLoader.svelte';
     import { goto } from '$app/navigation';
 
 

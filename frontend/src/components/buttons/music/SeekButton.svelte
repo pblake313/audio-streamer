@@ -1,5 +1,5 @@
 <script lang="ts">
-    import RewindFastForwardIcon from "../../svg/Icons/RewindFastForwardIcon.svelte";
+    import RewindFastForwardIcon from "../../Icons/svg/RewindFastForwardIcon.svelte";
     import { createEventDispatcher } from "svelte";
     import "./SeekButton.css";
 

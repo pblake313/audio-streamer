@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import PauseIcon from "../../svg/Icons/PauseIcon.svelte";
-    import PlayIcon from "../../svg/Icons/PlayIcon.svelte";
+    import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
+    import PlayIcon from "../../Icons/svg/PlayIcon.svelte";
 
     export let height = "40px";
     export let playIconHeight = "30px";

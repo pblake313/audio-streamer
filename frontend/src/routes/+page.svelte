@@ -2,9 +2,9 @@
     import { onMount } from "svelte";
     import { navStyle } from "../stores/navstore";
     import PinForm from "../forms/PinForm.svelte";
-    import GitHubLink from "../components/PageComponents/GitHubLink.svelte";
-    import RightArrowIcon from "../components/Icons/RightArrowIcon.svelte";
+    import GitHubLink from "../components/links/GitHubLink.svelte";
     import './Home.css'    
+    import RightArrowIcon from "../components/Icons/svg/RightArrowIcon.svelte";
 
 
     onMount(() => {

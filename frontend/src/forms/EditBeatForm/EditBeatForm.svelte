@@ -1,109 +1,121 @@
 <script lang="ts">
-    import TextInput from '../../components/form-inputs/TextInput.svelte';
-    import ImageUploader from '../../components/file-uploaders/ImageUploader.svelte';
-    import './EditBeatForm.css';
-    import { onMount } from 'svelte';
-    import { pushNotification } from '../../stores/NotificationStore';
-    import { getSocket } from '../../stores/socketStore';
-    import SelectButton from '../../components/form-inputs/SelectButton.svelte';
-    import { beatMoodOptions,  colorOptions,  destinationOptions, songKeyOptions, songModeOptions, tagOptions } from '$lib/selectoptions';
-    import BoxButton from '../../components/buttons/BoxButton.svelte';
-    import Mp3Uploader from '../../components/file-uploaders/Mp3Uploader.svelte';
-    import BackendStatusBlock from '../../components/reusable/BackendStatusBlock.svelte';
-    import BpmInput from '../../components/form-inputs/BpmInput.svelte';
-    import { createEditBeatFormData } from './EditBeatFormHelpers';
-    import ColorSelect from '../../components/form-inputs/ColorSelect.svelte';
-    import MultiSelect from '../../components/form-inputs/MultiSelect.svelte';
-    import type { Beat } from '../../lib/types/Beats';
-    import AddTrackPreview from '../../components/previews/AddTrackPreview.svelte';
-    import AudioLoader from '../../components/reusable/Loaders/AudioLoader.svelte';
-    import { authorizedFetch } from '../../helpers/Fetchers/authorizedFetch';
-    import { audioPlayerState } from '../../stores/AudioPlayerStore';
-    import { upsertBeat } from '../../stores/AudioPlayer/beatArrayStore';
-    import { goto } from '$app/navigation';
-    import TrashIcon from '../../components/svg/Icons/TrashIcon.svelte';
-    import { deleteBeat } from '../../stores/EditBeatStore';
-  
+    import "./EditBeatForm.css";
+    import { onMount } from "svelte";
+    import { pushNotification } from "../../stores/NotificationStore";
+    import { getSocket } from "../../stores/socketStore";
+    import {
+        beatMoodOptions,
+        colorOptions,
+        destinationOptions,
+        songKeyOptions,
+        songModeOptions,
+        tagOptions,
+    } from "$lib/selectoptions";
+    import BoxButton from "../../components/buttons/BoxButton.svelte";
+    import BpmInput from "../../components/form-inputs/BpmInput.svelte";
+    import { createEditBeatFormData } from "./EditBeatFormHelpers";
+    import type { Beat } from "../../lib/types/Beats";
+    import AddTrackPreview from "../../components/previews/AddTrackPreview.svelte";
+    import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
+    import { audioPlayerState } from "../../stores/AudioPlayerStore";
+    import { upsertBeat } from "../../stores/AudioPlayer/beatArrayStore";
+    import { goto } from "$app/navigation";
+    import { deleteBeat } from "../../stores/EditBeatStore";
+    import TextInput from "../../components/form-inputs/text/TextInput.svelte";
+    import SelectButton from "../../components/form-inputs/select/SelectButton.svelte";
+    import ImageUploader from "../../components/form-inputs/file-uploaders/ImageUploader.svelte";
+    import Mp3Uploader from "../../components/form-inputs/file-uploaders/Mp3Uploader.svelte";
+    import ColorSelect from "../../components/form-inputs/select/ColorSelect.svelte";
+    import MultiSelect from "../../components/form-inputs/select/MultiSelect.svelte";
+    import AudioLoader from "../../components/loaders/AudioLoader.svelte";
+    import BackendStatusBlock from "../../components/misc/BackendStatusBlock.svelte";
+
     const backendLink = import.meta.env.VITE_BACKEND_URL;
-  
+
     export let beatCopy: Beat;
-    
+
     let socket: any;
 
     // for previews
-    let temporaryArtworkUrl: string | null = null
-    let temporaryMp3PreviewUrl: string | null = null
+    let temporaryArtworkUrl: string | null = null;
+    let temporaryMp3PreviewUrl: string | null = null;
 
     // form status
     let shaking: boolean = false;
     let formSubmitted: boolean = false;
 
     // loading status
-    let artUploadStatus: 'Waiting' | 'Uploading' | 'Upload Success' = 'Waiting';
-    let mp3UploadStatus: 'Waiting' | 'Uploading' | 'Upload Success' = 'Waiting';
-    let loadingStatusText : string | null = null
+    let artUploadStatus: "Waiting" | "Uploading" | "Upload Success" = "Waiting";
+    let mp3UploadStatus: "Waiting" | "Uploading" | "Upload Success" = "Waiting";
+    let loadingStatusText: string | null = null;
 
     let isLoading: boolean = true;
-    let updatingBeat: boolean = false
-  
+    let updatingBeat: boolean = false;
 
     // temporary variables for file uploaders
 
-    let newMp3File: File | null = null
+    let newMp3File: File | null = null;
     let newArtworkFile: File | null = null;
-  
+
     onMount(async () => {
-        setTemporaryFiles()
+        setTemporaryFiles();
         socket = await getSocket();
-        if (socket && typeof socket.on === 'function') {
-            socket.on('updateStatus', (status: string | null)  => {
-                loadingStatusText = status
-            })
-            socket.on('uploadStarted', (status: string) => {
-                if (status === 'artwork') {
-                    artUploadStatus = 'Uploading'
+        if (socket && typeof socket.on === "function") {
+            socket.on("updateStatus", (status: string | null) => {
+                loadingStatusText = status;
+            });
+            socket.on("uploadStarted", (status: string) => {
+                if (status === "artwork") {
+                    artUploadStatus = "Uploading";
                 }
-                if (status === 'mp3') {
-                    mp3UploadStatus = 'Uploading'
+                if (status === "mp3") {
+                    mp3UploadStatus = "Uploading";
                 }
-            })
-            socket.on('uploadComplete', (status: string) => {
-                if (status === 'artwork') {
-                    artUploadStatus = 'Upload Success'
+            });
+            socket.on("uploadComplete", (status: string) => {
+                if (status === "artwork") {
+                    artUploadStatus = "Upload Success";
                 }
-                if (status === 'mp3') {
-                    mp3UploadStatus = 'Upload Success'
+                if (status === "mp3") {
+                    mp3UploadStatus = "Upload Success";
                 }
-            })
+            });
         }
     });
 
     function setTemporaryFiles() {
-        temporaryArtworkUrl = beatCopy.artworkUrl
-        temporaryMp3PreviewUrl = beatCopy.mp3previewUrl
+        temporaryArtworkUrl = beatCopy.artworkUrl;
+        temporaryMp3PreviewUrl = beatCopy.mp3previewUrl;
     }
 
-
-    function isValidForm():boolean{
-        if (!beatCopy.beatTitle || !beatCopy.bpm || (beatCopy.bpm <= 0 || beatCopy.bpm >= 200) || !beatCopy.key || !temporaryArtworkUrl || !temporaryMp3PreviewUrl){
-            return false
+    function isValidForm(): boolean {
+        if (
+            !beatCopy.beatTitle ||
+            !beatCopy.bpm ||
+            beatCopy.bpm <= 0 ||
+            beatCopy.bpm >= 200 ||
+            !beatCopy.key ||
+            !temporaryArtworkUrl ||
+            !temporaryMp3PreviewUrl
+        ) {
+            return false;
         }
 
-        return true
+        return true;
     }
 
     // setting values
-    function resetUploadStatuses(){
-        artUploadStatus = 'Waiting';
-        mp3UploadStatus = 'Waiting';
+    function resetUploadStatuses() {
+        artUploadStatus = "Waiting";
+        mp3UploadStatus = "Waiting";
     }
 
     async function updateBeat() {
         formSubmitted = true;
 
-        if (!isValidForm()){
-            shake()
-            return
+        if (!isValidForm()) {
+            shake();
+            return;
         }
 
         // create the formdata.
@@ -117,46 +129,65 @@
             bpm: beatCopy.bpm,
             newArtworkFile,
             newMp3File,
-            customTag: beatCopy.customTag || '',
-            customTagColor: beatCopy.customTagColor || '',
-            futureDestinations: beatCopy.futureDestinations || []
+            customTag: beatCopy.customTag || "",
+            customTagColor: beatCopy.customTagColor || "",
+            futureDestinations: beatCopy.futureDestinations || [],
         });
 
         try {
-            loadingStatusText = 'Validating Request'
+            loadingStatusText = "Validating Request";
             updatingBeat = true;
 
             const socketId = socket.id;
 
-            const response = await authorizedFetch(`/secure/beats/update-beat/${beatCopy.id}`, {
-                method: 'POST',
-                headers: {
-                    'x-socket-id': socketId,
+            const response = await authorizedFetch(
+                `/secure/beats/update-beat/${beatCopy.id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "x-socket-id": socketId,
+                    },
+                    body: formData,
                 },
-                body: formData
-            })
-            console.log(response) 
+            );
+            console.log(response);
 
             if (response.updatedBeat) {
-                upsertBeat(response.updatedBeat)
-                pushNotification('Beat updated successfully.', 'Success', false, 1500, 'Updated!')
+                upsertBeat(response.updatedBeat);
+                pushNotification(
+                    "Beat updated successfully.",
+                    "Success",
+                    false,
+                    1500,
+                    "Updated!",
+                );
             } else {
-                pushNotification('The beat returned a successful response, but an updated beat wasnt returned.', 'Error', false, 5000, 'Returned Beat Error')
+                pushNotification(
+                    "The beat returned a successful response, but an updated beat wasnt returned.",
+                    "Error",
+                    false,
+                    5000,
+                    "Returned Beat Error",
+                );
             }
 
-            goto('/portal/manage-beats')
-
-    
+            goto("/portal/manage-beats");
         } catch (err: any) {
-            console.log(err)
-            pushNotification(err.message || 'An unknown error has occurred.', 'Error', false, 5000, 'Edit Beat Error')
+            console.log(err);
+            pushNotification(
+                err.message || "An unknown error has occurred.",
+                "Error",
+                false,
+                5000,
+                "Edit Beat Error",
+            );
         } finally {
-            resetUploadStatuses() // reset status texts....
+            resetUploadStatuses(); // reset status texts....
             updatingBeat = false;
         }
     }
 
-    // shaking 
+    // shaking
     function shake() {
         shaking = true;
         setTimeout(() => {
@@ -165,30 +196,26 @@
     }
 
     function handleKeySelect(value: string) {
-        beatCopy.key = value as Beat['key'];
+        beatCopy.key = value as Beat["key"];
     }
     function handleModeSelect(value: string) {
-        beatCopy.mode = value as Beat['mode'];
+        beatCopy.mode = value as Beat["mode"];
     }
 
-    async function removeBeat(beatId:string) {
+    async function removeBeat(beatId: string) {
         try {
-            updatingBeat = true
-            await deleteBeat(beatId)
+            updatingBeat = true;
+            await deleteBeat(beatId);
         } catch (err) {
-
         } finally {
-            updatingBeat = false
+            updatingBeat = false;
         }
     }
-
 </script>
-
 
 <!-- preview -->
 <div class="wrapEditPreview">
-
-    <AddTrackPreview 
+    <AddTrackPreview
         heading={`Edit Track - ${beatCopy.beatTitle}`}
         albumUrl={temporaryArtworkUrl}
         bpm={beatCopy.bpm}
@@ -204,113 +231,127 @@
     ></AddTrackPreview>
 </div>
 
-
 {#if !updatingBeat}
     <div class="deleteBeatArea">
-        <BoxButton on:click={() => {removeBeat(beatCopy.id)}} buttonIcon={'trash'} buttonText={'Delete Track'} buttonStyle={'danger'}  noPad={true} iconColor={'c30d0d'}></BoxButton>
+        <BoxButton
+            on:click={() => {
+                removeBeat(beatCopy.id);
+            }}
+            buttonIcon={"trash"}
+            buttonText={"Delete Track"}
+            buttonStyle={"danger"}
+            noPad={true}
+            iconColor={"c30d0d"}
+        ></BoxButton>
     </div>
 {/if}
 
-
 <div class="editFormWrapper">
-
     {#if !updatingBeat}
-
-        <div class="editAreaFlex" class:paddFormForPlay={$audioPlayerState !== 'Idle'}>
-
+        <div
+            class="editAreaFlex"
+            class:paddFormForPlay={$audioPlayerState !== "Idle"}
+        >
             <!-- left side -->
             <div class="halfEdit">
                 <div class="holdHeadings">
                     <p><b>Track Details</b></p>
                 </div>
                 <div class="singleEditInput">
-                    <TextInput 
+                    <TextInput
                         value={beatCopy.beatTitle}
-                        inputError={formSubmitted && !beatCopy.beatTitle ? 'Please enter a beat title.' : null} 
-                        onTextChange={(v) => {beatCopy.beatTitle = v}}
-                        label='Beat Title'
+                        inputError={formSubmitted && !beatCopy.beatTitle
+                            ? "Please enter a beat title."
+                            : null}
+                        onTextChange={(v) => {
+                            beatCopy.beatTitle = v;
+                        }}
+                        label="Beat Title"
                         maxlength={50}
                     />
                 </div>
 
-
                 <div class="trackDetailsInputFlex">
                     <div class="wrapbpmJ">
                         <BpmInput
-                            bpmChanged={(v) => {beatCopy.bpm = v}}
+                            bpmChanged={(v) => {
+                                beatCopy.bpm = v;
+                            }}
                             bpm={beatCopy.bpm ? beatCopy.bpm : 0}
-                            inputError={formSubmitted && (!beatCopy.bpm || (beatCopy.bpm <= 0 || beatCopy.bpm >= 200)) ? 'A number between 1 and 199.' : null}
+                            inputError={formSubmitted &&
+                            (!beatCopy.bpm ||
+                                beatCopy.bpm <= 0 ||
+                                beatCopy.bpm >= 200)
+                                ? "A number between 1 and 199."
+                                : null}
                         />
                     </div>
                     <div class="wrapkeyJoint">
-
-                        <SelectButton 
+                        <SelectButton
                             onSelect={(v) => {
-                                handleKeySelect(v)
+                                handleKeySelect(v);
                             }}
-                            selectedOption={beatCopy.key} 
-                            inputError={formSubmitted && !beatCopy.key ? 'Missing' : null} 
-                            options={songKeyOptions} 
-                            label={'Key'} 
+                            selectedOption={beatCopy.key}
+                            inputError={formSubmitted && !beatCopy.key
+                                ? "Missing"
+                                : null}
+                            options={songKeyOptions}
+                            label={"Key"}
                         />
                     </div>
 
                     <div class="wrapModeJoint">
-                        <SelectButton  
+                        <SelectButton
                             onSelect={(v) => {
-                                handleModeSelect(v)
+                                handleModeSelect(v);
                             }}
-                            selectedOption={beatCopy.mode} 
-                            inputError={formSubmitted && !beatCopy.mode ? 'Missing' : ''} 
-                            options={songModeOptions} 
-                            label={'Mode'} 
+                            selectedOption={beatCopy.mode}
+                            inputError={formSubmitted && !beatCopy.mode
+                                ? "Missing"
+                                : ""}
+                            options={songModeOptions}
+                            label={"Mode"}
                         />
                     </div>
                 </div>
 
                 <div class="singleEditInput">
-
                     <ImageUploader
                         fileName={beatCopy.artworkUrl}
                         imageUrl={temporaryArtworkUrl}
-                        label={'Album Artwork'}
-                        clearInput={()=> {
+                        label={"Album Artwork"}
+                        clearInput={() => {
                             newArtworkFile = null;
-                            temporaryArtworkUrl = null
+                            temporaryArtworkUrl = null;
                         }}
                         fileUploaded={(v) => {
-                            temporaryArtworkUrl = v.imageUrl
+                            temporaryArtworkUrl = v.imageUrl;
                             newArtworkFile = v.file;
                         }}
-                        inputError={formSubmitted && !temporaryArtworkUrl ? 'Please upload an artowrk file.' : null} 
+                        inputError={formSubmitted && !temporaryArtworkUrl
+                            ? "Please upload an artowrk file."
+                            : null}
                     />
-
                 </div>
 
-     
-
                 <div class="singleEditInput">
-
-
-                    <Mp3Uploader 
-                        label={'Beat Preview (MP3)'}
+                    <Mp3Uploader
+                        label={"Beat Preview (MP3)"}
                         mp3Uploaded={(v) => {
                             newMp3File = v.file;
                             temporaryMp3PreviewUrl = v.mp3Url;
                         }}
-                        clearInput={()=> {
-                            temporaryMp3PreviewUrl = null
-                            newMp3File = null
+                        clearInput={() => {
+                            temporaryMp3PreviewUrl = null;
+                            newMp3File = null;
                         }}
                         fileName={temporaryMp3PreviewUrl}
-                        inputError={formSubmitted && !temporaryMp3PreviewUrl ? 'Please upload an audio file.' : null} 
-
+                        inputError={formSubmitted && !temporaryMp3PreviewUrl
+                            ? "Please upload an audio file."
+                            : null}
                     />
-
                 </div>
-         
             </div>
-
 
             <!-- right side -->
             <div class="halfEdit">
@@ -321,104 +362,109 @@
                     <div class="goHalfRightEdit">
                         <TextInput
                             onTextChange={(v) => {
-                                beatCopy.customTag = v
+                                beatCopy.customTag = v;
                             }}
-                            label={'Custom Tag'}
-                            value={beatCopy.customTag || ''}
+                            label={"Custom Tag"}
+                            value={beatCopy.customTag || ""}
                             maxlength={35}
                         />
                     </div>
                     <div class="goHalfRightEdit">
                         <ColorSelect
-                            label={'Custom Tag Color'}
-                            onSelect={(v) => {beatCopy.customTagColor = v}}
+                            label={"Custom Tag Color"}
+                            onSelect={(v) => {
+                                beatCopy.customTagColor = v;
+                            }}
                             selectedOption={beatCopy.customTagColor}
-                            colorOptions={colorOptions}
+                            {colorOptions}
                         />
                     </div>
                 </div>
 
                 <div class="editInputsFlex">
                     <div class="goHalfRightEdit">
-                        <SelectButton 
+                        <SelectButton
                             onSelect={(v) => {
-                                beatCopy.tagOne = v
+                                beatCopy.tagOne = v;
                             }}
-                            selectedOption={beatCopy.tagOne} 
-                            options={tagOptions} 
-                            label={'Tag One'}
+                            selectedOption={beatCopy.tagOne}
+                            options={tagOptions}
+                            label={"Tag One"}
                         />
                     </div>
                     <div class="goHalfRightEdit">
-                        <SelectButton 
+                        <SelectButton
                             onSelect={(v) => {
-                                beatCopy.tagTwo = v
+                                beatCopy.tagTwo = v;
                             }}
-                            selectedOption={beatCopy.tagTwo} 
-                            options={tagOptions} 
-                            label={'Tag Two'}
+                            selectedOption={beatCopy.tagTwo}
+                            options={tagOptions}
+                            label={"Tag Two"}
                         />
                     </div>
                 </div>
 
                 <div class="editInputsFlex">
                     <div class="goHalfRightEdit">
-                        <SelectButton 
+                        <SelectButton
                             onSelect={(v) => {
-                                beatCopy.mood = v
+                                beatCopy.mood = v;
                             }}
                             options={beatMoodOptions}
-                            label={'Mood'} 
+                            label={"Mood"}
                             selectedOption={beatCopy.mood}
                         />
                     </div>
                     <div class="goHalfRightEdit">
-                        <MultiSelect 
-                            label={'Future Destination'} 
-
+                        <MultiSelect
+                            label={"Future Destination"}
                             onChange={(v) => {
-                                beatCopy.futureDestinations = v
+                                beatCopy.futureDestinations = v;
                             }}
-                            selected={beatCopy.futureDestinations} 
-                            options={destinationOptions} 
+                            selected={beatCopy.futureDestinations}
+                            options={destinationOptions}
                         />
                     </div>
                 </div>
-
-
-
-
-
             </div>
         </div>
 
-        <div class="wrapAddBeatSub" class:padforPlayer={$audioPlayerState !== 'Idle'}>
+        <div
+            class="wrapAddBeatSub"
+            class:padforPlayer={$audioPlayerState !== "Idle"}
+        >
             <div class="innerSubmitButton">
-                <BoxButton {shaking} on:click={updateBeat} buttonText={'Update'} fullWidth={true}></BoxButton> 
+                <BoxButton
+                    {shaking}
+                    on:click={updateBeat}
+                    buttonText={"Update"}
+                    fullWidth={true}
+                ></BoxButton>
             </div>
         </div>
+    {:else}
+        <!-- if THE Form IS LOADING. -->
 
-
-    {:else} <!-- if THE Form IS LOADING. -->
-    
         {#if newArtworkFile}
-            <BackendStatusBlock title={'New Artwork Upload Status'} status="{artUploadStatus}"></BackendStatusBlock>
+            <BackendStatusBlock
+                title={"New Artwork Upload Status"}
+                status={artUploadStatus}
+            ></BackendStatusBlock>
         {/if}
         {#if newMp3File}
-            <BackendStatusBlock title={'New MP3 Preview Upload Status'} status="{mp3UploadStatus}"></BackendStatusBlock>
+            <BackendStatusBlock
+                title={"New MP3 Preview Upload Status"}
+                status={mp3UploadStatus}
+            ></BackendStatusBlock>
         {/if}
         <div style="margin: auto;">
             <AudioLoader backgroundColor={"#222222"}></AudioLoader>
             {#if loadingStatusText}
-                <br>
-                <p style="text-align: center; font-size: 11pt;">{loadingStatusText}</p>
+                <br />
+                <p style="text-align: center; font-size: 11pt;">
+                    {loadingStatusText}
+                </p>
             {/if}
         </div>
-
     {/if}
-
-
-
 </div>
-    
-

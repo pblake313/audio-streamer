@@ -4,10 +4,10 @@
     import { fly, fade } from 'svelte/transition';
     export let notification: Notification;
     import CloseButton from '../../buttons/CloseButton.svelte';
-    import CheckIcon from '../../svg/Icons/CheckIcon.svelte';
-    import ErrorIcon from '../../svg/Icons/ErrorIcon.svelte';
-    import InfoIcon from '../../svg/Icons/InfoIcon.svelte';
-    import WarningIcon from '../../svg/Icons/WarningIcon.svelte';
+    import CheckIcon from '../../Icons/svg/CheckIcon.svelte';
+    import ErrorIcon from '../../Icons/svg/ErrorIcon.svelte';
+    import InfoIcon from '../../Icons/svg/InfoIcon.svelte';
+    import WarningIcon from '../../Icons/svg/WarningIcon.svelte';
     import './NotificationItem.css';
   
     const dispatch = createEventDispatcher();
