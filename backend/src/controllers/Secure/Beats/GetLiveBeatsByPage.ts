@@ -26,7 +26,7 @@ export async function getLiveBeatsByPage(req: Request, res: Response) {
 
 async function handleGetBeatsByPage(pageNumber: number): Promise<{ beats: Beat[]; hasFullBatch: boolean }> {
     try {
-        const limitCount = 2; // Number of documents per page
+        const limitCount = 25; // Number of documents per page
         const beatsCollection = db.collection('Beats').orderBy('uploadDate', 'desc');
         
         let query = beatsCollection.limit(limitCount);
