@@ -16,7 +16,7 @@ npm run start
 ```
 
 ## Environment Variables
-The backend requires a .env file in /backend.
+The backend requires a .env file in /backend. Create that file in the /backend root.
 
 Copy the example file:
 `example.env`
