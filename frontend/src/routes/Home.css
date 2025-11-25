@@ -92,6 +92,7 @@
     display: flex;
     justify-content: center;
     transition: .3s;
+    padding-right: 7px;
 }
 
 /* ----------- Hover animations (desktop / devices with hover) ----------- */
@@ -104,6 +105,8 @@
 
 .moreInfoLink:hover .contiainTheIcon {
     width: 35px;
+    padding-right: 0px;
+
 }
 
 
