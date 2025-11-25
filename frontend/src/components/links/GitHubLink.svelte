@@ -12,6 +12,7 @@
         display: flex;
         align-items: center;
         width: fit-content;
+
     }
     .stickyLink{
         margin: auto;
@@ -23,7 +24,6 @@
     .insideGitLink{
         margin: auto;
         width: fit-content;
-        padding: 5px 10px;
         display: flex;
         align-items: center;
 

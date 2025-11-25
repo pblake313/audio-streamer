@@ -8,7 +8,7 @@
    
     export let slideType: 'mobile' | 'desktop' = 'desktop'
 
-
+    import '../styles.css'
     import './ProjectDetails.css'
 </script>
 

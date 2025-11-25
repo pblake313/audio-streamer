@@ -4,6 +4,7 @@
         overflow: hidden;
         padding-top: 60px;
     }
+
     h1 {
         font-size: 28pt;
     }
@@ -50,7 +51,8 @@
     .insideGitter{
         margin: auto;
         width: 100%;
-        padding: 0px 15px;
+        max-width: 1250px;
+        padding: 0px 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -66,12 +68,18 @@
         }
     }
     @media(max-width: 650px){
+        h1 {
+            font-size: 24pt;
+        }
         .wrapGotoLoginButton{
             width: calc(100% - 30px);
             max-width: 100%;
             padding: 0px 15px;
         }
         .wrapProjectInfo{
+            padding: 0px 15px;
+        }
+        .insideGitter{
             padding: 0px 15px;
         }
     }
