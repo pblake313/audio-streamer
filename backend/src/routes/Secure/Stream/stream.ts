@@ -98,8 +98,7 @@ router.get('/stream-beat/:beatId', async (req, res) => {
             return file.createReadStream().pipe(res);
         }
     } catch (err) {
-        console.error('Streaming error:', err);
-        return res.status(500).send('Error streaming file');
+        return res.status(500).send({message: 'Error streaming', error: err});
     }
 });
 

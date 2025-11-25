@@ -1,23 +1,29 @@
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
+# Audio Streamer Frontend
+This is the frontend service for the audio-streamer application.
 
-# create-svelte
-This project is the production application for www.patsway.com Enter more summary stuff here...
+## Getting Started
+Make sure you are inside the frontend directory: cd frontend
 
-## Cloning And Setup
-First clone the project and install all dependencies using `npm install` .
+Install dependencies:
 
-Make sure (in vs code) you have autosave files set to ON if you are on a new device.
+```bash
+npm install
+```
 
-Set up your environment! You will create a new .env file in the root of the project. Use the file sample.env.txt and copy and paste that into your .env file.
+Start the application:
+```bash
+npm run dev
+```
 
-Replace the values within the .env file to match your firebase database.
+## Environment Variables
+The frontend requires a .env file in /frontend. Create that file in the /frontent root.
 
-## Developing
-Start a development server using `npm run dev`
+Copy the example file:
+`example.env`
 
-## Building
-Every time this repository has a new update on the master branch, the live website will be redeployed and built again. 
+Do NOT commit your real .env file
 
 
-### Edit README 
-https://readme.so/editor
+## Scripts
+npm install        installs dependencies
+npm run dev      starts the server

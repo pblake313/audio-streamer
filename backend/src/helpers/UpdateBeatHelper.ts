@@ -67,8 +67,7 @@ export async function updateBeat(
 
         return updatedBeat;
     } catch (error) {
-        console.error("Error updating beat:", error);
-        throw new Error("Error updating beat");
+        throw error;
     }
 }
 

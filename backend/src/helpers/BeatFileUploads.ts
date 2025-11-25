@@ -43,7 +43,6 @@ export async function uploadBeatArtwork({
     });
 
     blobStream.on('error', (error) => {
-      console.error(error);
       return reject({
         message: 'Unable to upload file, something went wrong.',
         fileName: file.originalname,
@@ -81,7 +80,6 @@ export async function uploadBeatMp3({
     });
 
     blobStream.on('error', (error) => {
-      console.error(error);
       return reject({
         message: 'Unable to upload file, something went wrong.',
         fileName: file.originalname,

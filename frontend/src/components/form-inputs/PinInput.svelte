@@ -10,10 +10,16 @@
     function handleInput(event: Event, index: number) {
         const inputEvent = event as InputEvent;
         const target = inputEvent.target as HTMLInputElement;
-        const value = target.value.replace(/[^0-9a-zA-Z]/g, '').charAt(0);
-        if (!value) return;
+
+        // 🔒 only allow digits 0-9
+        const value = target.value.replace(/[^0-9]/g, '').charAt(0);
+        if (!value) {
+            target.value = '';
+            return;
+        }
 
         pin[index] = value;
+        target.value = value;
 
         if (index < inputs.length - 1) {
             inputs[index + 1].focus();
@@ -36,9 +42,11 @@
         if (event.key === 'Backspace') {
             if (pin[index]) {
                 pin[index] = '';
+                target.value = '';
             } else if (index > 0) {
                 inputs[index - 1].focus();
                 pin[index - 1] = '';
+                inputs[index - 1].value = '';
             }
 
             dispatch('change', pin.join(''));
@@ -81,7 +89,6 @@
 <style>
     .pin-input-wrapper {
         display: grid;
-        /* allow columns to shrink: minmax(0, 1fr) prevents overflow */
         grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 0.7rem;
         width: 100%;
@@ -90,7 +97,7 @@
     }
 
     .pin-box {
-        box-sizing: border-box; /* include border in the square */
+        box-sizing: border-box;
         aspect-ratio: 1 / 1;
         width: 100%;
         min-width: 0;
@@ -116,7 +123,6 @@
 
         .pin-box {
             font-size: 1.2rem;
-            /* keep aspect-ratio; no explicit width/height here */
         }
     }
 </style>

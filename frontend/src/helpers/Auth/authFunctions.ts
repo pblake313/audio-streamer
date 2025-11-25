@@ -4,6 +4,7 @@ import { user } from "../../stores/UserStore"
 import { authorizedFetch } from "../Fetchers/authorizedFetch"
 import { publicFetch } from "../Fetchers/publicFetch"
 import { stopTrack } from "../../stores/AudioPlayerStore"
+import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted } from "../../stores/AudioPlayer/beatArrayStore"
 
 
 export const attemptingAutoLogin = writable<boolean>(false)
@@ -63,6 +64,14 @@ export async function logout() {
         stopTrack()
         accessToken.set(null)
         user.set(false)
+
+        // reset beat stores
+
+        allBeatPagesFetched.set(false)
+        beatPagesFetched.set([])
+        fetchBeatsAttempted.set(false)
+        beats.set([])
+
     }
    
 }

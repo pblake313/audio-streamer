@@ -13,7 +13,6 @@ export async function getBeatById(beatId: string): Promise<Beat | null> {
             return beatDoc.data() as Beat;
         }
     } catch (error) {
-        console.error('Error fetching beat by ID:', error);
         throw error;
     }
 }

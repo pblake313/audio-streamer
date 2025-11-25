@@ -68,7 +68,6 @@ export async function addBeat(req: Request, res: Response) {
         return res.status(200).send({ newBeat: newBeat });
 
     } catch (error) {
-        console.log(error);
         return res.status(500).send({
             error: (error as Error).message || 'An unknown error has occurred.',
         });
