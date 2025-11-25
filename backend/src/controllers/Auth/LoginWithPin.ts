@@ -16,8 +16,7 @@ export async function loginWithPin(req: Request, res: Response) {
 		}
 
 		if (pinSubmitted === activePIN) {
-			console.log("🟢 pins match -- create and send tokens.");
-			console.log("Client IP:", ip);
+			// console.log("🟢 pins match -- create and send tokens.");
 
 			// Refresh token – long lived, stored in cookie
 			const refreshToken = sign(
@@ -54,7 +53,7 @@ export async function loginWithPin(req: Request, res: Response) {
 			return res.status(200).send({ accessToken, streamToken });
 		} else {
 
-            console.log("🟠 pin mismatch :(");
+            // console.log("🟠 pin mismatch :(");
 
             // create a wrong pin doc.
             console.log(ip)
@@ -76,7 +75,7 @@ export async function loginWithPin(req: Request, res: Response) {
                     const diffMs = now.getTime() - lastTouched.getTime();
 
                     if (diffMs >= sevenDaysMs) {
-                        console.log('🟢 Block expired — resetting wrong pin doc for IP:', ip);
+                        // console.log('🟢 Block expired — resetting wrong pin doc for IP:', ip);
                         await createWrongPinDocument(ip);
 
                         return res.status(401).send({
@@ -85,7 +84,7 @@ export async function loginWithPin(req: Request, res: Response) {
                             blocked: false
                         });
                     } else {
-                        console.log('🔴 User is still blocked for IP:', ip);
+                        // console.log('🔴 User is still blocked for IP:', ip);
 
                         const blockedUntil = new Date(
                             lastTouched.getTime() + sevenDaysMs
@@ -118,14 +117,13 @@ export async function loginWithPin(req: Request, res: Response) {
                 });
 
             } else {
-                console.log('🟣 need to create a past pin doc')
+                // console.log('🟣 need to create a past pin doc')
                 await createWrongPinDocument(ip)
                 return res.status(401).send({message: 'Invalid PIN', attemptsRemaining: 4})
             }
 
 		}
 	} catch (err: any) {
-		console.error(err);
 		return res.status(500).send({
 			error: err.message || "An unknown error has occurred."
 		});

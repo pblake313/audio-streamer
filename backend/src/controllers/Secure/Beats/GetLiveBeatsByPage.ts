@@ -76,7 +76,6 @@ async function handleGetBeatsByPage(pageNumber: number): Promise<{ beats: Beat[]
 
         return { beats: liveBeats, hasFullBatch: hasFullBatch };
     } catch (error) {
-        console.error('Error getting live beats:', error);
         throw new Error('Error getting live beats');
     }
 }
