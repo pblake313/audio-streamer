@@ -331,14 +331,10 @@ input {
     opacity: .5;
     padding: 10px 0px;
 }
-.desktopNavigation:hover{
-    opacity: .7;
-}
+
 .cartJoint  {
     margin: 0px 25px 0px 15px;
 }
-
-
 
 .desktopNavigation::before {
     content: '';
@@ -351,19 +347,7 @@ input {
     background-color: #f7f7f7;
     transition: width 0.3s ease;
     transition: .3s;
-
 }
-
-.desktopNavigation:hover::before {
-    height: 2px;
-    width: 70%;
-    position: absolute;
-    bottom: 0px;
-    left: 50%;
-    transition: .3s;
-    background-color: #f7f7f7;
-}
-
 
 .navActive {
     opacity: 1;
@@ -428,5 +412,21 @@ input {
     .navContainer {
         padding: 10px 15px;
         width: calc(100% - 30px);
+    }
+}
+/* Only apply hover styles on devices that actually support hover (desktop, trackpad, etc) */
+@media (hover: hover) and (pointer: fine) {
+    .desktopNavigation:hover {
+        opacity: .7;
+    }
+
+    .desktopNavigation:hover::before {
+        height: 2px;
+        width: 70%;
+        position: absolute;
+        bottom: 0px;
+        left: 50%;
+        transition: .3s;
+        background-color: #f7f7f7;
     }
 }

@@ -8,6 +8,8 @@
    
     export let slideType: 'mobile' | 'desktop' = 'desktop'
 
+
+    import './ProjectDetails.css'
 </script>
 
 
@@ -17,70 +19,13 @@
 </svelte:head>
 
 
-<style>
-    .containProjectDetails{
-        margin: auto;
-        max-width: 100%;
-        overflow: hidden;
-    }
-    h1 {
-        font-size: 28pt;
-    }
-    h2 {
-        font-size: 24pt;
-        margin-bottom: 10px;
-    }
-    p {
-        font-size: 12pt;
-        opacity: .6;
-    }
-    .wrapProjectInfo{
-        max-width: 1250px;
-        padding: 0px 25px;
-        margin: auto;
-    }
-    .wrapGit{
-        width: fit-content;
-        margin: auto;
-        width: 100%;
-        position: sticky;
-        top: 0px;
-        display: flex;
-        justify-content: space-evenly;
-        padding: 10px 0px;
-        background-color: #222222;
-        z-index: 5;
-
-    }
-
-    .wrapGotoLoginButton{
-        width: 100%;
-        max-width: 250px;
-        margin: auto;
-        margin-top: 50px;
-        margin-bottom: 150px;
-
-    }
-    @media(max-width: 500px){
-        h2 {
-            font-size: 18pt;
-        }
-    }
-    @media(max-width: 650px){
-        .wrapGotoLoginButton{
-            width: calc(100% - 30px);
-            max-width: 100%;
-            padding: 0px 15px;
-        }
-        .wrapProjectInfo{
-            padding: 0px 15px;
-        }
-    }
-</style>
-
 <div class="containProjectDetails">
     <div class="wrapGit">
-        <GitHubLink></GitHubLink>
+        <div class="insideGitter">
+
+            <GitHubLink gitText={'@pblake313'}></GitHubLink>
+            <BoxButton on:click={() => {goto('/')}} buttonStyle={'stayWhite'} buttonText={'Login'} tightPad={true}></BoxButton>
+        </div>
     </div>
 
 
@@ -183,7 +128,12 @@
 
         <div class="wrapGotoLoginButton">
             <BoxButton buttonText={'Go To Login'} fullWidth={true} on:click={()=> {goto('/')}}></BoxButton>
+
         </div>
+        <div class="bottomGit">
+            <GitHubLink></GitHubLink>
+        </div>
+
 
     </div>
 
