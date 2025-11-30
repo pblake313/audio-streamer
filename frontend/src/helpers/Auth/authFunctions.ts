@@ -5,6 +5,7 @@ import { authorizedFetch } from "../Fetchers/authorizedFetch"
 import { publicFetch } from "../Fetchers/publicFetch"
 import { stopTrack } from "../../stores/AudioPlayerStore"
 import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted } from "../../stores/AudioPlayer/beatArrayStore"
+import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore"
 
 
 export const attemptingAutoLogin = writable<boolean>(false)
@@ -71,6 +72,8 @@ export async function logout() {
         beatPagesFetched.set([])
         fetchBeatsAttempted.set(false)
         beats.set([])
+
+        selectedBeat.set(null)
 
     }
    
