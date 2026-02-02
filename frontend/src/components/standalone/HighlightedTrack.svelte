@@ -17,7 +17,7 @@
     import AudioRange from "../misc/AudioRange.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
     import SpinLoader from "../loaders/SpinLoader.svelte";
-    import AudioControlBox from "./AudioControlBox.svelte";
+    import AudioControlBox from "./AudioPlayerControls.svelte";
 
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
