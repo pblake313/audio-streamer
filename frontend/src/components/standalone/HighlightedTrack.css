@@ -127,7 +127,7 @@
 
 }
 .trackControls {
-    width: 350px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -224,7 +224,7 @@
     }
 
     .trackInfoTop {
-        margin-bottom: 35px;
+        margin-bottom: 15px;
     }
 }
 @media(max-width: 900px){
@@ -282,7 +282,8 @@
         margin-bottom: 5px;
     }
     .wrapHighlightedTitle h2 {
-        font-size: 12pt;
+        font-size: 18pt;
+        font-weight: 450;
     }
     .keyandMode {
         font-size: 9pt;

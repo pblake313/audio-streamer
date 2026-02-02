@@ -17,10 +17,6 @@
             <HollowLoader></HollowLoader>
         </div>
 
-        <div class="subAudioLoad">
-            <AudioLoader height={'2px'} backgroundColor={'transparent'}></AudioLoader>
-        </div>
-
         {#if loadingText}
             <div style="margin-top: 25px;">
                 <p style="opacity: .3; font-size: 10pt;">{loadingText}</p>

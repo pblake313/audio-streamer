@@ -16,6 +16,8 @@ export async function getLiveBeatsByPage(req: Request, res: Response) {
         }
     
         const beatResults = await handleGetBeatsByPage(page);
+
+
         return res.status(200).send({ beats: beatResults.beats, fullBatch: beatResults.hasFullBatch });
     } catch (error: any) {
         console.error('Error occurred while getting live beats:', error);
@@ -53,19 +55,33 @@ async function handleGetBeatsByPage(pageNumber: number): Promise<{ beats: Beat[]
 
         const liveBeats: Beat[] = [];
         const bucket = getStorage().bucket();
+        const signedExpiryMs = Date.now() + 1000 * 60 * 60 * 48; // 48 hours
 
+        
         for (const doc of liveBeatsSnapshot.docs) {
             const beat = doc.data() as Beat;
             beat.id = doc.id;
  
+            // Sign artwork if it exists
             if (beat.artworkUrl) {
-                const file = bucket.file(`Beats/${beat.id}/Artwork/${beat.id}`);
-                const [url] = await file.getSignedUrl({
-                    version: 'v4',
-                    action: 'read',
-                    expires: Date.now() + 1000 * 60 * 60 * 48 // 48 hours
+                const artworkFile = bucket.file(`Beats/${beat.id}/Artwork/${beat.id}`);
+                const [artworkSignedUrl] = await artworkFile.getSignedUrl({
+                    version: "v4",
+                    action: "read",
+                    expires: signedExpiryMs,
                 });
-                beat.artworkUrl = url;
+                beat.artworkUrl = artworkSignedUrl;
+            }
+
+            // Sign mp3 preview if it exists
+            if (beat.mp3previewUrl) {
+                const mp3File = bucket.file(`Beats/${beat.id}/MP3Preview/${beat.id}`);
+                const [mp3SignedUrl] = await mp3File.getSignedUrl({
+                    version: "v4",
+                    action: "read",
+                    expires: signedExpiryMs,
+                });
+                beat.mp3previewUrl = mp3SignedUrl;
             }
 
             liveBeats.push(beat); 

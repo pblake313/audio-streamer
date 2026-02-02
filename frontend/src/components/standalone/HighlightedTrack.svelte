@@ -17,6 +17,7 @@
     import AudioRange from "../misc/AudioRange.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
     import SpinLoader from "../loaders/SpinLoader.svelte";
+    import AudioControlBox from "./AudioControlBox.svelte";
 
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
@@ -167,40 +168,9 @@
                         <div></div>
 
                         <div>
-                            <AudioRange imageUrl={$selectedBeat?.artworkUrl || null} />
-
-                            <div class="highlightedTrackControls">
-                                <SeekButton
-                                    iconHeight={"12px"}
-                                    isDisabled={["Buffering", "Loading"].includes($audioPlayerState) && $userTapped}
-                                    on:seek={() => {
-                                        resetTrackTimer();
-                                        smartPreviousTrack();
-                                    }}
-                                    rewindOrForward={"rewind"}
-                                />
-
-                                <div class="wPlayPlauser">
-                                    <PlayPauseButton
-                                        playOrPause={playOrPauseIcon}
-                                        isDisabled={["Buffering", "Loading"].includes($audioPlayerState) && $userTapped}
-                                        on:togglePlayPause={handlePlayPauseClick}
-                                        color={"#f7f7f7"}
-                                        playIconHeight={"22px"}
-                                        pauseIconHeight={"20px"}
-                                        height={"50px"}
-                                    />
-                                </div>
-
-                                <SeekButton
-                                    iconHeight={"12px"}
-                                    isDisabled={["Buffering", "Loading"].includes($audioPlayerState) && $userTapped}
-                                    on:seek={() => {
-                                        resetTrackTimer();
-                                        smartNextTrack();
-                                    }}
-                                />
-                            </div>
+                            
+                            <AudioRange showTrackTime={false} waveHeight={55} useWaveForm={true} imageUrl={$selectedBeat?.artworkUrl || null} />
+                            <AudioControlBox {playOrPauseIcon}></AudioControlBox>
                         </div>
                     </div>
                 </div>
@@ -241,6 +211,10 @@
                                 {/if}
                             </div>
                         </div>
+                    {:else}
+                        <div class="trackStateText">
+                            <p>{$audioPlayerState}</p>
+                        </div>
                     {/if}
 
                     <div class="wrapHighlightedTitle">
@@ -258,40 +232,14 @@
                         <div></div>
 
                         <div>
-                            <AudioRange imageUrl={$selectedBeat?.artworkUrl || null} />
 
-                            <div class="highlightedTrackControls">
-                                <SeekButton
-                                    iconHeight={"12px"}
-                                    isDisabled={["Buffering", "Loading"].includes($audioPlayerState) && $userTapped}
-                                    on:seek={() => {
-                                        resetTrackTimer();
-                                        smartPreviousTrack();
-                                    }}
-                                    rewindOrForward={"rewind"}
-                                />
+                            <AudioControlBox {playOrPauseIcon}></AudioControlBox>
 
-                                <div class="wPlayPlauser">
-                                    <PlayPauseButton
-                                        playOrPause={playOrPauseIcon}
-                                        isDisabled={["Buffering", "Loading"].includes($audioPlayerState) && $userTapped}
-                                        on:togglePlayPause={handlePlayPauseClick}
-                                        color={"#f7f7f7"}
-                                        playIconHeight={"22px"}
-                                        pauseIconHeight={"20px"}
-                                        height={"50px"}
-                                    />
-                                </div>
 
-                                <SeekButton
-                                    iconHeight={"12px"}
-                                    isDisabled={["Buffering", "Loading"].includes($audioPlayerState) && $userTapped}
-                                    on:seek={() => {
-                                        resetTrackTimer();
-                                        smartNextTrack();
-                                    }}
-                                />
-                            </div>
+                            <AudioRange waveHeight={140} useWaveForm={true} imageUrl={$selectedBeat?.artworkUrl || null} />
+
+
+                         
                         </div>
                     </div>
                 </div>

@@ -79,8 +79,8 @@ async function createBeat(obj: any, artworkUrl: string, mp3Url: string) {
         key: obj.key,
         mode: obj.mode,
         beatTitle: obj.beatTitle,
-        mp3previewUrl: mp3Url,
-        artworkUrl: artworkUrl,
+        mp3previewUrl: mp3Url,     // will get replaced with signed URL below
+        artworkUrl: artworkUrl,    // will get replaced with signed URL below
         bpm: +obj.bpm,
         mood: obj.mood,
         tagOne: obj.tagOne,
@@ -100,22 +100,39 @@ async function createBeat(obj: any, artworkUrl: string, mp3Url: string) {
 
         await docRef.set(beat);
 
-        if (artworkUrl) {
-            const bucket = getStorage().bucket();
-            const file = bucket.file(`Beats/${beat.id}/Artwork/${beat.id}`);
+        const bucket = getStorage().bucket();
 
-            const [signedUrl] = await file.getSignedUrl({
-                version: 'v4',
-                action: 'read',
-                expires: Date.now() + 1000 * 60 * 60 * 48 // 48 hours
+        // ---- SIGN ARTWORK ----
+        if (artworkUrl) {
+            const artworkFile = bucket.file(`Beats/${beat.id}/Artwork/${beat.id}`);
+
+            const [artworkSignedUrl] = await artworkFile.getSignedUrl({
+                version: "v4",
+                action: "read",
+                expires: Date.now() + 1000 * 60 * 60 * 48, // 48 hours
             });
 
-            beat.artworkUrl = signedUrl;
+            beat.artworkUrl = artworkSignedUrl;
+        }
+
+        // ---- SIGN MP3 PREVIEW ----
+        if (mp3Url) {
+            // Make sure this matches the exact path used in uploadBeatMp3
+            // (your logs show: Beats/{id}/MP3Preview/{id})
+            const mp3File = bucket.file(`Beats/${beat.id}/MP3Preview/${beat.id}`);
+
+            const [mp3SignedUrl] = await mp3File.getSignedUrl({
+                version: "v4",
+                action: "read",
+                expires: Date.now() + 1000 * 60 * 60 * 48, // 48 hours
+            });
+
+            beat.mp3previewUrl = mp3SignedUrl;
         }
 
         return beat;
 
     } catch (error) {
-        throw new Error('An error uploading beat occurred.');
+        throw new Error("An error uploading beat occurred.");
     }
 }

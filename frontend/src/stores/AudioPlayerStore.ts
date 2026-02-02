@@ -1,5 +1,6 @@
 import { get, writable } from "svelte/store";
 import {
+    preloadNeighbors,
 	selectedBeat,
 	selectNextBeat,
 	selectPreviousBeat
@@ -62,6 +63,8 @@ async function advanceToNextTrackWithPagination() {
 		}
 
 		await fetchBeats(getNextBeatPageToFetch());
+        void preloadNeighbors();
+
 	}
 
 	// Move to next beat regardless

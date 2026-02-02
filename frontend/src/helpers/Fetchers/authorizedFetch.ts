@@ -1,6 +1,6 @@
 // src/lib/fetchers/authorizedFetch.ts
 import { get } from "svelte/store";
-import { accessToken, streamToken } from "../../stores/tokenStore";
+import { accessToken } from "../../stores/tokenStore";
 import { logout } from "../Auth/authFunctions";
 import { pushNotification } from "../../stores/NotificationStore";
 
@@ -48,11 +48,6 @@ export async function authorizedFetch<T = any>(
         // console.log("🔁 Access token refreshed on client");
     }
 
-    const newStreamToken = res.headers.get("x-stream-token")
-    if (newStreamToken){
-        // console.log("🔁 Stream token refreshed on client");
-        streamToken.set(newStreamToken)
-    }
 
     let data: any = null;
 
