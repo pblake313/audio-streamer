@@ -148,8 +148,8 @@
         height={waveHeight}
         zoom={1}
         mirrorScale={0.55}
-        gapPx={3}
-        gapOpacity={0.1}
+        gapPx={2}
+        gapOpacity={0.05}
     />
 
 
