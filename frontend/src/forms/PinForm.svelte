@@ -4,7 +4,7 @@
     import FormError from "../components/errors/FormError.svelte";
     import { publicFetch } from "../helpers/Fetchers/publicFetch";
     import './PinForm.css'
-    import { accessToken, streamToken } from "../stores/tokenStore";
+    import { accessToken } from "../stores/tokenStore";
     import { goto } from "$app/navigation";
     import { getAuthenticatedUser } from "../helpers/Auth/authFunctions";
     import { onMount } from "svelte";
@@ -43,10 +43,6 @@
                 credentials: 'include',
                 body: JSON.stringify({ pin })
             });
-
-            if (response.streamToken){
-                streamToken.set(response.streamToken)
-            }
 
             if (response.accessToken) {
                 accessToken.set(response.accessToken);
