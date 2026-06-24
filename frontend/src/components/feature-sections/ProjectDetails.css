@@ -1,0 +1,49 @@
+
+    .projectDetails_section{
+        max-width: 1250px;
+        padding: 0px 25px;
+        margin: auto;
+        margin-bottom: 50px;
+    }
+    h2 {
+        margin-bottom: 10px;
+    }
+    .wrapGit{
+        width: fit-content;
+        margin: auto;
+        width: 100%;
+        position: sticky;
+        top: 0px;
+        display: flex;
+        justify-content: space-evenly;
+        padding: 10px 0px;
+        background-color: #222222;
+        z-index: 5;
+
+    }
+
+    .wrapGotoLoginButton{
+        width: 100%;
+        max-width: 250px;
+        margin: auto;
+        margin-top: 50px;
+        margin-bottom: 40px;
+
+    }
+
+    .projectDetails_photoFlex{
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+
+        align-items: center;
+                max-width: 1250px;
+        padding: 0px 25px;
+    }
+    .projectDetails_swiperSection{
+        margin-bottom: 35px;
+    }
+
+strong {
+    color: var(--font-color-heading);
+}

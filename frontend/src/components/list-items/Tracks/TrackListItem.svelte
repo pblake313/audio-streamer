@@ -22,7 +22,7 @@
     import NotePadForm from "../../../forms/NotePadForm.svelte";
     import { isUpdatingBeatFromModal } from "../../../stores/BeatUpdatingStore";
     import { fade } from "svelte/transition";
-    import SpinLoader from "../../loaders/SpinLoader.svelte";
+    import SpinLoader from "../../loaders/Loader.svelte";
     import AudioLoader from "../../loaders/AudioLoader.svelte";
     import BeatTag from "../../misc/BeatTag.svelte";
     import Modal from "../../misc/Modal.svelte";

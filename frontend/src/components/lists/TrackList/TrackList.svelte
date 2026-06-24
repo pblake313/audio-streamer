@@ -6,7 +6,8 @@
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
     import TrackListItem from "../../list-items/Tracks/TrackListItem.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";
-    import SpinLoader from "../../loaders/SpinLoader.svelte";
+    import SpinLoader from "../../loaders/Loader.svelte";
+    import Loader from "../../loaders/Loader.svelte";
 
     let loadingNewBeats: boolean = false;
 

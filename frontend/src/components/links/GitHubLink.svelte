@@ -30,15 +30,15 @@
 
     }
     .gitHubStyle{
-        font-size: 10pt;
-        opacity: .5;
         margin-left: 10px;
         padding-top: 5px;
         transition: .3s;
+        color: var(--font-color-light);
         
     }
     .insideGitLink:hover p {
-        opacity: 1;
+        color: var(--font-color-heading);
+
     }
 </style>
 

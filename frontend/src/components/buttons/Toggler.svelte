@@ -21,7 +21,7 @@
     height: 32px;
     background: #222222;
     border-radius: 9999px;
-    border: 1px solid rgba(211, 211, 211, 0.336);
+    border: 1px solid rgba(211, 211, 211, 0.226);
     display: grid;
     grid-template-columns: 1fr 1fr;
     overflow: hidden;
@@ -61,7 +61,7 @@
     left: 3px;
     width: calc(50% - 6px);
     height: calc(100% - 6px);
-    background: #bebebe;
+    background: #f7f7f7;
     border-radius: 9999px;
     transition: transform 0.25s ease;
     z-index: 1;

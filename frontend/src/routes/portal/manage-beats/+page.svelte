@@ -18,7 +18,7 @@
 
     import "./ManageBeatsPage.css";
     import ManageBeatListItem from "../../../components/list-items/ManageBeatListItem/ManageBeatListItem.svelte";
-    import SpinLoader from "../../../components/loaders/SpinLoader.svelte";
+    import SpinLoader from "../../../components/loaders/Loader.svelte";
 
     let loadingNewBeats: boolean = false;
 

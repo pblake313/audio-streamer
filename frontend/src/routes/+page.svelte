@@ -1,18 +1,19 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { navStyle } from "../stores/navstore";
-    import PinForm from "../forms/PinForm.svelte";
     import GitHubLink from "../components/links/GitHubLink.svelte";
-    import './Home.css'    
     import RightArrowIcon from "../components/Icons/svg/RightArrowIcon.svelte";
+    import { user } from "../stores/UserStore";
+    import HighlightedTrack from "../components/standalone/HighlightedTrack.svelte";
+    import TrackList from "../components/lists/TrackList/TrackList.svelte";
 
+    import './Homepage.css'
+    import Hero from "../components/feature-sections/Hero.svelte";
+    import ProjectDetails from "../components/feature-sections/ProjectDetails.svelte";
 
     onMount(() => {
         navStyle.set({style: 'standard', capWidth:false, addLine: true})
-
-
     })
-
 
 </script>
 
@@ -23,33 +24,25 @@
 
 
 
+{#if $user}
 
-<div class="containStartInfo">
-    <div class="wrapPinForm">
-        <PinForm></PinForm>
+    <HighlightedTrack />
+
+    <div class="wrapTrackList">
+        <TrackList />
     </div>
-</div>
 
-<div class="wrapGitLinkAndDetails">
-    <a class="moreInfoLink" href="/project-details">
+{:else}
 
-        <h4 style="font-size: 16pt;">About This Project</h4>
-        <p class="projectInfoLink">Details about how it works.</p>
 
-        <div class="flexMoreInfo">
-            <div class="learnMore">
-                <p class="lmoreText" >Learn More</p>
-            </div>
-            <div class="contiainTheIcon">
-                <div class="wrapRighta">
-                    <RightArrowIcon color={'#f7f7f7'}></RightArrowIcon>
-                </div> 
-            </div>
 
-        </div>
-    </a>
-    <div style="height: 50px;"></div>
-    <GitHubLink></GitHubLink>
-</div>
+        
+        <Hero />
 
+        <br><br><br><br>
+
+        <!-- how would i say an open sourced audio player? what would be good for a hero section here? -->
+        <ProjectDetails />
+
+{/if}
 

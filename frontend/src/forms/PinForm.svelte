@@ -117,9 +117,6 @@
 
 <div class="wrapPINForm">
 
-    <div class="wraplogopin">
-        <Logo color={'#f7f7f7'} width={'100%'}></Logo>
-    </div>
 
 
     {#if !$isCheckingIp}
@@ -131,12 +128,6 @@
                 <p>{$checkIpErrorMesssage}</p>
             </div>
         {:else}
-
-
-            {#if !$userBlockedMessage}
-                <p style="text-align: center; opacity: .6; font-size: 9pt; margin-top: 15px; margin-right: 5px;">Enter PIN Below</p>
-            {/if}
-
 
             <div class="holdPIN">
                 {#if !isLoading}

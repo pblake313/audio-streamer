@@ -7,10 +7,10 @@ const beatPagesFetched = writable<Number[]>([])
 const allBeatPagesFetched = writable<boolean>(false)
 const fetchBeatsAttempted = writable<boolean>(false)
 const isFetchingBeats = writable<boolean>(false)
-
 const beatFetchError = writable<string | null>(null)
-
 const beats = writable<Beat[]>([]);
+
+const oneBeatFetchSuccessfull = writable<boolean>(false) 
 
 // Fetch beats from the backend
 
@@ -41,6 +41,9 @@ async function fetchBeats(pageToFetch: number = 1) {
             allBeatPagesFetched.set(true)
         }
 
+        oneBeatFetchSuccessfull.set(true)
+        
+
         const newBeats: Beat[] = result.beats
 
         newBeats.forEach((beat) => upsertBeat(beat));
@@ -57,17 +60,15 @@ async function fetchBeats(pageToFetch: number = 1) {
         if (!currentSelectedBeat && newBeats.length > 0) {
             const firstBeat = newBeats[0];
             selectNewBeat(firstBeat)
-          }
+        }
+
 
         return result;
         
     } catch (error: any) {
         beatFetchError.set(error.message || 'An unknown error has occurred.')
-        throw new Error('An error occurred while fetching beats.');
     } finally {
-        fetchBeatsAttempted.set(true)
         isFetchingBeats.set(false)
-
     }
 }
 

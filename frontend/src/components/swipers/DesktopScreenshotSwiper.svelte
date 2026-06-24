@@ -2,7 +2,9 @@
     import { onMount, onDestroy } from "svelte";
     import SwiperCore from "swiper";
     import { Navigation } from "swiper/modules";
+    // @ts-ignore: CSS side-effect import for Swiper
     import "swiper/css";
+    // @ts-ignore: CSS side-effect import for Swiper navigation
     import "swiper/css/navigation";
     import "./DesktopScreenshotSwiper.css";
     import SlideNavButton from "../buttons/SlideNavButton.svelte";
@@ -17,7 +19,7 @@
         "/Images/ScreenShots/Desktop/desk6.png",
         "/Images/ScreenShots/Desktop/desk4.png",
         "/Images/ScreenShots/Desktop/desk7.png",
-        "/Images/ScreenShots/Desktop/desk8.png"
+        "/Images/ScreenShots/Desktop/desk8.png",
     ];
 
     let swiperContainer: HTMLDivElement;
@@ -40,36 +42,32 @@
         swiper = new SwiperCore(swiperContainer, {
             modules: [Navigation],
 
-            // 🔥 Default slidesPerView
             slidesPerView: 2.3,
-            spaceBetween: 25,
-            loop: true,
+            spaceBetween: 15,
+            loop: false,
             speed: 300,
             roundLengths: false,
-            centeredSlides: true,
+            centeredSlides: false,
             centeredSlidesBounds: false,
 
-            // 🔥 RESPONSIVE BREAKPOINTS
             breakpoints: {
                 1600: {
-                    slidesPerView: 1.5
+                    slidesPerView: 1.2,
                 },
                 1200: {
-                    slidesPerView: 1.7
+                    slidesPerView: 1.4,
                 },
                 900: {
-                    slidesPerView: 1.2
+                    slidesPerView: 1.2,
                 },
                 650: {
                     slidesPerView: 1.1,
-                  
                 },
                 0: {
                     slidesPerView: 1.1,
                     spaceBetween: 15,
-
-                    centeredSlides: false
-                }
+                    centeredSlides: false,
+                },
             },
 
             on: {
@@ -78,8 +76,8 @@
                 },
                 slideChange(sw) {
                     activeIndex = sw.realIndex;
-                }
-            }
+                },
+            },
         });
 
         return () => {
@@ -94,16 +92,17 @@
     });
 </script>
 
-
-<div class="wrapImageSwiper" in:fade={{delay: 500, duration: 500}} out:fade={{duration: 500}}>
-
-
-    <div class="megaSwipeWrap">
-        <div class="swiper mobileC" bind:this={swiperContainer}>
-            <div class="swiper-wrapper">
+<div
+    class="dss_container"
+    in:fade={{ delay: 500, duration: 500 }}
+    out:fade={{ duration: 500 }}
+>
+    <div class="dss_megaSwipeWrap">
+        <div class="swiper dss_swiper" bind:this={swiperContainer}>
+            <div class="swiper-wrapper dss_swiperWrapper">
                 {#each images as img, index}
-                    <div class="swiper-slide singleSwiperSlide">
-                        <div class="imageContainer">
+                    <div class="swiper-slide dss_singleSwiperSlide">
+                        <div class="dss_imageContainer">
                             <img
                                 src={img}
                                 alt={`Screenshot ${index + 1}`}
@@ -116,26 +115,24 @@
         </div>
     </div>
 
-    <div class="swiperLocation">
-        <div class="innerLocationGrid">
+    <div class="dss_swiperLocation">
+        <div class="dss_innerLocationGrid">
             {#each images as _, i}
                 <button
-                    class="swiperNavButton {i === activeIndex ? 'active' : ''}"
+                    class="dss_swiperNavButton {i === activeIndex ? 'dss_active' : ''}"
                     on:click={() => goToSlide(i)}
                     aria-label={`Go to screenshot ${i + 1}`}
                 />
             {/each}
         </div>
 
-        <div class="nonDots"></div>
+        <div class="dss_nonDots"></div>
 
-        <div class="swiperButtons">
-            <!-- LEFT (PREVIOUS) BUTTON -->
-            <div class="swiperButtonPrev">
+        <div class="dss_swiperButtons">
+            <div class="dss_swiperButtonPrev">
                 <SlideNavButton on:click={goPrev} />
             </div>
 
-            <!-- RIGHT (NEXT) BUTTON -->
             <SlideNavButton on:click={goNext} />
         </div>
     </div>

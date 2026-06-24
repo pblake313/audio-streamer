@@ -7,8 +7,8 @@
     import { autoLoginAttempted } from "../../helpers/Auth/authFunctions";
 
     // Only run this on the client
-    $: if (browser && $user === false && $autoLoginAttempted) {
-        goto('/');
+    $: if (!$user) {
+        goto('/')
     }
 </script>
 

@@ -16,7 +16,7 @@
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import AudioRange from "../misc/AudioRange.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
-    import SpinLoader from "../loaders/SpinLoader.svelte";
+    import SpinLoader from "../loaders/Loader.svelte";
     import AudioControlBox from "./AudioPlayerControls.svelte";
 
     // controls the icon ONLY

@@ -2,7 +2,7 @@
     import "./BoxButton.css";
     import CloseIcon from "../Icons/svg/CloseIcon.svelte";
     import MoreIcon from "../Icons/svg/MoreIcon.svelte";
-    import SpinLoader from "../loaders/SpinLoader.svelte";
+    import SpinLoader from "../loaders/Loader.svelte";
     import AddIcon from "../Icons/svg/AddIcon.svelte";
     import TrashIcon from "../Icons/svg/TrashIcon.svelte";
 
@@ -83,12 +83,8 @@
         {/if}
 
         {#if buttonIcon !== "loading"}
-            <p
-                class="fixa"
-                style="white-space: nowrap; font-size: {fontSize}; "
-            >
+
                 {buttonText}
-            </p>
         {/if}
     </div>
 </button>

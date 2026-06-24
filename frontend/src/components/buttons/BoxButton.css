@@ -12,10 +12,10 @@
     background-color: transparent;
     -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
 }
-.boxab:hover .innaFlex .fixa {
+.boxab:hover .innaFlex .bb_text {
     transition: .3s;
 }
-.fixa {
+.bb_text {
     white-space: nowwrap;
     transition: .3s;
     padding: 0px;
@@ -33,21 +33,23 @@
 }
 
 .tightPad {
-    padding: 5px 10px;
+    padding: 8px 10px;
     height: fit-content;
 }
 
 /* stockButton button */
 .stockButton {
-    background-color: #404040;
-    border: 1px solid #404040;
+    background-color: #f7f7f7;
+    border: 1px solid #f7f7f7;
+    transition: .3s;
 }
 .stockButton:hover {
-    background-color: #555555;
+    background-color: #f7f7f7;
 
 }
-.stockButton .innaFlex .fixa {
-    color: white;
+.stockButton .innaFlex .bb_text {
+    color: #323232;
+    font-weight: 600;
 }
 .ghostButton:hover {
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.176);

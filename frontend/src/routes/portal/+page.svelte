@@ -1,14 +1,15 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import HighlightedTrack from '../../components/standalone/HighlightedTrack.svelte';
-    import { fetchBeats, fetchBeatsAttempted } from '../../stores/AudioPlayer/beatArrayStore';
+    import { beatFetchError, fetchBeats, fetchBeatsAttempted, isFetchingBeats } from '../../stores/AudioPlayer/beatArrayStore';
     import { selectedBeat } from '../../stores/AudioPlayer/selectedBeatStore';
     import { pauseTrack, playTrack, smartNextTrack, smartPreviousTrack } from '../../stores/AudioPlayerStore';
     import { navStyle } from '../../stores/navstore';
     import { get } from 'svelte/store';
     import { pushNotification } from '../../stores/NotificationStore';
-    import SpinLoader from '../../components/loaders/SpinLoader.svelte';
+    import SpinLoader from '../../components/loaders/Loader.svelte';
     import TrackList from '../../components/lists/TrackList/TrackList.svelte';
+    import Loader from '../../components/loaders/Loader.svelte';
 
 
     let fetchBeatsErrorOccurred: boolean = false
@@ -47,20 +48,7 @@
     onMount( async()=> {
         navStyle.set({style:'standard', capWidth: true, addLine: false})
 
-        try {
-
-            const beatFetchAttemtpted = get(fetchBeatsAttempted)
-
-            if (!beatFetchAttemtpted){
-                await fetchBeats()
-            }
-
-        } catch {
-            fetchBeatsErrorOccurred = true
-            pushNotification("There was an error that occurred when fetching beats.", 'Error', false, 6000, 'Fetch Beats Error')
-        } finally {
-
-        }
+        await fetchBeats()
 
     })
 
@@ -88,20 +76,22 @@
 </style>
 
 
-{#if !$fetchBeatsAttempted}
-    <SpinLoader></SpinLoader>
+
+
+{#if $isFetchingBeats}
+    <Loader loaderStyle={"loader_full"}/>
+{:else if $beatFetchError}
+    <p>{$beatFetchError}</p>
 {:else}
-    {#if !fetchBeatsErrorOccurred}
-        <HighlightedTrack></HighlightedTrack>
-        <div class="wrapTrackList">
-            <TrackList></TrackList>
-        </div>
-        <div style="height: 100px;"></div>
-    {:else}
-        <p>There was an error while fetching beats</p>
-    {/if}
-
-
+    <HighlightedTrack></HighlightedTrack>
+    <div class="wrapTrackList">
+        <TrackList></TrackList>
+    </div>
 {/if}
+
+
+
+
+
 
 

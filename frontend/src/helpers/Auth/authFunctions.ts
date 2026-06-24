@@ -15,8 +15,8 @@ export async function autoLogin(){
     try {
 
         if (get(autoLoginAttempted) === true){
+            console.log('autologin already attempted, returning.')
             return
-
         }
 
         attemptingAutoLogin.set(true)
