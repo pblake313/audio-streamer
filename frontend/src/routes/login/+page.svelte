@@ -25,7 +25,6 @@
                     <h2 style="margin-bottom: 25px;">Login</h2>
  
                     <PinForm />
-                    <a href="/" class="loginPage_idk">Where is my code?</a>
                 </div>
 
             </GlassSurface>

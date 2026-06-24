@@ -83,6 +83,38 @@
     text-align: center;
 }
 
+/* HELP LINK */
+.pinHelpWrap {
+    width: 100%;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-6px);
+    transition:
+        max-height 300ms ease,
+        opacity 220ms ease,
+        transform 300ms ease;
+}
+
+.pinHelpWrap_open {
+    max-height: 70px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pinForm_idk {
+    color: var(--font-color-heading);
+    margin-top: 25px;
+    display: block;
+    opacity: 0.5;
+    transition: opacity 220ms ease;
+}
+
+.pinForm_idk:hover {
+    text-decoration: underline;
+    opacity: 1;
+}
+
 .wrapIpChecker {
     margin: auto;
     text-align: center;
@@ -91,10 +123,6 @@
 }
 
 @media (max-width: 600px) {
-    .wrapPINForm {
-        top: 45%;
-    }
-
     .pinInputWrap {
         max-height: 110px;
     }
@@ -105,6 +133,14 @@
 
     .pinError {
         width: 90%;
+        margin-top: 20px;
+    }
+
+    .pinHelpWrap_open {
+        max-height: 60px;
+    }
+
+    .pinForm_idk {
         margin-top: 20px;
     }
 }

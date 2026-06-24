@@ -23,18 +23,7 @@
     padding: 25px 35px;
 }
 
-.loginPage_idk {
-    color: var(--font-color-heading);
-    margin-top: 25px;
-    display: block;
-    opacity: 0.5;
-    transition: 0.3s;
-}
 
-.loginPage_idk:hover {
-    text-decoration: underline;
-    opacity: 1;
-}
 
 .loginPage_video {
     position: absolute;

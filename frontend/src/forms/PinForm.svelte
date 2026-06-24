@@ -50,14 +50,10 @@
         }, 6000);
     }
 
-    function hidePinError() {
+    function clearPinErrorNow() {
         clearErrorTimeouts();
         pinErrorVisible = false;
-
-        removeErrorTimeout = setTimeout(() => {
-            pinErrorMessage = null;
-            removeErrorTimeout = null;
-        }, 300);
+        pinErrorMessage = null;
     }
 
     onMount(async () => {
@@ -69,12 +65,8 @@
     onDestroy(() => {
         clearErrorTimeouts();
     });
-    function clearPinErrorNow() {
-        clearErrorTimeouts();
-        pinErrorVisible = false;
-        pinErrorMessage = null;
-    }
-    async function pinSubmitted(event: CustomEvent) {
+
+    async function pinSubmitted(event: CustomEvent<string>) {
         const pin = event.detail;
 
         try {
@@ -88,13 +80,12 @@
                 body: JSON.stringify({ pin }),
             });
 
-            console.log(response);
-
             if (response?.accessToken) {
                 goto("/portal");
             }
         } catch (error: any) {
             console.log(error);
+
             await showPinError(
                 error.message || "An unknown error has occurred.",
             );
@@ -132,6 +123,14 @@
                     />
                 </div>
             {/if}
+        </div>
+
+        <div
+            class:pinHelpWrap_open={!isLoading && !pinErrorMessage}
+            class="pinHelpWrap"
+            aria-hidden={isLoading || !!pinErrorMessage}
+        >
+            <a href="/" class="pinForm_idk">Where is my code?</a>
         </div>
     </div>
 </div>
