@@ -39,7 +39,7 @@ h1 {
 
 .hero_buttonContainer{
     margin: auto;
-    margin-top: 25px;
+    margin-top: 40px;
     width: 150px;
 }
 
@@ -75,23 +75,52 @@ h1 {
         rgba(34, 34, 34, 0) 100%
     );
 }
+.hero_githubLink{
+    margin: auto;
+    width: fit-content;
+    margin-top: 45px;
+}
 
 @media (max-width: 1600px) {
     .hero_container {
         padding: 150px 0px;
     }
+    h1 {
+        font-size: 65pt;
+    }
 }
-@media (max-width: 700px) {
-    .hero_container {
-        padding: 150px 0;
+@media (max-width: 1200px) {
+    h1 {
+        font-size: 45pt;
     }
 
-    .hero_insideContainer {
-        padding: 0 15px;
+    
+}
+@media (max-width: 700px) {
+
+
+    .hero_subtext{
+        max-width: none;
+
     }
 
     .hero_topFade,
     .hero_bottomFade {
         height: 130px;
     }
+}
+@media (max-width: 650px) {
+        .hero_container{
+        padding: 150px 0px;
+    }
+    h1 {
+        font-size: 38pt;
+    }
+
+}
+@media (max-width: 500px) {
+        h1 {
+        font-size: 30pt;
+    }
+    
 }

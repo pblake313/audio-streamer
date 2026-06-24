@@ -35,7 +35,8 @@
     }
 
     function goToSlide(index: number) {
-        swiper?.slideToLoop(index);
+        activeIndex = index;
+        swiper?.slideTo(index);
     }
 
     onMount(() => {
@@ -52,7 +53,7 @@
 
             breakpoints: {
                 1600: {
-                    slidesPerView: 1.2,
+                    slidesPerView: 1,
                 },
                 1200: {
                     slidesPerView: 1.4,
@@ -97,6 +98,24 @@
     in:fade={{ delay: 500, duration: 500 }}
     out:fade={{ duration: 500 }}
 >
+    <div class="dss_slidePicker" aria-label="Screenshot picker">
+        {#each images as img, index}
+            <button
+                type="button"
+                class="dss_slidePickerButton {index === activeIndex ? 'dss_slidePickerButtonActive' : ''}"
+                on:click={() => goToSlide(index)}
+                aria-label={`View screenshot ${index + 1}`}
+                aria-pressed={index === activeIndex}
+            >
+                <img
+                    src={img}
+                    alt={`Screenshot thumbnail ${index + 1}`}
+                    loading="lazy"
+                />
+            </button>
+        {/each}
+    </div>
+
     <div class="dss_megaSwipeWrap">
         <div class="swiper dss_swiper" bind:this={swiperContainer}>
             <div class="swiper-wrapper dss_swiperWrapper">
@@ -119,9 +138,11 @@
         <div class="dss_innerLocationGrid">
             {#each images as _, i}
                 <button
+                    type="button"
                     class="dss_swiperNavButton {i === activeIndex ? 'dss_active' : ''}"
                     on:click={() => goToSlide(i)}
                     aria-label={`Go to screenshot ${i + 1}`}
+                    aria-pressed={i === activeIndex}
                 />
             {/each}
         </div>

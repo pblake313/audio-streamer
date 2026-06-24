@@ -14,6 +14,8 @@
     --font-color-light: #b4b4b4;
     --font-color-heading: white;
 
+    --border-light: 1px solid rgba(255, 255, 255, 0.096);
+
 }
 
 html {
@@ -161,9 +163,19 @@ li {
     }
 }
 
-@media (max-width: 750px) {
-    h3 {
-        font-size: 20pt;
+@media (max-width: 1200px) {
+    h2 {
+        font-size: 32pt;
     }
-
 }
+@media (max-width: 700px) {
+    h2 {
+        font-size: 30pt;
+    }
+}
+@media (max-width: 500px) {
+    h2 {
+        font-size: 26pt;
+    }
+}
+

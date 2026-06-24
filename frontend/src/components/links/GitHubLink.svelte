@@ -2,7 +2,7 @@
     import GitHubIcon from "../Icons/Logos/GitHubIcon.svelte";
 
     export let stickyLink: boolean = false
-    export let gitText:string = 'Download this project from GitHub | @pblake313'
+    export let gitText:string = 'Download this project from GitHub'
 
 </script>
 
@@ -45,7 +45,7 @@
 <div class="gitHubLinkWrapper" class:stickyLink={stickyLink}>
     <a href="https://github.com/pblake313/audio-streamer" target="_blank" class="insideGitLink">
         <div style="width:30px; height:30px;">
-            <GitHubIcon></GitHubIcon>
+            <GitHubIcon />
         </div>
         <p class="gitHubStyle">{gitText}</p>
     </a>

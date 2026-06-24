@@ -10,9 +10,10 @@
     let slideType: "mobile" | "desktop" = "desktop";
 </script>
 
-<div class="wrapProjDeets">
+<div class="projectDetails_container">
     <!-- PROJECT SUMMARY -->
     <div class="projectDetails_section">
+
         <h2>Project Summary</h2>
 
         <p>
@@ -130,14 +131,5 @@
         </p>
     </div>
 
-    <BoxButton
-        buttonText={"Login"}
-        on:click={() => {
-            goto("/login");
-        }}
-    />
 
-    <div class="bottomGit">
-        <GitHubLink />
-    </div>
 </div>

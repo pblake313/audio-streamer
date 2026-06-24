@@ -1,10 +1,55 @@
 .dss_container {
     max-width: 1250px;
-    padding: 0 25px;
     margin: auto;
-    
+    overflow: hidden;
 }
 
+/* THUMBNAIL PICKER */
+.dss_slidePicker {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+.dss_slidePickerButton {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid rgba(220, 220, 220, 0.65);
+    background: transparent;
+    opacity: 0.65;
+    transition:
+        border-color 0.25s ease,
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.dss_slidePickerButton:hover {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.dss_slidePickerButtonActive {
+    border-color: white;
+    opacity: 1;
+}
+
+.dss_slidePickerButton img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* MAIN SWIPER */
 .dss_megaSwipeWrap {
     width: 100%;
 }
@@ -15,6 +60,10 @@
     box-sizing: border-box;
 }
 
+.swiper.dss_swiper {
+    overflow: visible !important;
+}
+
 .dss_singleSwiperSlide {
     font-size: 18px;
     cursor: grab;
@@ -22,6 +71,11 @@
     border-radius: 10px;
     border: 1px solid rgba(92, 92, 92, 0.5);
     display: flex;
+    overflow: hidden;
+}
+
+.dss_singleSwiperSlide:active {
+    cursor: grabbing;
 }
 
 .dss_imageContainer {
@@ -38,10 +92,7 @@
     display: block;
 }
 
-.swiper.dss_swiper {
-    overflow: visible !important;
-}
-
+/* BOTTOM NAV */
 .dss_swiperLocation {
     display: flex;
     justify-content: space-between;
@@ -63,6 +114,19 @@
     transition: 0.3s;
 }
 
+.dss_swiperNavButton:hover {
+    opacity: 1;
+}
+
+.dss_swiperNavButton.dss_active {
+    background: #ffffff;
+    opacity: 1;
+}
+
+.dss_swiperNavButton.dss_active:hover {
+    opacity: 1;
+}
+
 .dss_photosButtonsFlex {
     width: 100%;
     display: flex;
@@ -79,17 +143,9 @@
     margin-top: 15px;
 }
 
-.dss_swiperNavButton:hover {
-    opacity: 1;
-}
-
-.dss_swiperNavButton.dss_active {
-    background: #ffffff;
-    opacity: 1;
-}
-
-.dss_swiperNavButton.dss_active:hover {
-    opacity: 1;
+.dss_swiperButtonPrev {
+    transform: rotate(180deg);
+    padding-top: 3px;
 }
 
 .dss_lastNavButton {
@@ -97,27 +153,6 @@
     background-color: blue;
 }
 
-.dss_swiperButtonPrev {
-    transform: rotate(180deg);
-    padding-top: 3px;
-}
-
 .dss_nonDots {
     display: none;
-}
-
-@media (max-width: 750px) {
-    .dss_innerLocationGrid {
-        display: none;
-    }
-
-    .dss_nonDots {
-        display: block;
-    }
-}
-
-@media (max-width: 650px) {
-    .dss_container {
-        padding: 0 15px;
-    }
 }

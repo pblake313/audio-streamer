@@ -2,13 +2,15 @@
     position: fixed;
     width: 100%;
     z-index: 99;
+    transition: .3s;
+    border-bottom: 1px solid transparent;
     
 }
 
 .nav_inside{
     margin: auto;
     max-width: 1250px;
-    padding: 10px 25px;
+    padding: 15px 25px;
     transition: .3s;
 
 }
@@ -26,8 +28,21 @@
     gap: 25px;
     align-items: center;
 }
-@media (max-width: 650px) {
-    .nav_inside{
-        padding: 0px 15px;
+.nav_scrolled{
+    transition: .3s;
+    background-color: #222;
+    border-bottom: var(--border-light);
+}
+.nav_mobileToggle{
+    display: none;
+}
+
+/* mobile nav */
+@media (max-width: 750px) {
+    .nav_rightFlex{
+        display: none;
+    }
+    .nav_mobileToggle{
+        display: block;
     }
 }

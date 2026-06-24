@@ -39,6 +39,10 @@
             />
         </div>
 
+        <div class="hero_githubLink">
+            <GitHubLink />
+        </div>
+
     </div>
 
     <div class="hero_topFade"></div>

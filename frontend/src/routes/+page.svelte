@@ -10,6 +10,7 @@
     import './Homepage.css'
     import Hero from "../components/feature-sections/Hero.svelte";
     import ProjectDetails from "../components/feature-sections/ProjectDetails.svelte";
+    import Footer from "../components/standalone/Nav/Footer.svelte";
 
     onMount(() => {
         navStyle.set({style: 'standard', capWidth:false, addLine: true})
@@ -39,10 +40,11 @@
         
         <Hero />
 
-        <br><br><br><br>
 
         <!-- how would i say an open sourced audio player? what would be good for a hero section here? -->
         <ProjectDetails />
+
+        <Footer />
 
 {/if}
 

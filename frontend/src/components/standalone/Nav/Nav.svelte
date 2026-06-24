@@ -1,7 +1,7 @@
 <script lang="ts">
     import "./Nav.css";
     import { page } from "$app/stores";
-    import { navOpen, navStyle } from "../../../stores/navstore";
+    import { mobileNavOpen, navOpen, navStyle } from "../../../stores/navstore";
     import EarIcon from "../../Icons/svg/EarIcon.svelte";
     import SettingsIcon from "../../Icons/svg/SettingsIcon.svelte";
     import { onMount, onDestroy } from "svelte";
@@ -15,6 +15,8 @@
     import BoxButton from "../../buttons/BoxButton.svelte";
     import GitHubIcon from "../../Icons/Logos/GitHubIcon.svelte";
     import NavigationLink from "../../buttons/NavigationLink.svelte";
+    import MobileMenuToggler from "../../UI/MobileMenuToggler.svelte";
+    import MobileNav from "./MobileNav.svelte";
 
     let isScrolled = false;
 
@@ -42,7 +44,7 @@
 
 <!-- have a user. -->
 
-<div class="nav_container">
+<div class="nav_container" class:nav_scrolled={isScrolled}>
     <div class="nav_inside">
         {#if $user}
             <div
@@ -52,20 +54,6 @@
             >
                 <div class="insideNav" class:maxoutnav={$navStyle.capWidth}>
                     <div class="leftSideNav">
-                        <button
-                            class="logoButtonRouter"
-                            on:click={() => {
-                                goto("/portal");
-                            }}
-                        >
-                            <div class="wrapDeskHomeLogo">
-                                <Logo color={"#f7f7f7"} width={"120px"}></Logo>
-                            </div>
-                            <div class="wrapMobileHomeLogo">
-                                <Logo color={"#f7f7f7"} width={"100px"}></Logo>
-                            </div>
-                        </button>
-
                         <button on:click={logout} class="logoutJoint">
                             <p style="font-size: 9pt;">Logout</p>
                             <LogoutIcon height={"15px"} color={"#f7f7f7"}
@@ -132,7 +120,17 @@
                     }}/>
 
                 </div>
+
+                <div class="nav_mobileToggle">
+                    <MobileMenuToggler />
+                </div>
+
+                
             </div>
         {/if}
     </div>
 </div>
+
+{#if $mobileNavOpen}
+    <MobileNav />
+{/if}

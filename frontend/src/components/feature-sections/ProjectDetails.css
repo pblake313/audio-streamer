@@ -30,6 +30,11 @@
         margin-bottom: 40px;
 
     }
+    .projectDetails_loginButton{
+        width: 150px;
+        margin: auto;
+
+    }
 
     .projectDetails_photoFlex{
         display: flex;
@@ -43,7 +48,15 @@
     .projectDetails_swiperSection{
         margin-bottom: 35px;
     }
+.projectDetails_gitLink{
+    width: fit-content;
+    margin: auto;
+    margin-bottom: 65px;
 
+}
+.projectDetails_container{
+    margin: 150px 0px;
+}
 strong {
     color: var(--font-color-heading);
 }
