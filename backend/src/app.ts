@@ -55,9 +55,11 @@ app.use('/auth', auth)
 
 import secure from './routes/Secure/secure'
 app.use('/secure', secure)
-// for users who have successfully entered the pin.
 
 
+// ERRORS
+import { errorHandler } from './middlewares/errorHandler';
+app.use(errorHandler);
 
 
 export default app;

@@ -60,7 +60,8 @@ h1 {
     color: var(--font-color-heading);
     font-family: var(--font-sans);
     font-weight: 500;
-    font-size: 50pt;
+    font-size: 80pt;
+
         padding: 0px;
     margin: 0px;
 }

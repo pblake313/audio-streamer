@@ -10,6 +10,7 @@
     max-width: 1250px;
     position: relative;
     z-index: 1;
+    margin-bottom: 25px;
 }
 
 .footer_containLogo {
@@ -24,6 +25,7 @@
 .footer_eyebrow{
     font-size: 10pt;
     opacity: .6;
+    margin-bottom: 15px;
 
 }
 .footer_socials{

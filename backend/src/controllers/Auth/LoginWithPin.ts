@@ -1,22 +1,25 @@
 // src/routes/auth/loginWithPin.ts
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { getClientIp } from "../../helpers/IpHelpers";
 import { createWrongPinDocument, deleteWrongPinDocByIP, getWrongPinDocByIP, incrementLastPinDoc } from "../../helpers/WrongPin";
+import { AppError } from "../../errors/AppError";
 
-export async function loginWithPin(req: Request, res: Response) {
+export async function loginWithPin(req: Request, res: Response, next: NextFunction) {
 	try {
 		const activePIN = process.env.ACTIVE_PIN;
 		const pinSubmitted = req.body.pin;
 
 		const ip = getClientIp(req);
 
-		if (!ip) {
-			throw new Error("Missing IP address in header.");
-		}
+        if (!ip) {
+            throw new AppError(400, "Missing or invalid IP address.");
+        }
 
 		if (pinSubmitted === activePIN) {
 			// console.log("🟢 pins match -- create and send tokens.");
+
+            if ( 1 === 1) throw new Error('Pins finna match')
 
 			// Refresh token – long lived, stored in cookie
 			const refreshToken = sign(
@@ -52,6 +55,9 @@ export async function loginWithPin(req: Request, res: Response) {
 
 			return res.status(200).send({ accessToken, streamToken });
 		} else {
+
+            if ( 1 === 1) throw new Error('Pins do not match.')
+
 
             // console.log("🟠 pin mismatch :(");
 
@@ -124,9 +130,8 @@ export async function loginWithPin(req: Request, res: Response) {
 
 		}
 	} catch (err: any) {
-		return res.status(500).send({
-			error: err.message || "An unknown error has occurred."
-		});
+        next(err)
 	}
+
 }
  

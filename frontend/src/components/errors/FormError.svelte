@@ -13,8 +13,8 @@
 
     {#if errorTitle}
         <div class="errorTitleFlex" class:squareUpError={textAlign === 'center'}>
-            <AlertIcon  color={"#f7f7f7"} height="24px"></AlertIcon>
-            <p class="eTitle" ><b>{errorTitle}</b></p>
+            <AlertIcon  color={"#f7f7f7"} height="20px"></AlertIcon>
+            <p class="formError_title">{errorTitle}</p>
         </div>
         
     {/if}
@@ -22,9 +22,9 @@
     {#if errorMessage}
         <div class="errorTitleFlex" class:squareUpMessage={textAlign === 'center'}>
             {#if !errorTitle}
-                <AlertIcon color={"#f7f7f7"} height="24px"></AlertIcon>
+                <AlertIcon color={"#f7f7f7"} height="20px"></AlertIcon>
             {/if}
-            <p class="eTitle suberr" class:noETitle={!errorTitle}>{errorMessage}</p>
+            <p class="formError_title suberr" class:noETitle={!errorTitle}>{errorMessage}</p>
         </div>
         
     {/if}
@@ -33,14 +33,18 @@
 
 
 <style>
-    .eTitle {
+    .formError_title {
         margin-left: 10px;
-        color: #a5a5a5;
+        color: var(--font-color-heading);
+        font-weight: 550;
+        font-size: 14pt;
     }
     .suberr{
         opacity: .8;
         margin-left: 0px;
         margin-top: 10px;
+        font-weight: 400;
+        font-size: 12pt;
 
     }
     .errorTitleFlex {
@@ -57,7 +61,7 @@
         margin: auto;
         width: fit-content;
     }
-    .noETitle {
+    .noformError_title {
         margin-left: 10px;
     }
 </style>

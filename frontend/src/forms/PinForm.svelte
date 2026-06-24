@@ -1,177 +1,137 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
+    import { tick } from "svelte";
     import PinInput from "../components/form-inputs/PinInput.svelte";
     import FormError from "../components/errors/FormError.svelte";
     import { publicFetch } from "../helpers/Fetchers/publicFetch";
-    import './PinForm.css'
-    import { accessToken } from "../stores/tokenStore";
+    import "./PinForm.css";
     import { goto } from "$app/navigation";
-    import { getAuthenticatedUser } from "../helpers/Auth/authFunctions";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { user } from "../stores/UserStore";
-    import { checkIp, checkIpErrorMesssage, isCheckingIp, userBlockedMessage } from "../stores/IPStore";
-    import AudioLoader from "../components/loaders/AudioLoader.svelte";
-    import Logo from "../components/Icons/Logos/Logo.svelte";
+    import Loader from "../components/loaders/Loader.svelte";
 
-    let formErrorMessage: string | null = null;
     let isLoading: boolean = false;
+    let pinErrorMessage: string | null = null;
+    let pinErrorVisible: boolean = false;
 
-    // track the timeout so we can reset it
-    let pinErrorTimeout: ReturnType<typeof setTimeout> | null = null;
+    let errorTimeout: ReturnType<typeof setTimeout> | null = null;
+    let removeErrorTimeout: ReturnType<typeof setTimeout> | null = null;
 
-
-    onMount(async ()=> {
-        if ($user === true){
-            goto('/portal')
+    function clearErrorTimeouts() {
+        if (errorTimeout) {
+            clearTimeout(errorTimeout);
+            errorTimeout = null;
         }
-        await checkIp()
-        
-    })
 
+        if (removeErrorTimeout) {
+            clearTimeout(removeErrorTimeout);
+            removeErrorTimeout = null;
+        }
+    }
+
+    async function showPinError(message: string) {
+        clearErrorTimeouts();
+
+        pinErrorVisible = false;
+        pinErrorMessage = message;
+
+        await tick();
+
+        pinErrorVisible = true;
+
+        errorTimeout = setTimeout(() => {
+            pinErrorVisible = false;
+
+            removeErrorTimeout = setTimeout(() => {
+                pinErrorMessage = null;
+                removeErrorTimeout = null;
+            }, 300);
+
+            errorTimeout = null;
+        }, 6000);
+    }
+
+    function hidePinError() {
+        clearErrorTimeouts();
+        pinErrorVisible = false;
+
+        removeErrorTimeout = setTimeout(() => {
+            pinErrorMessage = null;
+            removeErrorTimeout = null;
+        }, 300);
+    }
+
+    onMount(async () => {
+        if ($user === true) {
+            goto("/portal");
+        }
+    });
+
+    onDestroy(() => {
+        clearErrorTimeouts();
+    });
+    function clearPinErrorNow() {
+        clearErrorTimeouts();
+        pinErrorVisible = false;
+        pinErrorMessage = null;
+    }
     async function pinSubmitted(event: CustomEvent) {
+        const pin = event.detail;
+
         try {
+            if (isLoading) return;
 
-            if ($userBlockedMessage) return
-
+            clearPinErrorNow();
             isLoading = true;
-            formErrorMessage = null;
 
-            const pin = event.detail;
-
-            const response = await publicFetch('/auth/login-with-pin', {
-                method: 'POST',
-                credentials: 'include',
-                body: JSON.stringify({ pin })
+            const response = await publicFetch("/auth/login-with-pin", {
+                method: "POST",
+                body: JSON.stringify({ pin }),
             });
 
-            if (response.accessToken) {
-                accessToken.set(response.accessToken);
-                // call autologin...
-                await getAuthenticatedUser()
-                goto('/portal')
+            console.log(response);
 
-            } else {
-                formErrorMessage = 'A successful response occurred, but no access token was received.';
-                resetPinError(5);
+            if (response?.accessToken) {
+                goto("/portal");
             }
-
         } catch (error: any) {
-
-            if (error?.data?.blocked) {
-
-                if (error?.data?.blockedUntil) {
-
-                    const readableDate = new Date(error.data.blockedUntil)
-                        .toLocaleString(undefined, {
-                            weekday: "short",
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit"
-                        });
-
-                    userBlockedMessage.set(
-                        `You have been denied access until ${readableDate}. You may try again after that.`
-                    );
-
-                } else {
-                    userBlockedMessage.set('Access denied.');
-                }
-
-                return;
-            }
-
-            // set the error message
-            const errorMessage = error.message || "An unknown error has occurred.";
-            const attemptsRemaining: number | undefined = error?.data?.attemptsRemaining;
-            let combinedError = errorMessage;
-            if (typeof attemptsRemaining === "number") {
-                combinedError += ` | ${attemptsRemaining} attempt${
-                    attemptsRemaining === 1 ? "" : "s"
-                } remaining`;
-            }
-
-
-
-            formErrorMessage = combinedError;
-            resetPinError(5);
+            console.log(error);
+            await showPinError(
+                error.message || "An unknown error has occurred.",
+            );
         } finally {
             isLoading = false;
         }
     }
-
-    function resetPinError(seconds: number) {
-        // clear any existing timer so it fully resets
-        if (pinErrorTimeout) {
-            clearTimeout(pinErrorTimeout);
-        }
-
-        pinErrorTimeout = setTimeout(() => {
-            formErrorMessage = null;
-            pinErrorTimeout = null; // optional, but keeps it clean
-        }, seconds * 1000);
-    }
 </script>
 
-
 <div class="wrapPINForm">
-
-
-
-    {#if !$isCheckingIp}
-
-
-        {#if $checkIpErrorMesssage}
-            <div class="pinError" in:fade={{duration: 300}}>
-                <br>
-                <p>{$checkIpErrorMesssage}</p>
-            </div>
-        {:else}
-
-            <div class="holdPIN">
-                {#if !isLoading}
-
-                    {#if !$userBlockedMessage}
-                        <PinInput on:pinSubmitted={pinSubmitted}></PinInput>
-
-
-                    {:else}
-                        <div class="pinError">
-                            <p>{$userBlockedMessage || 'Unauthorized'}</p>
-                        </div>
-
-                    {/if}
-
-                {:else}
-                        <div style="margin: auto; max-width: 150px; width: 100%" in:fade={{duration: 300}}>
-                            <AudioLoader backgroundColor={'#222222'}></AudioLoader>
-                        </div>
-                        
-                {/if}
-            </div>
-            {#if formErrorMessage}
-                <div class="wrapPinErrorMessage" in:fade={{duration: 350}} out:fade={{duration: 300}}>
-                    <FormError textAlign={'center'} errorMessage={formErrorMessage} errorTitle={'PIN Error'}></FormError>
-                </div>
-            {/if}
-
-
-
-            
-        {/if}
-
-   
-
-    {:else}
-        <div class="wrapIpChecker" in:fade={{duration: 300}}>
-            <p style="opacity: .5; font-size: 9pt;">Hang tight. Validating.</p>
-            <br>
-            <AudioLoader backgroundColor={'#222222'}></AudioLoader>
+    <div class="holdPIN">
+        <div class:pinInputWrap_closed={isLoading} class="pinInputWrap">
+            <PinInput on:pinSubmitted={pinSubmitted} />
         </div>
 
-    {/if}
+        <div
+            class:pinLoaderWrap_open={isLoading}
+            class="pinLoaderWrap"
+            aria-hidden={!isLoading}
+        >
+            <Loader />
+        </div>
 
-    
-
+        <div
+            class:pinErrorWrap_open={!isLoading && pinErrorVisible}
+            class="pinErrorWrap"
+            aria-live="polite"
+        >
+            {#if pinErrorMessage}
+                <div class="pinError">
+                    <FormError
+                        errorMessage={pinErrorMessage}
+                        errorTitle={"Login Error"}
+                        textAlign={"center"}
+                    />
+                </div>
+            {/if}
+        </div>
+    </div>
 </div>

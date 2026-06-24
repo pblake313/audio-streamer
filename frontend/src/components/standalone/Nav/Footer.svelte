@@ -14,11 +14,4 @@ import './Footer.css'
         <div class="footer_bottomFade"></div>
     </div>
 
-    <div class="footer_socials">
-        <SocialButton height={"22px"}  buttonType={"instagram"}/>
-        <SocialButton height={"18px"} buttonType={"x"}/>
-        <SocialButton height={"32px"} buttonType={"soundcloud"}/>
-        <SocialButton buttonType={"youtube"}/>
-        <SocialButton height={"22px"} buttonType={"github"}/>
-    </div>
 </div>
