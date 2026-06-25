@@ -8,6 +8,8 @@
     import { onMount, onDestroy } from "svelte";
     import { user } from "../stores/UserStore";
     import Loader from "../components/loaders/Loader.svelte";
+    import { firestoreTimestampToDate, formatTimeRemaining } from "../helpers/formatters";
+    import { accessToken } from "../stores/tokenStore";
 
     let isLoading: boolean = false;
     let pinErrorMessage: string | null = null;
@@ -80,15 +82,51 @@
                 body: JSON.stringify({ pin }),
             });
 
-            if (response?.accessToken) {
-                goto("/portal");
-            }
-        } catch (error: any) {
-            console.log(error);
+            console.log(response)
 
-            await showPinError(
-                error.message || "An unknown error has occurred.",
-            );
+            if (response?.accessToken){
+                accessToken.set(response.accessToken )
+                user.set(true)
+            }
+
+
+        } catch (error: any) {
+
+            let errorMessage = error.message || 'An unknown error has occurred.'
+
+            // console.log(error);
+            const wrongPinDoc = error.data.wrongPinDoc || null
+
+            if (wrongPinDoc) {
+                const attemptsRemaining = Math.max(0, 5 - wrongPinDoc.attempts);
+
+                errorMessage = `Invalid PIN: ${attemptsRemaining} attempts remaining.`;
+            }
+
+            // blocked error message
+            if (wrongPinDoc?.blocked) {
+                const lastAttempt = firestoreTimestampToDate(wrongPinDoc.lastAttempt);
+
+                if (!lastAttempt) {
+                    errorMessage = "This device is blocked. Please try again later.";
+                    await showPinError(errorMessage);
+                    return;
+                }
+
+                const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+                const blockedUntil = new Date(lastAttempt.getTime() + sevenDaysMs);
+
+                const now = new Date();
+                const timeRemainingMs = blockedUntil.getTime() - now.getTime();
+
+                const timeRemaining = formatTimeRemaining(timeRemainingMs);
+
+                errorMessage = `Too many invalid PIN attempts. This device is blocked for ${timeRemaining}.`;
+            }
+
+
+            await showPinError(errorMessage);
+
         } finally {
             isLoading = false;
         }

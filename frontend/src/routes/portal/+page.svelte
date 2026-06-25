@@ -1,18 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import HighlightedTrack from '../../components/standalone/HighlightedTrack.svelte';
-    import { beatFetchError, fetchBeats, fetchBeatsAttempted, isFetchingBeats } from '../../stores/AudioPlayer/beatArrayStore';
+    import { beatFetchError, fetchBeats,  isFetchingBeats } from '../../stores/AudioPlayer/beatArrayStore';
     import { selectedBeat } from '../../stores/AudioPlayer/selectedBeatStore';
     import { pauseTrack, playTrack, smartNextTrack, smartPreviousTrack } from '../../stores/AudioPlayerStore';
     import { navStyle } from '../../stores/navstore';
-    import { get } from 'svelte/store';
-    import { pushNotification } from '../../stores/NotificationStore';
-    import SpinLoader from '../../components/loaders/Loader.svelte';
     import TrackList from '../../components/lists/TrackList/TrackList.svelte';
     import Loader from '../../components/loaders/Loader.svelte';
 
-
-    let fetchBeatsErrorOccurred: boolean = false
 
     // This reactive block runs every time $selectedBeat changes.
     $: if (typeof navigator !== 'undefined' && navigator.mediaSession && $selectedBeat) {

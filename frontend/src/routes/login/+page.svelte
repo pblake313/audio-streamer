@@ -4,8 +4,14 @@
     import PinForm from "../../forms/PinForm.svelte";
     import "./LoginPage.css";
     import { onMount } from "svelte";
+    import { user } from "../../stores/UserStore";
+    import { goto } from "$app/navigation";
 
         let showVideo = false;
+
+    $: if ($user){
+        goto('/portal')
+    }
 
     onMount(() => {
         showVideo = true;
@@ -19,7 +25,7 @@
         
     {#if showVideo}
         
-        <div class="loginPage_glass" in:fade={{duration: 500}}>
+        <div class="loginPage_glass" in:fade={{duration: 500, delay: 350}}>
             <GlassSurface>
                 <div class="loginPage_wrapForm">
                     <h2 style="margin-bottom: 25px;">Login</h2>

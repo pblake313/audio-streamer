@@ -12,14 +12,45 @@ export async function loginWithPin(req: Request, res: Response, next: NextFuncti
 
 		const ip = getClientIp(req);
 
-        if (!ip) {
-            throw new AppError(400, "Missing or invalid IP address.");
-        }
+        if (!ip) throw new AppError(400, "Missing or invalid IP address.");
 
 		if (pinSubmitted === activePIN) {
 			// console.log("🟢 pins match -- create and send tokens.");
 
-            if ( 1 === 1) throw new Error('Pins finna match')
+
+            // first check if we have a wrong pin doc for this ip
+
+            const pastWrongPinDoc = await getWrongPinDocByIP(ip)
+
+            if (pastWrongPinDoc) {
+
+                if (pastWrongPinDoc?.blocked){
+                    // check if the user is still blocked.
+
+                    const lastAttempt =
+                        pastWrongPinDoc.lastAttempt instanceof Date
+                            ? pastWrongPinDoc.lastAttempt
+                            : pastWrongPinDoc.lastAttempt.toDate();
+
+                    const now = new Date();
+                    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+                    const diffMs = now.getTime() - lastAttempt.getTime();
+
+                    if (diffMs >= sevenDaysMs) {
+                        // console.log('🟢 password correct, but users block period has expired and can now log in.', ip);
+                    } else {
+                        // console.log(`🔴 Password correct, but user is still blocked.);
+                        throw new AppError(401, 'Device Blocked', {wrongPinDoc: pastWrongPinDoc})
+                    }
+
+                } 
+            }
+
+            // delete all wrong pin docs for this ip.
+            await deleteWrongPinDocByIP(ip)
+
+
+            // got here...
 
 			// Refresh token – long lived, stored in cookie
 			const refreshToken = sign(
@@ -42,90 +73,55 @@ export async function loginWithPin(req: Request, res: Response, next: NextFuncti
 				{ expiresIn: "30s" }
 			);
 
-            const streamToken = sign(
-                { ip },
-                process.env.STREAM_SECRET || "",
-                { expiresIn: "10s" }
-            );
 
-
-            // delete wrong pin doc.
-
-            await deleteWrongPinDocByIP(ip)
-
-			return res.status(200).send({ accessToken, streamToken });
+			return res.status(200).send({ accessToken });
 		} else {
 
-            if ( 1 === 1) throw new Error('Pins do not match.')
-
-
             // console.log("🟠 pin mismatch :(");
-
-            // create a wrong pin doc.
-            console.log(ip)
 
             const pastWrongPinDoc = await getWrongPinDocByIP(ip)
 
             if (pastWrongPinDoc) {
-                console.log('🔵 We have a past pin doc')
+                // console.log('🔵 Past wrong pin doc: ', pastWrongPinDoc)
+
 
                 if (pastWrongPinDoc.blocked) {
                     // 🔍 Normalize lastTouched into a JS Date (handles Firestore Timestamp or Date)
-                    const lastTouched =
-                        pastWrongPinDoc.lastTouched instanceof Date
-                            ? pastWrongPinDoc.lastTouched
-                            : pastWrongPinDoc.lastTouched.toDate();
+                    const lastAttempt =
+                        pastWrongPinDoc.lastAttempt instanceof Date
+                            ? pastWrongPinDoc.lastAttempt
+                            : pastWrongPinDoc.lastAttempt.toDate();
 
                     const now = new Date();
                     const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-                    const diffMs = now.getTime() - lastTouched.getTime();
+                    const diffMs = now.getTime() - lastAttempt.getTime();
 
                     if (diffMs >= sevenDaysMs) {
                         // console.log('🟢 Block expired — resetting wrong pin doc for IP:', ip);
-                        await createWrongPinDocument(ip);
+                        const replacedPinDoc = await createWrongPinDocument(ip);
 
-                        return res.status(401).send({
-                            message: 'Invalid PIN',
-                            attemptsRemaining: 4, // back to "first wrong attempt" state
-                            blocked: false
-                        });
+                        throw new AppError(401, 'Invalid PIN', {wrongPinDoc: replacedPinDoc})
                     } else {
-                        // console.log('🔴 User is still blocked for IP:', ip);
+                        // console.log(`🔴 User is still blocked for IP:`, ip, `Blocked until: ${diffMs}`);
 
-                        const blockedUntil = new Date(
-                            lastTouched.getTime() + sevenDaysMs
-                        );
+                        throw new AppError(401, 'Device Blocked', {wrongPinDoc: pastWrongPinDoc})
 
-                        return res.status(401).send({
-                            message: 'Too many invalid attempts. Try again later.',
-                            blocked: true,
-                            blockedUntil // you can .toISOString() this if you want
-                        });
                     }
                 }
 
-
                 const updatedPinDoc = await incrementLastPinDoc(ip);
 
-                // Convert Firestore Timestamp or JS Date into a JS Date
-                const lastTouched = updatedPinDoc.lastTouched instanceof Date
-                    ? updatedPinDoc.lastTouched
-                    : updatedPinDoc.lastTouched.toDate();
-
                 // 7 days after lastTouched
-                const blockedUntil = new Date(lastTouched.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-                return res.status(401).send({
-                    message: 'Invalid PIN',
-                    attemptsRemaining: 5 - updatedPinDoc.attempts,
-                    blocked: updatedPinDoc.blocked,
-                    blockedUntil
-                });
+                throw new AppError(401, 'Invalid PIN', {wrongPinDoc: updatedPinDoc})
 
             } else {
                 // console.log('🟣 need to create a past pin doc')
-                await createWrongPinDocument(ip)
-                return res.status(401).send({message: 'Invalid PIN', attemptsRemaining: 4})
+
+                const wrongPinDoc = await createWrongPinDocument(ip)
+                // console.log('🟣 New wrong pin doc: ', wrongPinDoc)
+
+                throw new AppError(401, 'Invalid PIN', {wrongPinDoc})
             }
 
 		}

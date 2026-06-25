@@ -14,14 +14,15 @@ export const autoLoginAttempted = writable<boolean>(false)
 export async function autoLogin(){
     try {
 
-        if (get(autoLoginAttempted) === true){
-            console.log('autologin already attempted, returning.')
-            return
-        }
+
+
+        if (get(autoLoginAttempted)) return
+        
+        console.log('attemtping autologin')
 
         attemptingAutoLogin.set(true)
         // try to get an authenticated user with an access token or refresh cookie.
-        const validUser = await getAuthenticatedUser()
+        await getAuthenticatedUser()
 
     } catch (err) {
         console.log(err)
@@ -34,7 +35,7 @@ export async function autoLogin(){
 
 }
 
-export async function getAuthenticatedUser() : Promise<boolean> {
+export async function getAuthenticatedUser() {
     //will return true if we have a valid user, or false if we dont...
     try {
         await authorizedFetch('/secure/get-authorized-user', {
@@ -44,10 +45,8 @@ export async function getAuthenticatedUser() : Promise<boolean> {
         // console.log(response)
 
         user.set(true)
-        return true
     } catch (err) {
-        console.log(err)
-        return false
+        throw err
     } 
 
     // will return the authenticated user- but a valid access token is required.
@@ -67,7 +66,6 @@ export async function logout() {
         user.set(false)
 
         // reset beat stores
-
         allBeatPagesFetched.set(false)
         beatPagesFetched.set([])
         fetchBeatsAttempted.set(false)

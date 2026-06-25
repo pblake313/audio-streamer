@@ -38,7 +38,12 @@
 .nav_mobileToggle{
     display: none;
 }
-
+.nav_userFlex{
+    border: 1px solid blue;
+        display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 /* mobile nav */
 @media (max-width: 750px) {
     .nav_rightFlex{

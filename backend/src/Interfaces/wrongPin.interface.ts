@@ -4,5 +4,6 @@ export interface WrongPinDoc {
     dateCreated: FirebaseFirestore.Timestamp | Date;
     attempts: number;
     blocked: boolean;
-    lastTouched: FirebaseFirestore.Timestamp | Date;
+    updatedAt: FirebaseFirestore.Timestamp | Date;
+    lastAttempt: FirebaseFirestore.Timestamp | Date;
 }

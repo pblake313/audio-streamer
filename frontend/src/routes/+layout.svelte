@@ -1,22 +1,35 @@
 <script lang="ts">
-    import './styles.css';
-    import { autoLogin } from '../helpers/Auth/authFunctions';
-    import { onMount } from 'svelte';
-    import NotificationsList from '../components/standalone/Notificaitons/NotificationsList.svelte';
-    import Nav from '../components/standalone/Nav/Nav.svelte';
+    import "./styles.css";
+    import {
+        attemptingAutoLogin,
+        autoLogin,
+        autoLoginAttempted,
+    } from "../helpers/Auth/authFunctions";
+    import { onMount } from "svelte";
+    import NotificationsList from "../components/standalone/Notificaitons/NotificationsList.svelte";
+    import Nav from "../components/standalone/Nav/Nav.svelte";
+    import Loader from "../components/loaders/Loader.svelte";
+    import { fade } from "svelte/transition";
 
-
-    onMount( async ()=> {
-        await autoLogin()
-    })
-
-
-
+    onMount(async () => {
+        if (!$autoLoginAttempted) {
+            await autoLogin();
+        }
+    });
 </script>
 
 
-<Nav />
 
 <NotificationsList />
 
-<slot></slot>
+{#if $attemptingAutoLogin}
+    <div in:fade={{duration: 500}}>
+        <Loader loaderStyle={'loader_full'}/>
+    </div>
+{:else}
+    <div in:fade={{duration: 500, delay: 500}}>
+        <Nav />
+        <slot></slot>
+    </div>
+    
+{/if}

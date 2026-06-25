@@ -17,33 +17,36 @@
 
 <div class="hero_container">
 
-    <div class="hero_insideContainer">
+    {#if showVideo}
+        
+        <div class="hero_insideContainer" in:fade={{duration: 700, delay: 150}}>
 
+            <h1>Secure audio streaming for unreleased music.</h1>
 
-        <h1>Secure audio streaming for unreleased music.</h1>
+            <p class="hero_subtext">
+                A private SvelteKit and Node.js audio vault built for protected
+                playback, token-secured streaming, and locked-down access to unreleased
+                tracks.
+            </p>
 
-        <p class="hero_subtext">
-            A private SvelteKit and Node.js audio vault built for protected
-            playback, token-secured streaming, and locked-down access to unreleased
-            tracks.
-        </p>
+            <div class="hero_buttonContainer">
+                <BoxButton
+                    on:click={() => {
+                        goto("/login");
+                    }}
+                    buttonText={"Login"}
+                    tightPad={true}
+                    fullWidth={true}
+                />
+            </div>
 
-        <div class="hero_buttonContainer">
-            <BoxButton
-                on:click={() => {
-                    goto("/login");
-                }}
-                buttonText={"Login"}
-                tightPad={true}
-                fullWidth={true}
-            />
+            <div class="hero_githubLink">
+                <GitHubLink />
+            </div>
+
         </div>
+    {/if}
 
-        <div class="hero_githubLink">
-            <GitHubLink />
-        </div>
-
-    </div>
 
     <div class="hero_topFade"></div>
     <div class="hero_bottomFade"></div>
