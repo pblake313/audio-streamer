@@ -1,0 +1,48 @@
+.albumArtwork_container {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    position: relative;
+
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.08),
+        rgba(255, 255, 255, 0.02)
+    );
+    border: 1px solid transparent;
+
+}
+
+.albumArtwork_container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.albumArtwork_container.noImage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+}
+
+.albumArtwork_empty {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    color: #868686;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.albumArtwork_empty p {
+    margin: 0;
+    opacity: 0.85;
+}

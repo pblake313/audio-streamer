@@ -4,7 +4,7 @@
     export let tagColor: string = '#353535'
 
     export let tagTextColor: string = '#f7f7f7'
-    export let tagText: string = '`tagText`'
+    export let tagText: string
 </script>
 
 

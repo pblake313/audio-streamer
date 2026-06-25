@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { io } from '../../../../server';
 import { getStorage } from 'firebase-admin/storage';
 import admin from 'firebase-admin';
@@ -10,7 +10,7 @@ import { buildBeatObj } from "../../../helpers/AddBeatHelpers";
 
 const db = admin.firestore();
 
-export async function addBeat(req: Request, res: Response) {
+export async function addBeat(req: Request, res: Response, next: NextFunction) {
     try {
         let socketId = req.headers['x-socket-id'] as string;
 
@@ -68,9 +68,8 @@ export async function addBeat(req: Request, res: Response) {
         return res.status(200).send({ newBeat: newBeat });
 
     } catch (error) {
-        return res.status(500).send({
-            error: (error as Error).message || 'An unknown error has occurred.',
-        });
+        next(error)
+
     }
 }
 

@@ -17,6 +17,7 @@
     import NavigationLink from "../../buttons/NavigationLink.svelte";
     import MobileMenuToggler from "../../UI/MobileMenuToggler.svelte";
     import MobileNav from "./MobileNav.svelte";
+    import { authorizedFetch } from "../../../helpers/Fetchers/authorizedFetch";
 
     let isScrolled = false;
 
@@ -40,6 +41,24 @@
             window.removeEventListener("scroll", handleScroll);
         });
     }
+
+    let isLoading: boolean = false
+
+    async function test() {
+        try{
+            isLoading = true
+
+            const response = await authorizedFetch('/secure/test')
+
+            console.log('Successful Response: ', response)
+        } catch (err){
+            console.log(err)
+        } finally {
+            isLoading = false
+        }
+        
+    }
+
 </script>
 
 <!-- have a user. -->
@@ -48,7 +67,10 @@
     <div class="nav_inside">
         {#if $user}
             <div class="nav_userFlex">
-                <GitHubLink gitText={"@pblake313"} />
+                <div class="nav_githubFlex">
+                    <GitHubLink gitText={"@pblake313"} />
+                    <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/>
+                </div>
                 <div class="nav_rightFlex">
                     <NavigationLink linkText={"Portal"} linksTo={"/portal"} />
                     <NavigationLink
@@ -59,8 +81,11 @@
                         linkText={"Project Details"}
                         linksTo={"/"}
                     />
-                    <BoxButton buttonText={"Logout"} on:click={logout} tightPad={true}/>
-    
+                    <BoxButton
+                        buttonText={"Logout"}
+                        on:click={logout}
+                        tightPad={true}
+                    />
                 </div>
 
                 <div class="nav_mobileToggle">
@@ -69,7 +94,10 @@
             </div>
         {:else}
             <div class="nav_noUserFlex">
-                <GitHubLink gitText={"@pblake313"} />
+                <div class="nav_githubFlex">
+                    <GitHubLink gitText={"@pblake313"} />
+                     <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/>
+                </div>
 
                 <div class="nav_rightFlex">
                     <NavigationLink

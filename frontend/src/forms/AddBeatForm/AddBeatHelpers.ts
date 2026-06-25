@@ -1,32 +1,6 @@
-export function validateAddBeatForm(
-    title: string, 
-    bpm: number, 
+export function validateAddBeatForm(){
 
-    artworkFile: File | null,
-    mp3PreviewFile: File | null,
 
-    key: string,
-    mode: string
-){
-
-    if (!title || title.trim() === ''){
-        return false
-    }
-    if (!bpm || bpm <= 10){
-        return false
-    }
-    if (!artworkFile){
-        return false
-    }
-    if (!mp3PreviewFile){
-        return false
-    }
-    if (!mode || mode.trim() === ''){
-        return false
-    }
-    if (!key || key.trim() === ''){
-        return false
-    }
 
     return true
 }

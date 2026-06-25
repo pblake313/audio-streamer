@@ -4,7 +4,7 @@
     width: fit-content;
 }
 .tagText{
-    font-size: 9pt;
+    font-size: 11pt;
     padding: 2px 12px 0px 12px;
     white-space: nowrap;
 }
@@ -17,8 +17,6 @@
 }
 @media(max-width: 600px){
     .tagText{
-        font-size: 9pt;
         padding: 0px 7px 0px 7px;
-
     }
 }

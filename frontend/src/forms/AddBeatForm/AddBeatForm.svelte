@@ -33,17 +33,32 @@
     let isLoading = false;
 
     // form values
-    let title: string = "";
-    let tagOne: string = "";
-    let tagTwo: string = "";
-    let mood: string = "";
-    let customTag: string = "";
-    let customTagColor: string = "";
-    let key: string = "C";
-    let mode: string = "Minor";
-    let bpm: number = 0;
-    let artworkFile: File | null = null;
-    let mp3File: File | null = null;
+
+    let form: {
+        title: string | null,
+        tagOne: string | null,
+        tagTwo: string | null,
+        mood: string | null,
+        customTag: string | null,
+        customTagColor: string | null,
+        key: string,
+        mode: string,
+        bpm: number,
+        artworkFile: File | null,
+        mp3File: File | null
+    } = {
+        title: null,
+        tagOne: null,
+        tagTwo: null,
+        mood: null,
+        customTag: null,
+        customTagColor: null,
+        key: 'C',
+        mode: 'Minor',
+        bpm: 0,
+        artworkFile: null,
+        mp3File: null
+    }
 
     // temporary things for preview
     let temporaryArtUrl: string | null = null;
@@ -87,34 +102,10 @@
     async function addBeat() {
         formSubmitted = true;
 
-        const addBeatFormIsValid = validateAddBeatForm(
-            title,
-            bpm,
-            artworkFile,
-            mp3File,
-            key,
-            mode,
-        );
+        const addBeatFormIsValid = validateAddBeatForm();
 
-        if (!addBeatFormIsValid) {
-            shake();
-            return;
-        }
-
-        let formData = buildFormData({
-            title,
-            tagOne,
-            tagTwo,
-            mood,
-            bpm,
-            artworkFile,
-            mp3File,
-            key,
-            mode,
-            customTag,
-            customTagColor,
-        });
-
+        if (!addBeatFormIsValid) return;
+        
         isLoading = true;
 
         try {
@@ -127,7 +118,7 @@
                 headers: {
                     "x-socket-id": socketId,
                 },
-                body: formData,
+                // body: formData,
             });
 
             // console.log(response)
@@ -152,6 +143,8 @@
                 );
             }
         } catch (error: any) {
+            console.log(error)
+
             if (error.message)
                 pushNotification(
                     error.message || "An unknown error has occurred.",
@@ -180,17 +173,16 @@
     <div class="trackPreviewSide">
         <AddTrackPreview
             albumUrl={temporaryArtUrl}
-            {bpm}
-            {key}
-            {mode}
-            {tagOne}
-            {tagTwo}
-            {title}
-            {mood}
-            {customTag}
-            {customTagColor}
-            heading={"Add Track"}
-        ></AddTrackPreview>
+            bpm={form.bpm}
+            key={form.key}
+            mode={form.mode}
+            tagOne={form.tagOne}
+            tagTwo={form.tagTwo}
+            title={form.title}
+            mood={form.mood}
+            customTag={form.customTag}
+            customTagColor={form.customTagColor}
+        />
     </div>
 
     <div class="beatFormSide">
@@ -226,12 +218,12 @@
                     </div>
                     <div class="wrapFIn">
                         <TextInput
-                            value={title}
+                            value={form.title}
                             label={"Beat Title"}
-                            inputError={formSubmitted && !title
+                            inputError={formSubmitted && !form.title
                                 ? "Enter a valid beat title."
                                 : null}
-                            onTextChange={(v) => (title = v)}
+                            onTextChange={(v) => (form.title = v)}
                             maxlength={50}
                         />
                     </div>
@@ -239,20 +231,20 @@
                     <div class="tagsFlex">
                         <div class="addBpmSel">
                             <BpmInput
-                                bpmChanged={(v) => (bpm = v)}
-                                inputError={formSubmitted && !bpm
+                                bpmChanged={(v) => (form.bpm = v)}
+                                inputError={formSubmitted && !form.bpm
                                     ? "Number between 1 and 199."
                                     : null}
-                                {bpm}
+                                bpm={form.bpm}
                             />
                         </div>
 
                         <div class="keySelect">
                             <SelectButton
-                                onSelect={(v) => (key = v)}
+                                onSelect={(v) => (form.key = v)}
                                 label={"Key"}
                                 id={"songKey"}
-                                selectedOption={key}
+                                selectedOption={form.key}
                                 options={songKeyOptions}
                             />
                         </div>
@@ -261,9 +253,9 @@
                             <SelectButton
                                 label={"Mode"}
                                 id={"songMode"}
-                                selectedOption={mode}
+                                selectedOption={form.mode}
                                 options={songModeOptions}
-                                onSelect={(v) => (mode = v)}
+                                onSelect={(v) => (form.mode = v)}
                             />
                         </div>
                     </div>
@@ -274,18 +266,18 @@
                     <div class="wrapFIn">
                         <ImageUploader
                             fileUploaded={(v) => {
-                                artworkFile = v.file;
+                                form.artworkFile = v.file;
                                 temporaryArtUrl = v.imageUrl;
                             }}
                             clearInput={() => {
-                                artworkFile = null;
+                                form.artworkFile = null;
                                 temporaryArtUrl = null;
                             }}
-                            inputError={formSubmitted && !artworkFile
+                            inputError={formSubmitted && !form.artworkFile
                                 ? "Please upload an artwork image."
                                 : null}
                             label={"Artwork"}
-                            fileName={artworkFile?.name}
+                            fileName={form.artworkFile?.name}
                         />
                     </div>
 
@@ -293,16 +285,16 @@
                         <Mp3Uploader
                             label={"File Preview (MP3)"}
                             mp3Url={temporaryMp3Url}
-                            fileName={mp3File?.name}
-                            inputError={formSubmitted && !mp3File
+                            fileName={form.mp3File?.name}
+                            inputError={formSubmitted && !form.mp3File
                                 ? "Upload track audio file."
                                 : ""}
                             mp3Uploaded={(v) => {
-                                mp3File = v.file;
+                                form.mp3File = v.file;
                                 temporaryMp3Url = v.mp3Url;
                             }}
                             clearInput={() => {
-                                mp3File = null;
+                                form.mp3File = null;
                                 temporaryMp3Url = null;
                             }}
                         />
@@ -319,16 +311,16 @@
                         <div class="cTag">
                             <TextInput
                                 label={"Custom Tag"}
-                                onTextChange={(v) => (customTag = v)}
-                                value={customTag}
+                                onTextChange={(v) => (form.customTag = v)}
+                                value={form.customTag}
                                 maxlength={35}
                             />
                         </div>
                         <div class="customColor">
                             <ColorSelect
-                                onSelect={(v) => (customTagColor = v)}
+                                onSelect={(v) => (form.customTagColor = v)}
                                 label={"Tag Color"}
-                                selectedOption={customTagColor}
+                                selectedOption={form.customTagColor}
                                 {colorOptions}
                             />
                         </div>
@@ -337,21 +329,21 @@
                     <div class="tagsFlex">
                         <div class="tagHalf">
                             <SelectButton
-                                onSelect={(v) => (tagOne = v)}
+                                onSelect={(v) => (form.tagOne = v)}
                                 options={tagOptions}
                                 id={"tagNoOne"}
                                 label={"Tag One"}
-                                selectedOption={tagOne}
+                                selectedOption={form.tagOne}
                             />
                         </div>
 
                         <div class="tagHalf">
                             <SelectButton
-                                onSelect={(v) => (tagTwo = v)}
+                                onSelect={(v) => (form.tagTwo = v)}
                                 options={tagOptions}
                                 id={"tagNoTwo"}
                                 label={"Tag Two"}
-                                selectedOption={tagTwo}
+                                selectedOption={form.tagTwo}
                             />
                         </div>
                     </div>
@@ -359,8 +351,8 @@
                     <SelectButton
                         options={beatMoodOptions}
                         label="Mood"
-                        onSelect={(v) => (mood = v)}
-                        selectedOption={mood}
+                        onSelect={(v) => (form.mood = v)}
+                        selectedOption={form.mood}
                     />
                 </div>
             </div>

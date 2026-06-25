@@ -105,7 +105,6 @@ export async function loginWithPin(req: Request, res: Response, next: NextFuncti
                         // console.log(`🔴 User is still blocked for IP:`, ip, `Blocked until: ${diffMs}`);
 
                         throw new AppError(401, 'Device Blocked', {wrongPinDoc: pastWrongPinDoc})
-
                     }
                 }
 

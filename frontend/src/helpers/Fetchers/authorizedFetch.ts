@@ -48,7 +48,6 @@ export async function authorizedFetch<T = any>(
         // console.log("🔁 Access token refreshed on client");
     }
 
-
     let data: any = null;
 
     try {
@@ -75,7 +74,7 @@ export async function authorizedFetch<T = any>(
             logout(); // your store logout: clears user, tokens, etc.
 
 
-            console.log('---- finna data ----', data)
+            // console.log('---- finna data ----', data)
             // 2) Optional: show a toast
             pushNotification(data.message || 'An unknown logout reason occurred.', 'Error', false, 5000, 'Logout Forced');
 

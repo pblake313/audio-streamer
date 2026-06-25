@@ -6,7 +6,7 @@
     import AddIcon from "../Icons/svg/AddIcon.svelte";
     import TrashIcon from "../Icons/svg/TrashIcon.svelte";
 
-    export let buttonText: string = "Enter Button Text";
+    export let buttonText: string | null = "Enter Button Text";
     export let buttonStyle:
         | "stockButton"
         | "ghostButton"
@@ -29,7 +29,6 @@
     export let fullWidth: boolean = false;
     export let isDisabled: boolean = false;
     export let noPad: boolean = false;
-    export let fontSize: string = "11pt";
     export let iconColor: string = "ffffff";
 </script>
 
@@ -44,7 +43,7 @@
 >
     <div class="innaFlex">
         {#if buttonIcon}
-            <div class:wrapTheIcon={buttonText.trim() !== ""}>
+            <div class:wrapTheIcon={buttonText?.trim() !== ""}>
                 {#if buttonIcon === "add"}
                     <div style="margin-top: 4px;">
                         <AddIcon height={"18px"} color={iconColor}></AddIcon>
@@ -66,7 +65,7 @@
                 {#if buttonIcon === "more"}
                     <div style="margin-top: 3px;">
                         <MoreIcon
-                            height={buttonText.trim() !== "" ? "16px" : "19px"}
+                            height={buttonText?.trim() !== "" ? "16px" : "19px"}
                         ></MoreIcon>
                     </div>
                 {/if}
@@ -82,9 +81,8 @@
             </div>
         {/if}
 
-        {#if buttonIcon !== "loading"}
-
-                {buttonText}
+        {#if buttonText}
+            {buttonText}
         {/if}
     </div>
 </button>

@@ -11,6 +11,11 @@ const router = Router()
 router.use(secureMiddleWare)
 
 
+router.get('/test', (req, res, next) =>{
+    console.log('SUCCESSFULLY PASSED MIDDLEWARE')
+    return res.status(200).send({message: 'ok 4 now.'})
+})
+
 // this route is /secure
 
 router.get('/get-authorized-user', getAuthorizedUser)

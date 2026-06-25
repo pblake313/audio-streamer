@@ -13,7 +13,9 @@
 
     $: if (browser && $autoLoginAttempted && !$user && !redirected) {
         redirected = true;
-        goto("/");
+        goto("/login", {
+            replaceState: true,
+        });
     }
 </script>
 
@@ -21,8 +23,6 @@
     <Loader loaderStyle="loader_full" />
 {:else if $user}
     <Nav />
-
     <slot />
-
     <AudioStreamer />
 {/if}

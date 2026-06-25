@@ -2,8 +2,8 @@
     import FormInputErrorText from "../../errors/FormInputErrorText.svelte";
     import "./TextInput.css";
 
-    export let label: string = "Enter 'label'";
-    export let value: string = "";
+    export let label: string;
+    export let value: string | null = null;
     export let id: string | null = `${Date.now() + Math.random()}`;
     export let placeholder: string | null = null;
     export let inputError: string | null = null;
@@ -11,12 +11,18 @@
     export let showInputErrors: boolean = true;
     export let showLimit = true;
 
-    // ✅ new way: callback prop instead of createEventDispatcher
-    export let onTextChange: ((val: string) => void) | undefined;
+    export let onTextChange: ((val: string | null) => void) | undefined;
+
+    $: inputValue = value ?? "";
+    $: characterCount = value?.length ?? 0;
 
     function handleTextInput(event: Event) {
         const input = event.target as HTMLInputElement;
-        onTextChange?.(input.value); // directly call the callback if provided
+
+        // Empty input becomes null
+        const newValue = input.value.trim() === "" ? null : input.value;
+
+        onTextChange?.(newValue);
     }
 </script>
 
@@ -25,14 +31,15 @@
         <p>{label}</p>
 
         {#if showLimit}
-            <p class="charval">{value.length || 0} / {maxlength}</p>
+            <p class="charval">{characterCount} / {maxlength}</p>
         {/if}
     </label>
+
     <input
         class="textInput"
         {id}
         type="text"
-        {value}
+        value={inputValue}
         on:input={handleTextInput}
         placeholder={placeholder ?? label}
         autocomplete="off"
@@ -41,5 +48,5 @@
 </div>
 
 {#if showInputErrors}
-    <FormInputErrorText inputErrorText={inputError}></FormInputErrorText>
+    <FormInputErrorText inputErrorText={inputError} />
 {/if}

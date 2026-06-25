@@ -6,6 +6,7 @@ import { publicFetch } from "../Fetchers/publicFetch"
 import { stopTrack } from "../../stores/AudioPlayerStore"
 import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted } from "../../stores/AudioPlayer/beatArrayStore"
 import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore"
+import { goto } from "$app/navigation"
 
 
 export const attemptingAutoLogin = writable<boolean>(false)
@@ -51,28 +52,27 @@ export async function getAuthenticatedUser() {
 
     // will return the authenticated user- but a valid access token is required.
 }
-
 export async function logout() {
     try {
-        await publicFetch('/auth/logout', {
-            method:'GET',
-        })
-        // console.log(response)
-    } catch { 
-
+        await publicFetch("/auth/logout", {
+            method: "GET",
+        });
+    } catch (err) {
+        console.log("Logout request failed:", err);
     } finally {
-        stopTrack()
-        accessToken.set(null)
-        user.set(false)
+        stopTrack();
 
-        // reset beat stores
-        allBeatPagesFetched.set(false)
-        beatPagesFetched.set([])
-        fetchBeatsAttempted.set(false)
-        beats.set([])
+        accessToken.set(null);
+        user.set(false);
 
-        selectedBeat.set(null)
+        allBeatPagesFetched.set(false);
+        beatPagesFetched.set([]);
+        fetchBeatsAttempted.set(false);
+        beats.set([]);
+        selectedBeat.set(null);
 
+        await goto("/login", {
+            replaceState: true,
+        });
     }
-   
 }
