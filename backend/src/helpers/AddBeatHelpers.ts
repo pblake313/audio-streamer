@@ -1,36 +1,19 @@
 import { randomUUID } from "crypto";
 import { isValidBpm } from "../validators/BpmValidator";
+import { Request } from "express";
 
-export function validateAddBeatRequest(req: any): boolean  {
+export function validateAddBeatRequest(req: Request) {
 
-    if (!req.body.title || req.body.title.trim() === '') {
-        return false;
-    }
+    console.log(req.body)
 
-    if (!isValidBpm(+req.body.bpm)){
-        return false
-    }
+    if (1 === 1) throw new Error('temporary dev error.')
 
-    if (!req.body.key || req.body.key.trim() === '') {
-        return false;
-    }
-
-    if (!req.body.mode || req.body.mode.trim() === '') {
-        return false;
-    }
-
-    return true; 
 
 }
 
 export function buildBeatObj(req: any): any{
     
     try {
-        let validRequest = validateAddBeatRequest(req)
-
-        if (!validRequest){
-            throw new Error('The request you sent to the server was invalid.')
-        } 
 
         const beatObj = {
             beatTitle: req.body.title,

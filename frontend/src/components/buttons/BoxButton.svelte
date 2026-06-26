@@ -9,13 +9,9 @@
     export let buttonText: string | null = "Enter Button Text";
     export let buttonStyle:
         | "stockButton"
-        | "ghostButton"
-        | "lightHouse"
-        | "whiteButton"
-        | "stayWhite"
-        | "opacityIncrease"
-        | "whiteLightning"
-        | "danger" = "stockButton";
+        | "secondary"
+        | "clear"
+        | "glass" = "stockButton";
     export let buttonIcon:
         | "add"
         | "close"
@@ -72,10 +68,10 @@
 
                 {#if buttonIcon === "loading"}
                     <SpinLoader
-                        height={"24px"}
+                        height={"20px"}
                         color={buttonStyle === "stockButton"
-                            ? "#ffffff"
-                            : "#000000"}
+                            ? "#222222"
+                            : "#f7f7f7"}
                     ></SpinLoader>
                 {/if}
             </div>

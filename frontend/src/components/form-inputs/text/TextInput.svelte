@@ -26,27 +26,29 @@
     }
 </script>
 
-<div class="textInputContainer" class:error={!!inputError}>
-    <label class="textLabel" for={id}>
-        <p>{label}</p>
+<div>
+    <div class="textInputContainer" class:error={!!inputError}>
+        <label class="textLabel" for={id}>
+            <p>{label}</p>
 
-        {#if showLimit}
-            <p class="charval">{characterCount} / {maxlength}</p>
-        {/if}
-    </label>
+            {#if showLimit}
+                <p class="charval">{characterCount} / {maxlength}</p>
+            {/if}
+        </label>
 
-    <input
-        class="textInput"
-        {id}
-        type="text"
-        value={inputValue}
-        on:input={handleTextInput}
-        placeholder={placeholder ?? label}
-        autocomplete="off"
-        {maxlength}
-    />
+        <input
+            class="textInput"
+            {id}
+            type="text"
+            value={inputValue}
+            on:input={handleTextInput}
+            placeholder={placeholder ?? label}
+            autocomplete="off"
+            {maxlength}
+        />
+    </div>
+
+    {#if showInputErrors}
+        <FormInputErrorText inputErrorText={inputError} />
+    {/if}
 </div>
-
-{#if showInputErrors}
-    <FormInputErrorText inputErrorText={inputError} />
-{/if}

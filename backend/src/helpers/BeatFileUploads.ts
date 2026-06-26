@@ -4,21 +4,16 @@ import type { Server } from 'socket.io';
 
 type UploadBeatParams = {
   file: Express.Multer.File;
-  socketId: string;
   beatId: string;
-  io: Server;
 };
 
 
 export async function uploadBeatArtwork({
   file,
-  socketId,
   beatId,
-  io
 }: UploadBeatParams): Promise<string> {
   const bucket = admin.storage().bucket();
   const fileName = `Beats/${beatId}/Artwork/${beatId}`;
-  io.to(socketId).emit('uploadStarted', 'artwork');
 
   // convert to webp if image
   let fileBuffer = file.buffer;
@@ -51,7 +46,6 @@ export async function uploadBeatArtwork({
 
     blobStream.on('finish', () => {
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
-      io.to(socketId).emit('uploadComplete', 'artwork');
       resolve(publicUrl);
     });
 
@@ -61,13 +55,10 @@ export async function uploadBeatArtwork({
 
 export async function uploadBeatMp3({
   file,
-  socketId,
   beatId,
-  io
 }: UploadBeatParams): Promise<string> {
   const bucket = admin.storage().bucket();
   const fileName = `Beats/${beatId}/MP3Preview/${beatId}`;
-  io.to(socketId).emit('uploadStarted', 'mp3');
 
   const fileBuffer = file.buffer;
   const fileUpload = bucket.file(fileName);
@@ -88,7 +79,6 @@ export async function uploadBeatMp3({
 
     blobStream.on('finish', () => {
       const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
-      io.to(socketId).emit('uploadComplete', 'mp3');
       resolve(publicUrl);
     });
 

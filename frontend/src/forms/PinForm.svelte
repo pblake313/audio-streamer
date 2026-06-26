@@ -82,13 +82,10 @@
                 body: JSON.stringify({ pin }),
             });
 
-            console.log(response)
-
             if (response?.accessToken){
                 accessToken.set(response.accessToken )
                 user.set(true)
             }
-
 
         } catch (error: any) {
 
@@ -158,6 +155,7 @@
                         errorMessage={pinErrorMessage}
                         errorTitle={"Login Error"}
                         textAlign={"center"}
+                        color={'#f7f7f7'}
                     />
                 </div>
             {/if}

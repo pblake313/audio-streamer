@@ -4,7 +4,7 @@ import { getStorage } from 'firebase-admin/storage';
 import admin from 'firebase-admin';
 import { Beat } from "../../../Interfaces/beat.interface";
 import { uploadBeatArtwork, uploadBeatMp3 } from "../../../helpers/BeatFileUploads";
-import { buildBeatObj } from "../../../helpers/AddBeatHelpers";
+import { buildBeatObj, validateAddBeatRequest } from "../../../helpers/AddBeatHelpers";
 
 
 
@@ -12,22 +12,17 @@ const db = admin.firestore();
 
 export async function addBeat(req: Request, res: Response, next: NextFunction) {
     try {
-        let socketId = req.headers['x-socket-id'] as string;
 
-        if (!socketId) throw new Error('A socket id header is required to use this endpoint.');
-
-        io.to(socketId).emit('uploadStatus', 'Validating Request');
-
+        validateAddBeatRequest(req)
+        
         let beatObj = buildBeatObj(req);
-
-        io.to(socketId).emit('uploadStatus', 'Checking Files');
+        
+        if (1 === 1) throw new Error('finna testing.')
 
         const files = req.files as {
             [fieldname: string]: Express.Multer.File[];
         };
 
-        // validate files
-        io.to(socketId).emit('uploadStatus', 'Validating Files');
 
         const artworkFile = files.artworkFile?.[0];
         if (!artworkFile) throw new Error('An artwork file is required.');
@@ -42,26 +37,16 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
         }
 
         // ---- UPLOAD ARTWORK ----
-        io.to(socketId).emit('uploadStatus', 'Uploading Artwork');
 
         const artworkUrl = await uploadBeatArtwork({
             file: artworkFile,
-            socketId,
             beatId: beatObj.id,
-            io
         });
-
-        // ---- UPLOAD MP3 ----
-        io.to(socketId).emit('uploadStatus', 'Uploading MP3');
 
         const mp3Url = await uploadBeatMp3({
             file: mp3File,
-            socketId,
             beatId: beatObj.id,
-            io
         });
-
-        io.to(socketId).emit('uploadStatus', 'Creating beat');
 
         const newBeat = await createBeat(beatObj, artworkUrl, mp3Url);
 

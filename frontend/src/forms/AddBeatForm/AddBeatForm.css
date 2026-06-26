@@ -1,140 +1,120 @@
-.splitForPreview{
+.abf_formContainer {
+    max-width: 1250px;
     margin: auto;
-    justify-content: space-between;
+    padding: 0 25px;
+    margin-bottom: 100px;
 }
-.beatFormSide{
-    max-width: 1550px;
-    margin: auto;
-    padding:  0px 25px;
-    padding-bottom: 100px;
-}
-.trackPreviewSide{
-    /* border: 1px solid lime; */
-}
-.insidePreview{
-    max-width: 1550px;
-    margin: auto;
-    padding:  0px 25px;
-}
-.addBeatForm{
+
+.abf_form {
     display: flex;
     justify-content: space-between;
     gap: 50px;
-    transition: .5s;
+    margin-top: 25px;
+    transition: 0.5s;
 }
-.addBeatHalf{
+
+.abf_details {
     width: 50%;
 }
 
-.wrapAddBeatSub{
-    padding: 15px 0px;
-    background-color: #222;
-    width: calc(100% - 0px);
-    left: 0%;
-    position: fixed;
-    bottom: 0px;
-    transition: .5s;
+.abf_files {
+    width: 50%;
+}
 
+.abf_trackDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
 }
-.innerSubmitButton{
-    max-width: 1550px;
-    margin: auto;
-    padding: 0px 25px;
-    margin: auto;
-}
-.tagsFlex{
+
+.abf_multiInputFlex {
     display: flex;
     gap: 20px;
-    margin-bottom: 15px;
 }
-.tagHalf{
-    width: 50%;
-}
-.cTag{
-    width: 60%;
-}
-.customColor{
+
+.abf_bpm {
     width: 40%;
 }
 
-.addBpmSel{
-    width: 40%;
-}
-.modeSelect{
-    width: 40%;
-}
-.keySelect{
+.abf_key {
     width: 20%;
 }
-.wrapFIn{
+
+.abf_mode {
+    width: 40%;
+}
+
+.cTag {
+    width: 60%;
+}
+
+.customColor {
+    width: 40%;
+}
+
+.tagHalf {
+    width: 50%;
+}
+
+.abf_wrapFiles {
+    margin-top: 15px;
+}
+
+.wrapFIn {
     margin-bottom: 15px;
 }
-.padforPlayer{
-    padding-bottom: 90px;
+
+.abf_submit {
+    margin-top: 25px;
 }
-.padFormForPlayer{
-    padding-bottom: 50px;
-}
-.whh{
-    margin: 10px 0px;
-}
-.mobilePadder{
-    display: none;
+.abf_error{
+    margin-top: 20px;
 }
 
-@media(max-width: 950px){
-    .addBeatForm{
+@media (max-width: 950px) {
+    .abf_form {
         gap: 25px;
-    }
-}
-
-@media(max-width: 750px){
-    .tagsFlex{
         flex-direction: column;
-        gap: 8px;
-
     }
-    .wrapFIn{
-        margin-bottom: 8px;
-    }
-    .cTag{
-        width: 100%;
-
-    }
-    .customColor {
+    .abf_details{
         width: 100%;
     }
-    .tagHalf{
-        width: 100%;
-    }
-    .keySelect {
-        width: 100%;
-    }
-    .modeSelect {
-        width: 100%;
-    }
-    .addBpmSel {
+    .abf_files{
         width: 100%;
     }
 }
 
-@media(max-width:575px){
-    .innerSubmitButton{
-        padding: 0px 15px;
-    }
-    .addBeatForm {
+@media (max-width: 750px) {
+    .abf_multiInputFlex {
         flex-direction: column;
-        gap: 0px;
+        gap: 15px;
     }
-    .whh {margin-top: 25px;}
-    .addBeatHalf {
+
+    .abf_files{
+        margin-top: 25px;
+    }
+
+
+    .abf_bpm,
+    .abf_key,
+    .abf_mode,
+    .cTag,
+    .customColor,
+    .tagHalf {
         width: 100%;
     }
-    .beatFormSide{
-        padding: 0px 15px;
+}
+
+@media (max-width: 575px) {
+
+    .abf_form {
+        flex-direction: column;
+        gap: 0;
     }
-    .mobilePadder{
-        display: block;
-        height: 120px;
+
+    .abf_details,
+    .abf_files {
+        width: 100%;
     }
 }

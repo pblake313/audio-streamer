@@ -214,6 +214,12 @@ export const tagOptions = [
     'Yung Pinch'
 ];
 
+export const trackTypeOptions = [
+    'Beat',
+    'Reference'
+]
+
+
 export const kitDescriptionOptions = [
     'Drum Kit',
     'Loop & Drum Kit',

@@ -1,227 +1,385 @@
+.selectButtonContainer {
+    position: relative;
+}
 
-    .inputError {
-        line-height: 1em;
-        margin: 0px;
-        padding: 0px;
-        font-size: 10pt;
-        margin-bottom: 10px;
-    }
+.gotop {
+    position: relative;
+}
 
-    .selectButtonContainer {
+/* ---------------------------------------------
+   Label
+---------------------------------------------- */
+
+.selectButtonLabel {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: block;
+    position: relative;
+    margin: 0px;
+    margin-bottom: 8px;
+    padding: 0px;
+    padding-top: 1px;
+    font-size: 11pt;
+    line-height: 1em;
+    color: #b3b3b3;
+}
+
+/* ---------------------------------------------
+   Anchor
+---------------------------------------------- */
+
+.selectButtonAnchor {
+    position: relative;
+    height: 46px;
+}
+
+/* Main wrapper: border wraps button + dropdown */
+.actualSelectButton {
+    position: absolute;
+    width: calc(100% - 2px);
+
+    border: 1px solid #81818149;
+    border-radius: 8px;
+
+    background-color: #222222;
+
+    display: flex;
+    flex-direction: column;
+
+    max-height: 46px;
+    overflow: hidden;
+
+    transition:
+        max-height 220ms ease,
+        box-shadow 200ms ease,
+        border-color 200ms ease;
+}
+
+/* Open upward */
+.actualSelectButton.openUp {
+    bottom: 0;
+    flex-direction: column-reverse;
+}
+
+.actualSelectButton.selopopen {
+    max-height: calc(46px + 30vh);
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+    border-color: #81818149;
+}
+
+/* Error state */
+.actualSelectButton.hasInError {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
+
+.actualSelectButton.hasInError.selopopen {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
+
+/* ---------------------------------------------
+   Main button
+---------------------------------------------- */
+
+.selectedOptionButton {
+    display: block;
+    width: 100%;
+    height: 46px;
+
+    border: none;
+    outline: none;
+
+    background-color: #222222;
+    color: #6e7075;
+
+    font-size: 11pt;
+    text-align: left;
+    line-height: 1em;
+
+    padding: 14px;
+    padding-right: 42px;
+
+    border-radius: 8px;
+    cursor: pointer;
+
+    position: relative;
+    flex-shrink: 0;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.selectedOptionButton:hover {
+    background-color: #292929;
+}
+
+.selectedOptionButton.hasSelection {
+    color: #d1d1d1;
+}
+
+.selectedOptionButton:focus-visible {
+    box-shadow: inset 0px 0px 0px 1px #b8b8b8;
+}
+
+.selectedOptionText {
+    display: block;
+    width: 100%;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* ---------------------------------------------
+   Arrow
+---------------------------------------------- */
+
+.selectArrowWrapper {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    top: 13px;
+    right: 10px;
+    transition: 0.2s;
+    pointer-events: none;
+}
+
+.arrowContainer {
+    position: absolute;
+    padding-top: 3px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    transition: 0.2s;
+}
+
+.rotateSelectArrow {
+    transform: translate(-50%, -50%) rotate(270deg);
+}
+
+/* ---------------------------------------------
+   Options list
+---------------------------------------------- */
+
+.mySelOps {
+    width: calc(100% - 2px);
+    margin: 0 auto;
+
+    background-color: #292929;
+
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+
+    transform: translateY(-4px);
+
+    transition:
+        max-height 220ms ease,
+        opacity 160ms ease,
+        transform 160ms ease;
+
+    border-top: 1px solid #75757523;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(248, 248, 248, 0.25) transparent;
+}
+
+.mySelOps.isOpen {
+    max-height: 30vh;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.mySelOps.slectOpenUp {
+    border-top: none;
+    border-bottom: 1px solid #75757523;
+    transform: translateY(4px);
+}
+
+.mySelOps.isOpen.slectOpenUp {
+    transform: translateY(0);
+}
+
+/* Scrollbar */
+.mySelOps::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mySelOps::-webkit-scrollbar-thumb {
+    background-color: rgba(175, 175, 175, 0.35);
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.mySelOps:hover::-webkit-scrollbar-thumb,
+.mySelOps:active::-webkit-scrollbar-thumb {
+    background-color: rgba(175, 175, 175, 0.568);
+}
+
+/* ---------------------------------------------
+   Single option
+---------------------------------------------- */
+
+.selSingle {
+    display: block;
+    width: 100%;
+
+    padding: 10px 20px;
+
+    background-color: #222222;
+    border: none;
+    border-bottom: 1px solid #75757523;
+
+    text-align: left;
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+.selSingle:hover {
+    background-color: #292929;
+}
+
+.selSingle:last-child {
+    border-bottom: none;
+}
+
+.selSingle p {
+    margin: 0px;
+    padding: 0px;
+
+    color: #b3b3b3;
+    font-size: 11pt;
+    line-height: 1.2em;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.isPicked {
+    background-color: rgba(97, 97, 97, 0.596);
+}
+
+.isPicked p {
+    color: #ffffff;
+}
+
+.isPicked:hover {
+    background-color: rgba(97, 97, 97, 0.596);
+}
+
+.opforsel {
+    color: #b3b3b3;
+}
+
+/* ---------------------------------------------
+   Error
+---------------------------------------------- */
+
+.selectButtonError {
+    margin-top: 8px;
+}
+
+.inputError {
+    line-height: 1em;
+    margin: 0px;
+    padding: 0px;
+    font-size: 10pt;
+    margin-bottom: 10px;
+}
+
+/* ---------------------------------------------
+   Native mobile / touch select
+---------------------------------------------- */
+
+.nativeSelectWrapper {
+    display: none;
+}
+
+.nativeSelect {
+    display: block;
+    width: 100%;
+    height: 46px;
+
+    border: 1px solid #81818149;
+    border-radius: 8px;
+    outline: none;
+
+    background-color: #222222;
+    color: #d1d1d1;
+
+    font-size: 11pt;
+    line-height: 1em;
+
+    padding: 14px;
+    padding-right: 42px;
+
+    box-sizing: border-box;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    cursor: pointer;
+}
+
+.nativeSelect:invalid {
+    color: #6e7075;
+}
+
+.nativeSelect.hasInError {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
+
+.nativeSelect:focus {
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+}
+
+.nativeSelect.hasInError:focus {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
+
+/* Old IE/Edge native dropdown arrow */
+.nativeSelect::-ms-expand {
+    display: none;
+}
+
+.nativeArrowWrapper {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    top: 13px;
+    right: 10px;
+    pointer-events: none;
+}
+
+.nativeArrowContainer {
+    position: absolute;
+    padding-top: 3px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* Touch devices use real native select picker */
+@media (hover: none) and (pointer: coarse) {
+    .nativeSelectWrapper {
+        display: block;
         position: relative;
-    }
-
-    .dummySelectArea {
-        height: 44px;
-    }
-
-
-  .selSingle {
-        padding: 10px 20px;
-        background-color: transparent;
-        display: block;
-        border: none;
         width: 100%;
-        text-align: left;
-        border-bottom: 1px solid #75757523;
-        background-color: #222222;
+        height: 46px;
     }
 
-    .selSingle:hover {
-        cursor: pointer;
-        background-color: #292929;
-    }
-
-    .actualSelectButton {
-        display: block;
-        background-color: transparent;
-        border: 1px solid #81818149;
-        border-radius: 4px;
-        position: absolute;
-        background-color: #222222;
-        width: 100%;
-        transition: 0.3s;
-        padding: 0px;
-        margin: 0px;
-        bottom: 0px;
-        cursor: pointer;
-        box-shadow: 0px 0px 0px 1px transparent;
-    }
-
-
-    .actualSelectButton.selopopen {
-        box-shadow: 0px 0px 0px 1px #b8b8b8;
-    }
-
-    .selectedOptionText {
-        margin: 0px;
-        text-align: left;
-        margin-bottom: 0px;
-        transition: 0.3s;
-        padding: 14px;
-        color: #6e7075;
-        font-size: 11pt;
-        border-radius: 4px;
-        line-height: 1em;
-        transition: .5s;
-        white-space: nowrap;
-    }
-
-    .containSelOp{
-        display: block;
-       
-    }
-    .containSelOp p {
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-    .isPicked {
-        background-color: rgba(97, 97, 97, 0.596);
-
-    }
-
-    .isPicked p {
-        color: white;
-    }
-
-    .isPicked:hover {
-        background-color: rgba(97, 97, 97, 0.596);
-
-    }
-
-    .selectedOpen {
-        transition: 0.3s;
-        border-radius: 0px;
-    }
-
-    .hasInError {
-        border-color: #c30d0d;
-        box-shadow: 0px 0px 0px 1px #c30d0d;
-    }
-
-    .hasInError .selected {
-        color: #f94040;
-    }
-
-    .hasSelection {
-        color: #d1d1d1;
-        opacity: 1;
-    }
-
-    .gotop {
-        z-index: 5;
-    }
-
-    .selectButtonLabel {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-        display: block;
-        position: relative;
-        top: 0px;
-        left: 0px;
-        font-size: 11pt;
-        opacity: 1;
-        padding: 0px;
-        color: #b3b3b3;
-
-    }
-
-    .selectButtonLabel p {
-        color: #b3b3b3;
-
-    }
-
-    .selectArrowWrapper {
-        position: absolute;
-        height: 20px;
-        width: 20px;
-        top: 12px;
-        right: 10px;
-        transition: 0.3s;
-    }
-
-    .arrowContainer {
-        position: absolute;
-        padding-top: 3px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(90deg);
-        transition: 0.3s;
-    }
-
-    .rotateSelectArrow {
-        transform: translate(-50%, -50%) rotate(270deg);
-        transition: 0.3s;
-    }
-
-    /* ----- dropdown positioning / scroll aesthetic ----- */
-
-    .mySelOps {
-        max-height: 30vh;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(248, 248, 248, 0.25) transparent;
-        position: absolute;
-        width: calc(100% - 2px);
-        background-color: #292929;
-        border-radius: 4px;
-        box-shadow: none;
-        transition: box-shadow 0.2s ease;
-        top: calc(100% + 8px);   /* default: open DOWN */
-        bottom: auto;
-    }
-
-    /* when we decide to open UP */
-    .mySelOps.openUp {
-        top: auto;
-        bottom: calc(100% + 8px);
-    }
-
-    .mySelOps.isOpen {
-        box-shadow: 0px 0px 0px 1px #b8b8b8;
-    }
-
-    .mySelOps::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .mySelOps::-webkit-scrollbar-thumb {
-        background-color: rgba(216, 19, 19, 0.877);
-        border-radius: 10px;
-        transition: background-color 0.3s ease;
-    }
-
-    .mySelOps:hover::-webkit-scrollbar-thumb,
-    .mySelOps:active::-webkit-scrollbar-thumb {
-        background-color: rgba(71, 172, 4, 0.25);
-    }
-
-    .mySelOps {
-        scrollbar-width: thin;
-    }
-
-    .mySelOps:hover {
-        scrollbar-color: rgba(175, 175, 175, 0.568) transparent;
-    }
-
-  
-
-    .opforsel {
-        color: #b3b3b3;
-    }
-
-
-@media (hover: none) {
-    .actualSelectButton {
-        outline: none;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    .actualSelectButton:focus,
-    .actualSelectButton:focus-visible,
-    .actualSelectButton:active {
-        outline: none;
-        box-shadow: 0px 0px 0px 1px #b8b8b8; /* if you want a custom focus state */
-        border-color: #81818149;
+    .selectButtonAnchor {
+        display: none;
     }
 }

@@ -1,10 +1,9 @@
 <script lang="ts">
     import "./AddBeatForm.css";
+    import { tick, onDestroy } from "svelte";
     import { pushNotification } from "../../stores/NotificationStore";
-    import { onMount } from "svelte";
-    import { getSocket } from "../../stores/socketStore";
     import BoxButton from "../../components/buttons/BoxButton.svelte";
-    import { buildFormData, validateAddBeatForm } from "./AddBeatHelpers";
+    import { buildAddBeatFormData, validateAddBeatForm } from "./AddBeatHelpers";
     import BpmInput from "../../components/form-inputs/BpmInput.svelte";
     import AddTrackPreview from "../../components/previews/AddTrackPreview.svelte";
     import {
@@ -13,39 +12,35 @@
         songKeyOptions,
         songModeOptions,
         tagOptions,
+        trackTypeOptions,
     } from "../../lib/selectoptions";
     import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
     import { upsertBeat } from "../../stores/AudioPlayer/beatArrayStore";
-    import { goto } from "$app/navigation";
-    import { audioPlayerState } from "../../stores/AudioPlayerStore";
-    import AudioLoader from "../../components/loaders/AudioLoader.svelte";
     import TextInput from "../../components/form-inputs/text/TextInput.svelte";
     import SelectButton from "../../components/form-inputs/select/SelectButton.svelte";
     import ImageUploader from "../../components/form-inputs/file-uploaders/ImageUploader.svelte";
     import Mp3Uploader from "../../components/form-inputs/file-uploaders/Mp3Uploader.svelte";
     import ColorSelect from "../../components/form-inputs/select/ColorSelect.svelte";
-    import BackendStatusBlock from "../../components/misc/BackendStatusBlock.svelte";
+    import FormError from "../../components/errors/FormError.svelte";
 
-    let socket: any;
+    type TrackType = "Beat" | "Reference";
 
-    let shaking: boolean = false;
     let formSubmitted = false;
     let isLoading = false;
 
-    // form values
-
     let form: {
-        title: string | null,
-        tagOne: string | null,
-        tagTwo: string | null,
-        mood: string | null,
-        customTag: string | null,
-        customTagColor: string | null,
-        key: string,
-        mode: string,
-        bpm: number,
-        artworkFile: File | null,
-        mp3File: File | null
+        title: string | null;
+        tagOne: string | null;
+        tagTwo: string | null;
+        mood: string | null;
+        customTag: string | null;
+        customTagColor: string | null;
+        key: string;
+        mode: string;
+        bpm: number;
+        artworkFile: File | null;
+        mp3File: File | null;
+        trackType: TrackType;
     } = {
         title: null,
         tagOne: null,
@@ -53,78 +48,72 @@
         mood: null,
         customTag: null,
         customTagColor: null,
-        key: 'C',
-        mode: 'Minor',
+        key: "C",
+        mode: "Minor",
         bpm: 0,
         artworkFile: null,
-        mp3File: null
-    }
+        mp3File: null,
+        trackType: "Beat",
+    };
 
-    // temporary things for preview
+    let formError: string | null = null;
+    let formErrorEl: HTMLDivElement | null = null;
+    let formErrorTimeout: ReturnType<typeof setTimeout> | null = null;
+
     let temporaryArtUrl: string | null = null;
     let temporaryMp3Url: string | null = null;
 
-    let beatUploadStatus: string | null = null;
-    let artUploadStatus: "Waiting" | "Uploading" | "Upload Success" = "Waiting";
-    let mp3UploadStatus: "Waiting" | "Uploading" | "Upload Success" = "Waiting";
-
-    onMount(async () => {
-        socket = await getSocket(); // Get the singleton socket instance
-
-        if (socket && typeof socket.on === "function") {
-            socket.on("uploadStatus", (status: string) => {
-                beatUploadStatus = status;
-            });
-            socket.on("uploadStarted", (status: string) => {
-                if (status === "artwork") {
-                    artUploadStatus = "Uploading";
-                }
-                if (status === "mp3") {
-                    mp3UploadStatus = "Uploading";
-                }
-            });
-            socket.on("uploadComplete", (status: string) => {
-                if (status === "artwork") {
-                    artUploadStatus = "Upload Success";
-                }
-                if (status === "mp3") {
-                    mp3UploadStatus = "Upload Success";
-                }
-            });
+    function setTrackType(value: string) {
+        if (value === "Beat" || value === "Reference") {
+            form.trackType = value;
         }
-    });
+    }
 
-    function resetUploadStatuses() {
-        artUploadStatus = "Waiting";
-        mp3UploadStatus = "Waiting";
+    function clearFormErrorTimeout() {
+        if (formErrorTimeout) {
+            clearTimeout(formErrorTimeout);
+            formErrorTimeout = null;
+        }
+    }
+
+    async function showFormError(message: string) {
+        clearFormErrorTimeout();
+
+        formError = message;
+
+        await tick();
+
+        formErrorEl?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+        });
+
+        formErrorTimeout = setTimeout(() => {
+            formError = null;
+            formErrorTimeout = null;
+        }, 5000);
     }
 
     async function addBeat() {
-        formSubmitted = true;
+        clearFormErrorTimeout();
+        formError = null;
 
-        const addBeatFormIsValid = validateAddBeatForm();
-
-        if (!addBeatFormIsValid) return;
-        
-        isLoading = true;
+        if (isLoading) return;
 
         try {
-            beatUploadStatus = "Sending data...";
+            formSubmitted = true;
+            isLoading = true;
 
-            const socketId = socket.id;
+            const formData = buildAddBeatFormData(form);
 
             const response = await authorizedFetch("/secure/beats/add-beat", {
                 method: "POST",
-                headers: {
-                    "x-socket-id": socketId,
-                },
-                // body: formData,
+                body: formData,
             });
-
-            // console.log(response)
 
             if (response.newBeat) {
                 upsertBeat(response.newBeat);
+
                 pushNotification(
                     "Beat added successfully!",
                     "Success",
@@ -132,249 +121,211 @@
                     1500,
                     "New Beat Created",
                 );
-                goto("/portal/manage-beats");
-            } else {
-                pushNotification(
-                    "There was a successful response, but no new beat was returned.",
-                    "Error",
-                    false,
-                    5000,
-                    "Add Beat Error",
-                );
             }
         } catch (error: any) {
-            console.log(error)
+            const errorMessage =
+                error?.message || "An unknown error has occurred.";
 
-            if (error.message)
-                pushNotification(
-                    error.message || "An unknown error has occurred.",
-                    "Error",
-                    false,
-                    5000,
-                    "Add Beat Error",
-                );
-            // console.log(error)
+            await showFormError(errorMessage);
         } finally {
             isLoading = false;
-            beatUploadStatus = null;
-            resetUploadStatuses();
         }
     }
 
-    function shake() {
-        shaking = true;
-        setTimeout(() => {
-            shaking = false;
-        }, 600); // reset shaking
-    }
+    onDestroy(() => {
+        clearFormErrorTimeout();
+    });
 </script>
 
-<div class="splitForPreview">
-    <div class="trackPreviewSide">
-        <AddTrackPreview
-            albumUrl={temporaryArtUrl}
-            bpm={form.bpm}
-            key={form.key}
-            mode={form.mode}
-            tagOne={form.tagOne}
-            tagTwo={form.tagTwo}
-            title={form.title}
-            mood={form.mood}
-            customTag={form.customTag}
-            customTagColor={form.customTagColor}
-        />
-    </div>
+<div class="abf_preview">
+    <AddTrackPreview
+        albumUrl={temporaryArtUrl}
+        bpm={form.bpm}
+        key={form.key}
+        mode={form.mode}
+        tagOne={form.tagOne}
+        tagTwo={form.tagTwo}
+        title={form.title}
+        mood={form.mood}
+        customTag={form.customTag}
+        customTagColor={form.customTagColor}
+    />
+</div>
 
-    <div class="beatFormSide">
-        {#if isLoading}
-            <AudioLoader backgroundColor={"#323232"}></AudioLoader>
+<div class="abf_formContainer">
+    <div class="abf_form">
+        <div class="abf_details">
+            <h5>Details</h5>
 
-            {#if artUploadStatus}
-                <BackendStatusBlock
-                    title={"Artwork Status"}
-                    status={artUploadStatus}
-                ></BackendStatusBlock>
-            {/if}
-            {#if mp3UploadStatus}
-                <BackendStatusBlock
-                    title={"MP3 Status"}
-                    status={mp3UploadStatus}
-                ></BackendStatusBlock>
-            {/if}
+            <div class="abf_trackDetails">
+                <TextInput
+                    value={form.title}
+                    label={"Beat Title"}
+                    inputError={formSubmitted && !form.title
+                        ? "Enter a valid beat title."
+                        : null}
+                    onTextChange={(v) => (form.title = v)}
+                    maxlength={50}
+                />
 
-            {#if beatUploadStatus}
-                <p style="font-size: 9pt; text-align: center;">
-                    {beatUploadStatus}
-                </p>
-            {/if}
-        {:else}
-            <div
-                class="addBeatForm"
-                class:padFormForPlayer={$audioPlayerState !== "Idle"}
-            >
-                <div class="addBeatHalf">
-                    <div class="whh">
-                        <p><b>Track Details</b></p>
-                    </div>
-                    <div class="wrapFIn">
-                        <TextInput
-                            value={form.title}
-                            label={"Beat Title"}
-                            inputError={formSubmitted && !form.title
-                                ? "Enter a valid beat title."
+                <div class="abf_multiInputFlex">
+                    <div class="abf_bpm">
+                        <BpmInput
+                            bpmChanged={(v) => (form.bpm = v)}
+                            inputError={formSubmitted && !form.bpm
+                                ? "Number between 1 and 199."
                                 : null}
-                            onTextChange={(v) => (form.title = v)}
-                            maxlength={50}
+                            bpm={form.bpm}
                         />
                     </div>
 
-                    <div class="tagsFlex">
-                        <div class="addBpmSel">
-                            <BpmInput
-                                bpmChanged={(v) => (form.bpm = v)}
-                                inputError={formSubmitted && !form.bpm
-                                    ? "Number between 1 and 199."
-                                    : null}
-                                bpm={form.bpm}
-                            />
-                        </div>
-
-                        <div class="keySelect">
-                            <SelectButton
-                                onSelect={(v) => (form.key = v)}
-                                label={"Key"}
-                                id={"songKey"}
-                                selectedOption={form.key}
-                                options={songKeyOptions}
-                            />
-                        </div>
-
-                        <div class="modeSelect">
-                            <SelectButton
-                                label={"Mode"}
-                                id={"songMode"}
-                                selectedOption={form.mode}
-                                options={songModeOptions}
-                                onSelect={(v) => (form.mode = v)}
-                            />
-                        </div>
-                    </div>
-
-                    <div class="whh">
-                        <p><b>Files</b></p>
-                    </div>
-                    <div class="wrapFIn">
-                        <ImageUploader
-                            fileUploaded={(v) => {
-                                form.artworkFile = v.file;
-                                temporaryArtUrl = v.imageUrl;
-                            }}
-                            clearInput={() => {
-                                form.artworkFile = null;
-                                temporaryArtUrl = null;
-                            }}
-                            inputError={formSubmitted && !form.artworkFile
-                                ? "Please upload an artwork image."
-                                : null}
-                            label={"Artwork"}
-                            fileName={form.artworkFile?.name}
+                    <div class="abf_key">
+                        <SelectButton
+                            onSelect={(v) => (form.key = v)}
+                            label={"Key"}
+                            id={"songKey"}
+                            selectedOption={form.key}
+                            options={songKeyOptions}
                         />
                     </div>
 
-                    <div class="wrapFIn">
-                        <Mp3Uploader
-                            label={"File Preview (MP3)"}
-                            mp3Url={temporaryMp3Url}
-                            fileName={form.mp3File?.name}
-                            inputError={formSubmitted && !form.mp3File
-                                ? "Upload track audio file."
-                                : ""}
-                            mp3Uploaded={(v) => {
-                                form.mp3File = v.file;
-                                temporaryMp3Url = v.mp3Url;
-                            }}
-                            clearInput={() => {
-                                form.mp3File = null;
-                                temporaryMp3Url = null;
-                            }}
+                    <div class="abf_mode">
+                        <SelectButton
+                            label={"Mode"}
+                            id={"songMode"}
+                            selectedOption={form.mode}
+                            options={songModeOptions}
+                            onSelect={(v) => (form.mode = v)}
                         />
                     </div>
                 </div>
 
-                <!-- tags -->
-                <div class="addBeatHalf">
-                    <div class="whh">
-                        <p><b>Tags</b></p>
+                <div class="abf_multiInputFlex">
+                    <div class="cTag">
+                        <TextInput
+                            label={"Custom Tag"}
+                            onTextChange={(v) => (form.customTag = v)}
+                            value={form.customTag}
+                            maxlength={35}
+                        />
                     </div>
 
-                    <div class="tagsFlex">
-                        <div class="cTag">
-                            <TextInput
-                                label={"Custom Tag"}
-                                onTextChange={(v) => (form.customTag = v)}
-                                value={form.customTag}
-                                maxlength={35}
-                            />
-                        </div>
-                        <div class="customColor">
-                            <ColorSelect
-                                onSelect={(v) => (form.customTagColor = v)}
-                                label={"Tag Color"}
-                                selectedOption={form.customTagColor}
-                                {colorOptions}
-                            />
-                        </div>
+                    <div class="customColor">
+                        <ColorSelect
+                            onSelect={(v) => (form.customTagColor = v)}
+                            label={"Custom Tag Color"}
+                            selectedOption={form.customTagColor}
+                            {colorOptions}
+                        />
+                    </div>
+                </div>
+
+                <div class="abf_multiInputFlex">
+                    <div class="tagHalf">
+                        <SelectButton
+                            onSelect={(v) => (form.tagOne = v)}
+                            options={tagOptions}
+                            id={"tagNoOne"}
+                            label={"Tag One"}
+                            selectedOption={form.tagOne}
+                        />
                     </div>
 
-                    <div class="tagsFlex">
-                        <div class="tagHalf">
-                            <SelectButton
-                                onSelect={(v) => (form.tagOne = v)}
-                                options={tagOptions}
-                                id={"tagNoOne"}
-                                label={"Tag One"}
-                                selectedOption={form.tagOne}
-                            />
-                        </div>
+                    <div class="tagHalf">
+                        <SelectButton
+                            onSelect={(v) => (form.tagTwo = v)}
+                            options={tagOptions}
+                            id={"tagNoTwo"}
+                            label={"Tag Two"}
+                            selectedOption={form.tagTwo}
+                        />
+                    </div>
+                </div>
 
-                        <div class="tagHalf">
-                            <SelectButton
-                                onSelect={(v) => (form.tagTwo = v)}
-                                options={tagOptions}
-                                id={"tagNoTwo"}
-                                label={"Tag Two"}
-                                selectedOption={form.tagTwo}
-                            />
-                        </div>
+                <div class="abf_multiInputFlex">
+                    <div class="tagHalf">
+                        <SelectButton
+                            options={beatMoodOptions}
+                            label="Mood"
+                            onSelect={(v) => (form.mood = v)}
+                            selectedOption={form.mood}
+                        />
                     </div>
 
-                    <SelectButton
-                        options={beatMoodOptions}
-                        label="Mood"
-                        onSelect={(v) => (form.mood = v)}
-                        selectedOption={form.mood}
+                    <div class="tagHalf">
+                        <SelectButton
+                            options={trackTypeOptions}
+                            label={"Track Type"}
+                            onSelect={setTrackType}
+                            selectedOption={form.trackType}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="abf_files">
+            <h5>Files</h5>
+
+            <div class="abf_wrapFiles">
+                <div class="wrapFIn">
+                    <ImageUploader
+                        fileUploaded={(v) => {
+                            form.artworkFile = v.file;
+                            temporaryArtUrl = v.imageUrl;
+                        }}
+                        clearInput={() => {
+                            form.artworkFile = null;
+                            temporaryArtUrl = null;
+                        }}
+                        inputError={formSubmitted && !form.artworkFile
+                            ? "Please upload an artwork image."
+                            : null}
+                        label={"Artwork"}
+                        fileName={form.artworkFile?.name}
                     />
                 </div>
-            </div>
 
-            {#if $audioPlayerState !== "Idle"}
-                <div class="mobilePadder"></div>
-            {/if}
+                <div class="wrapFIn">
+                    <Mp3Uploader
+                        label={"File Preview (MP3)"}
+                        mp3Url={temporaryMp3Url}
+                        fileName={form.mp3File?.name}
+                        inputError={formSubmitted && !form.mp3File
+                            ? "Upload track audio file."
+                            : ""}
+                        mp3Uploaded={(v) => {
+                            form.mp3File = v.file;
+                            temporaryMp3Url = v.mp3Url;
+                        }}
+                        clearInput={() => {
+                            form.mp3File = null;
+                            temporaryMp3Url = null;
+                        }}
+                    />
+                </div>
 
-            <div
-                class="wrapAddBeatSub"
-                class:padforPlayer={$audioPlayerState !== "Idle"}
-            >
-                <div class="innerSubmitButton">
+                <div class="abf_submit">
                     <BoxButton
-                        buttonIcon={"add"}
-                        {shaking}
                         on:click={addBeat}
-                        buttonText={"Add Beat"}
+                        buttonText={isLoading ? "Adding Beat" : "Add Beat"}
                         fullWidth={true}
-                    ></BoxButton>
+                        isDisabled={isLoading}
+                        buttonIcon={isLoading ? "loading" : null}
+                    />
+
+                    {#if formError}
+                        <div class="abf_error" bind:this={formErrorEl}>
+                            <FormError
+                                errorMessage={formError}
+                                errorTitle={"Add Beat Error"}
+                                textAlign={"center"}
+                                color={"gold"}
+                            />
+                        </div>
+                    {/if}
                 </div>
             </div>
-        {/if}
+        </div>
     </div>
 </div>

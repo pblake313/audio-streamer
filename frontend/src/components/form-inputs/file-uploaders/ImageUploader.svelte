@@ -1,191 +1,295 @@
 <script lang="ts">
-    import BoxButton from '../../buttons/BoxButton.svelte';
-    import FormInputErrorText from '../../errors/FormInputErrorText.svelte';
-  import './ImageUploader.css';
+    import { onDestroy } from "svelte";
+    import BoxButton from "../../buttons/BoxButton.svelte";
+    import FormInputErrorText from "../../errors/FormInputErrorText.svelte";
+    import "./ImageUploader.css";
+    import AddIcon from "../../Icons/svg/AddIcon.svelte";
 
-  // props from parent
-  export let imageUrl: string | null = null;
-  export let fileName: string | null = null;
-  export let inputError: string | null = null; // parent-owned (e.g. "Please upload an artwork image.")
-  export let label: string = `Enter 'label'`;
-  export let showInputError: boolean = true;
-  export let maxFileSizeMB: number = 5;
-  export let id: string | null = null;
+    export let imageUrl: string | null = null;
+    export let fileName: string | null = null;
+    export let inputError: string | null = null;
+    export let label: string = `Enter 'label'`;
+    export let showInputError: boolean = true;
+    export let maxFileSizeMB: number = 5;
+    export let id: string | null = null;
+    export let dropZoneClass: string = "";
+    export let dropzoneLabel: string = "Add Image";
 
-  export let fileUploaded:
-    | ((payload: { imageUrl: string; file: File }) => void)
-    | undefined;
-  export let clearInput: (() => void) | undefined;
+    export let selectedFile: File | null = null;
 
-  let fileInput: HTMLInputElement | null = null;
-  export let dropZoneClass: string = '';
+    export let fileUploaded:
+        | ((payload: { imageUrl: string; file: File }) => void)
+        | undefined;
 
-  // child-owned error for type/size/etc
-  let internalError: string | null = null;
+    export let clearInput: (() => void) | undefined;
 
-  // combined error actually shown in UI
-  let combinedError: string | null = null;
-  $: combinedError = internalError ?? inputError;
+    let fileInput: HTMLInputElement | null = null;
+    let zoneEl: HTMLDivElement | null = null;
+    let dragActive = false;
 
-  const genId = () =>
-    `image-uploader-${
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    }`;
+    let internalError: string | null = null;
+    let errorTimer: ReturnType<typeof setTimeout> | null = null;
 
-  let inputId = id || genId();
-  $: if (id && id !== inputId) inputId = id;
+    $: combinedError = internalError ?? inputError;
 
-  const acceptedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-  let dragActive = false;
-  let zoneEl: HTMLDivElement | null = null;
+    const genId = () =>
+        `image-uploader-${
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        }`;
 
-  function revokeBlob() {
-    if (imageUrl?.startsWith('blob:')) URL.revokeObjectURL(imageUrl);
-  }
+    let inputId = id || genId();
 
-  function handleFiles(files: FileList | File[]) {
-    const file = Array.isArray(files) ? files[0] : files.item(0);
-    if (!file) return;
+    $: if (id && id !== inputId) {
+        inputId = id;
+    }
 
-    // reset internal error on every attempt
-    internalError = null;
+    const acceptedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "image/webp",
+    ];
 
-    if (!acceptedTypes.includes(file.type)) {
-      internalError = 'Please upload a JPEG, PNG, WEBP, or JPG file.';
-      setTimeout(() => {
+    function setTemporaryError(message: string) {
+        internalError = message;
+
+        if (errorTimer) {
+            clearTimeout(errorTimer);
+        }
+
+        errorTimer = setTimeout(() => {
+            internalError = null;
+            errorTimer = null;
+        }, 3000);
+    }
+
+    function revokeBlob() {
+        if (imageUrl?.startsWith("blob:")) {
+            URL.revokeObjectURL(imageUrl);
+        }
+    }
+
+    function clearCurrentFile() {
+        if (fileInput) {
+            fileInput.value = "";
+        }
+
+        revokeBlob();
+
+        imageUrl = null;
+        fileName = null;
+        selectedFile = null;
+
+        clearInput?.();
+    }
+
+    function handleFiles(files: FileList | File[]) {
+        const file = Array.isArray(files) ? files[0] : files.item(0);
+        if (!file) return;
+
         internalError = null;
-      }, 3000);
-      return;
+
+        if (!acceptedTypes.includes(file.type)) {
+            setTemporaryError("Please upload a JPEG, PNG, WEBP, or JPG file.");
+            return;
+        }
+
+        const maxBytes = maxFileSizeMB * 1024 * 1024;
+
+        if (file.size > maxBytes) {
+            setTemporaryError(
+                `Max file size is ${maxFileSizeMB} MB. Selected file is ${(
+                    file.size /
+                    (1024 * 1024)
+                ).toFixed(1)} MB.`,
+            );
+
+            clearCurrentFile();
+            return;
+        }
+
+        selectedFile = file;
+        fileName = file.name;
+
+        revokeBlob();
+
+        imageUrl = URL.createObjectURL(file);
+        internalError = null;
+
+        fileUploaded?.({ imageUrl, file });
     }
 
-    const maxBytes = maxFileSizeMB * 1024 * 1024;
-    if (file.size > maxBytes) {
-      internalError = `Max file size is ${maxFileSizeMB} MB. Selected file is ${(
-        file.size /
-        (1024 * 1024)
-      ).toFixed(1)} MB.`;
+    function handleFileChange(event: Event) {
+        const target = event.target as HTMLInputElement;
 
-      if (fileInput) fileInput.value = '';
-      revokeBlob();
-      imageUrl = null;
-      fileName = null;
-      clearInput?.();
-      return;
+        if (target.files?.length) {
+            handleFiles(target.files);
+        }
     }
 
-    fileName = file.name;
-    revokeBlob();
-    imageUrl = URL.createObjectURL(file);
-
-    internalError = null;
-
-    fileUploaded?.({ imageUrl, file });
-  }
-
-  const handleFileChange = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    if (target.files?.length) handleFiles(target.files);
-  };
-
-  const resetInput = () => {
-    if (fileInput) fileInput.value = '';
-    revokeBlob();
-    imageUrl = null;
-    fileName = null;
-    clearInput?.();
-    internalError = null;
-  };
-
-  const onDragOver = (e: DragEvent) => {
-    e.preventDefault();
-    dragActive = true;
-  };
-  const onDragEnter = (e: DragEvent) => {
-    e.preventDefault();
-    dragActive = true;
-  };
-  const onDragLeave = (e: DragEvent) => {
-    if (e.currentTarget === e.target) dragActive = false;
-  };
-  const onDrop = (e: DragEvent) => {
-    e.preventDefault();
-    dragActive = false;
-    if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
-  };
-
-  const openPicker = () => fileInput?.click();
-
-  const onZoneClick = (e: MouseEvent) => {
-    const t = e.target as HTMLElement;
-    if (t.closest('.imgUp-noOpen, button, a, input, textarea, select')) return;
-    openPicker();
-  };
-
-  const onKeyOpen = (e: KeyboardEvent) => {
-    if (e.currentTarget !== e.target) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      openPicker();
+    function resetInput() {
+        clearCurrentFile();
+        internalError = null;
     }
-  };
+
+    function onDragOver(event: DragEvent) {
+        event.preventDefault();
+        dragActive = true;
+    }
+
+    function onDragEnter(event: DragEvent) {
+        event.preventDefault();
+        dragActive = true;
+    }
+
+    function onDragLeave(event: DragEvent) {
+        if (event.currentTarget === event.target) {
+            dragActive = false;
+        }
+    }
+
+    function onDrop(event: DragEvent) {
+        event.preventDefault();
+        dragActive = false;
+
+        if (event.dataTransfer?.files?.length) {
+            handleFiles(event.dataTransfer.files);
+        }
+    }
+
+    function openPicker() {
+        fileInput?.click();
+    }
+
+    function onZoneClick(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+
+        if (
+            target.closest(
+                ".imgUp-noOpen, button, a, input, textarea, select",
+            )
+        ) {
+            return;
+        }
+
+        openPicker();
+    }
+
+    function onKeyOpen(event: KeyboardEvent) {
+        if (event.currentTarget !== event.target) return;
+
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openPicker();
+        }
+    }
+
+    function formatFileSize(size: number | null | undefined) {
+        if (!size) return null;
+
+        const mb = size / (1024 * 1024);
+
+        if (mb >= 1) {
+            return `${mb.toFixed(1)} MB`;
+        }
+
+        return `${(size / 1024).toFixed(0)} KB`;
+    }
+
+    onDestroy(() => {
+        if (errorTimer) {
+            clearTimeout(errorTimer);
+        }
+
+        revokeBlob();
+    });
 </script>
 
 <div class="imgUp-labelRow">
-  <label class="imgUp-label" for={inputId}>{label}</label>
-  <p class="imgUp-maxSize">{maxFileSizeMB}MB</p>
+    <label class="imgUp-label" for={inputId}>{label}</label>
+
+    <p class="imgUp-maxSize">{maxFileSizeMB}MB</p>
 </div>
 
 <div
-  bind:this={zoneEl}
-  class={`imgUp-dropZone ${dropZoneClass} ${dragActive ? 'imgUp-dragActive' : ''}`}
-  class:imgUp-hasFile={fileName}
-  class:imgUp-error={combinedError && !fileName}
-  role="button"
-  tabindex="0"
-  aria-controls={inputId}
-  on:click={onZoneClick}
-  on:keydown={onKeyOpen}
-  on:dragover={onDragOver}
-  on:dragenter={onDragEnter}
-  on:dragleave={onDragLeave}
-  on:drop={onDrop}
+    bind:this={zoneEl}
+    class={`imgUp-dropZone ${dropZoneClass} ${dragActive ? "imgUp-dragActive" : ""}`}
+    class:imgUp-hasFile={!!fileName}
+    class:imgUp-error={!!combinedError && !fileName}
+    role="button"
+    tabindex="0"
+    aria-controls={inputId}
+    on:click={onZoneClick}
+    on:keydown={onKeyOpen}
+    on:dragover={onDragOver}
+    on:dragenter={onDragEnter}
+    on:dragleave={onDragLeave}
+    on:drop={onDrop}
 >
-  {#if fileName}
-    <div class="imgUp-selectedRow">
-      <div class="imgUp-selectedName">
-        <p class="imgUp-fileName"><b>Selected:</b> {fileName}</p>
-      </div>
-      <div class="imgUp-removeBtn">
-        <BoxButton
-          on:click={resetInput}
-          tightPad={true}
-          fullWidth={true}
-          buttonIcon={'trash'}
-          buttonText={''}
-        />
-      </div>
-    </div>
-  {:else}
-    <div class="imgUp-emptyState">
-      <p class="imgUp-emptyTitle">
-        <b><u>Click to upload</u></b> or drag and drop
-      </p>
-      <p class="imgUp-fileTypes">Accepted: JPEG / PNG / WEBP / JPG</p>
-    </div>
-  {/if}
+    {#if fileName}
+        <div class="imgUp-selectedCard">
+            <div class="imgUp-selectedInfo">
+                <p class="imgUp-selectedEyebrow">Selected image</p>
+
+                <p class="imgUp-fileName">{fileName}</p>
+
+                <div class="imgUp-fileMeta">
+                    {#if formatFileSize(selectedFile?.size)}
+                        <span>{formatFileSize(selectedFile?.size)}</span>
+                    {/if}
+
+                    {#if selectedFile?.type}
+                        <span>{selectedFile.type.replace("image/", "").toUpperCase()}</span>
+                    {/if}
+                </div>
+            </div>
+
+            {#if imageUrl}
+                <div class="imgUp-previewWrap imgUp-noOpen">
+                    <img
+                        class="imgUp-preview"
+                        src={imageUrl}
+                        alt="Selected upload preview"
+                    />
+                </div>
+            {/if}
+
+            <div class="imgUp-removeBtn imgUp-noOpen">
+                <BoxButton
+                    on:click={resetInput}
+                    tightPad={true}
+                    fullWidth={true}
+                    buttonIcon={"trash"}
+                    buttonText={null}
+                    buttonStyle={"clear"}
+                />
+            </div>
+        </div>
+    {:else}
+        <div class="imgUp-emptyState">
+
+            <AddIcon color={"f7f7f7"} height="20px"/>
+            <p class="imgUp-emptyTitle">{dropzoneLabel}</p>
+
+            <p class="imgUp-fileTypes">Accepted: JPEG / PNG / WEBP / JPG</p>
+        </div>
+    {/if}
 </div>
 
 <input
-  id={inputId}
-  type="file"
-  bind:this={fileInput}
-  accept="image/jpeg, image/png, image/jpg, image/webp"
-  on:change={handleFileChange}
-  style="display:none"
+    id={inputId}
+    type="file"
+    bind:this={fileInput}
+    accept="image/jpeg, image/png, image/jpg, image/webp"
+    on:change={handleFileChange}
+    aria-invalid={!!combinedError}
+    style="display: none"
 />
 
 {#if showInputError && combinedError}
-  <FormInputErrorText inputErrorText={combinedError} />
+    <div class="imgUp-errorText">
+        <FormInputErrorText inputErrorText={combinedError} />
+    </div>
 {/if}

@@ -85,6 +85,7 @@
                         buttonText={"Logout"}
                         on:click={logout}
                         tightPad={true}
+                        buttonStyle={"glass"}
                     />
                 </div>
 

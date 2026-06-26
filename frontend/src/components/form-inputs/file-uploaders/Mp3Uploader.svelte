@@ -1,224 +1,317 @@
 <script lang="ts">
-    import BoxButton from '../../buttons/BoxButton.svelte';
-    import AudioVisualizer from '../../misc/AudioVisualizer.svelte';
-    import FormInputErrorText from '../../errors/FormInputErrorText.svelte';
-  import './Mp3Uploader.css';
+    import { onDestroy } from "svelte";
+    import BoxButton from "../../buttons/BoxButton.svelte";
+    import AudioVisualizer from "../../misc/AudioVisualizer.svelte";
+    import FormInputErrorText from "../../errors/FormInputErrorText.svelte";
+    import AddIcon from "../../Icons/svg/AddIcon.svelte";
+    import "./Mp3Uploader.css";
 
-  let fileInput: HTMLInputElement | null = null;
+    let fileInput: HTMLInputElement | null = null;
 
-  export let mp3Url: string | null = null;
-  export let fileName: string | null = null;
+    export let mp3Url: string | null = null;
+    export let fileName: string | null = null;
 
-  // parent-owned error (e.g. "Missing" on form submit)
-  export let inputError: string | null = null;
+    export let inputError: string | null = null;
 
-  export let label: string = `Enter 'label'`;
-  export let maxFileSizeMB: number = 10;
-  export let file: File | null = null;
-  export let id: string | null = null;
-  export let dropZoneClass: string = '';
-  export let showInputError: boolean = true;
+    export let label: string = `Enter 'label'`;
+    export let maxFileSizeMB: number = 10;
+    export let file: File | null = null;
+    export let id: string | null = null;
+    export let dropZoneClass: string = "";
+    export let showInputError: boolean = true;
+    export let dropzoneLabel: string = "Add MP3";
 
-  // callback props
-  export let mp3Uploaded:
-    | ((payload: { mp3Url: string; file: File }) => void)
-    | undefined;
-  export let clearInput: (() => void) | undefined;
+    export let mp3Uploaded:
+        | ((payload: { mp3Url: string; file: File }) => void)
+        | undefined;
 
-  // child-owned internal error (wrong type, too big, etc.)
-  let internalError: string | null = null;
+    export let clearInput: (() => void) | undefined;
 
-  // merged error shown in UI
-  let combinedError: string | null = null;
-  $: combinedError = internalError ?? inputError;
+    let dragActive = false;
+    let zoneEl: HTMLDivElement | null = null;
 
-  // Unique id
-  const genId = () =>
-    `mp3-uploader-${
-      typeof crypto !== 'undefined' && 'randomUUID' in crypto
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-    }`;
-  let inputId = id || genId();
-  $: if (id && id !== inputId) inputId = id;
+    let internalError: string | null = null;
+    let errorTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const acceptedTypes = [
-    'audio/mpeg', // most browsers
-    'audio/mp3', // Safari / WebKit
-    'audio/x-mpeg' // old crap
-  ];
+    $: combinedError = internalError ?? inputError;
 
-  let dragActive = false;
-  let zoneEl: HTMLDivElement | null = null;
+    const genId = () =>
+        `mp3-uploader-${
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+        }`;
 
-  function handleFiles(files: FileList | File[]) {
-    const picked = Array.isArray(files) ? files[0] : files.item(0);
-    if (!picked) return;
+    let inputId = id || genId();
 
-    internalError = null; // reset child error each attempt
+    $: if (id && id !== inputId) {
+        inputId = id;
+    }
 
-    if (!acceptedTypes.includes(picked.type)) {
-      internalError = 'Please upload an MP3 file.';
-      setTimeout(() => {
+    const acceptedTypes = [
+        "audio/mpeg",
+        "audio/mp3",
+        "audio/x-mpeg",
+    ];
+
+    function setTemporaryError(message: string) {
+        internalError = message;
+
+        if (errorTimer) {
+            clearTimeout(errorTimer);
+        }
+
+        errorTimer = setTimeout(() => {
+            internalError = null;
+            errorTimer = null;
+        }, 3000);
+    }
+
+    function revokeBlob() {
+        if (mp3Url?.startsWith("blob:")) {
+            URL.revokeObjectURL(mp3Url);
+        }
+    }
+
+    function clearCurrentFile() {
+        if (fileInput) {
+            fileInput.value = "";
+        }
+
+        revokeBlob();
+
+        mp3Url = null;
+        fileName = null;
+        file = null;
+
+        clearInput?.();
+    }
+
+    function isValidMp3(picked: File) {
+        return acceptedTypes.includes(picked.type) || picked.name.toLowerCase().endsWith(".mp3");
+    }
+
+    function handleFiles(files: FileList | File[]) {
+        const picked = Array.isArray(files) ? files[0] : files.item(0);
+        if (!picked) return;
+
         internalError = null;
-      }, 3000);
-      return;
+
+        if (!isValidMp3(picked)) {
+            setTemporaryError("Please upload an MP3 file.");
+            return;
+        }
+
+        const maxBytes = maxFileSizeMB * 1024 * 1024;
+
+        if (picked.size > maxBytes) {
+            setTemporaryError(
+                `Max file size is ${maxFileSizeMB} MB. Selected file is ${(
+                    picked.size /
+                    (1024 * 1024)
+                ).toFixed(1)} MB.`,
+            );
+
+            clearCurrentFile();
+            return;
+        }
+
+        file = picked;
+        fileName = picked.name;
+
+        revokeBlob();
+
+        mp3Url = URL.createObjectURL(picked);
+        internalError = null;
+
+        mp3Uploaded?.({ mp3Url, file });
     }
 
-    const maxBytes = maxFileSizeMB * 1024 * 1024;
-    if (picked.size > maxBytes) {
-      internalError = `Max file size is ${maxFileSizeMB} MB. Selected file is ${(
-        picked.size /
-        (1024 * 1024)
-      ).toFixed(1)} MB.`;
+    function handleFileChange(event: Event) {
+        const target = event.target as HTMLInputElement;
 
-      if (fileInput) fileInput.value = '';
-      if (mp3Url?.startsWith('blob:')) URL.revokeObjectURL(mp3Url);
-      mp3Url = null;
-      fileName = null;
-      file = null;
-      clearInput?.();
-      return;
+        if (target.files?.length) {
+            handleFiles(target.files);
+        }
     }
 
-    file = picked;
-    fileName = picked.name;
-
-    if (mp3Url?.startsWith('blob:')) URL.revokeObjectURL(mp3Url);
-    mp3Url = URL.createObjectURL(picked);
-
-    internalError = null;
-
-    mp3Uploaded?.({ mp3Url, file });
-  }
-
-  function handleFileChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) handleFiles(target.files);
-  }
-
-  function uploadFile() {
-    fileInput?.click();
-  }
-
-  function resetInput(event?: Event) {
-    event?.stopPropagation();
-    if (fileInput) fileInput.value = '';
-    if (mp3Url?.startsWith('blob:')) URL.revokeObjectURL(mp3Url);
-    mp3Url = null;
-    fileName = null;
-    file = null;
-    clearInput?.();
-    internalError = null;
-  }
-
-  // DnD handlers
-  const onDragOver = (e: DragEvent) => {
-    e.preventDefault();
-    dragActive = true;
-  };
-  const onDragEnter = (e: DragEvent) => {
-    e.preventDefault();
-    dragActive = true;
-  };
-  const onDragLeave = (e: DragEvent) => {
-    if (e.currentTarget === e.target) dragActive = false;
-  };
-  const onDrop = (e: DragEvent) => {
-    e.preventDefault();
-    dragActive = false;
-    const dt = e.dataTransfer;
-    if (dt?.files?.length) handleFiles(dt.files);
-  };
-
-  const onZoneClick = (e: MouseEvent) => {
-    const t = e.target as HTMLElement;
-    if (t.closest('.no-open, button, a, input, textarea, select')) return;
-    uploadFile();
-  };
-
-  const onKeyOpen = (e: KeyboardEvent) => {
-    if (e.currentTarget !== e.target) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      uploadFile();
+    function resetInput() {
+        clearCurrentFile();
+        internalError = null;
     }
-  };
+
+    function onDragOver(event: DragEvent) {
+        event.preventDefault();
+        dragActive = true;
+    }
+
+    function onDragEnter(event: DragEvent) {
+        event.preventDefault();
+        dragActive = true;
+    }
+
+    function onDragLeave(event: DragEvent) {
+        if (event.currentTarget === event.target) {
+            dragActive = false;
+        }
+    }
+
+    function onDrop(event: DragEvent) {
+        event.preventDefault();
+        dragActive = false;
+
+        if (event.dataTransfer?.files?.length) {
+            handleFiles(event.dataTransfer.files);
+        }
+    }
+
+    function uploadFile() {
+        fileInput?.click();
+    }
+
+    function onZoneClick(event: MouseEvent) {
+        const target = event.target as HTMLElement;
+
+        if (
+            target.closest(
+                ".mp3Up-noOpen, .no-open, button, a, input, textarea, select",
+            )
+        ) {
+            return;
+        }
+
+        uploadFile();
+    }
+
+    function onKeyOpen(event: KeyboardEvent) {
+        if (event.currentTarget !== event.target) return;
+
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            uploadFile();
+        }
+    }
+
+    function formatFileSize(size: number | null | undefined) {
+        if (!size) return null;
+
+        const mb = size / (1024 * 1024);
+
+        if (mb >= 1) {
+            return `${mb.toFixed(1)} MB`;
+        }
+
+        return `${(size / 1024).toFixed(0)} KB`;
+    }
+
+    function formatFileType(type: string | null | undefined) {
+        if (!type) return "MP3";
+
+        if (type.includes("mpeg") || type.includes("mp3")) {
+            return "MP3";
+        }
+
+        return type.replace("audio/", "").toUpperCase();
+    }
+
+    onDestroy(() => {
+        if (errorTimer) {
+            clearTimeout(errorTimer);
+        }
+
+        revokeBlob();
+    });
 </script>
 
-<div class="flexImageLabel">
-  <label class="imageUploadLabel" for={inputId}>
-    <p>{label}</p>
-  </label>
-  <div><p class="maxLabelText">{maxFileSizeMB}MB</p></div>
+<div class="mp3Up-labelRow">
+    <label class="mp3Up-label" for={inputId}>{label}</label>
+
+    <p class="mp3Up-maxSize">{maxFileSizeMB}MB</p>
 </div>
 
 <div
-  bind:this={zoneEl}
-  class={`dropZone ${dropZoneClass} ${dragActive ? 'dragActive' : ''}`}
-  class:hasFileSelected={fileName}
-  class:errorInput={combinedError && !fileName}
-  role="button"
-  tabindex="0"
-  aria-controls={inputId}
-  on:click={onZoneClick}
-  on:keydown={onKeyOpen}
-  on:dragover={onDragOver}
-  on:dragenter={onDragEnter}
-  on:dragleave={onDragLeave}
-  on:drop={onDrop}
+    bind:this={zoneEl}
+    class={`mp3Up-dropZone ${dropZoneClass} ${dragActive ? "mp3Up-dragActive" : ""}`}
+    class:mp3Up-hasFile={!!fileName}
+    class:mp3Up-error={!!combinedError && !fileName}
+    role="button"
+    tabindex="0"
+    aria-controls={inputId}
+    aria-invalid={!!combinedError}
+    on:click={onZoneClick}
+    on:keydown={onKeyOpen}
+    on:dragover={onDragOver}
+    on:dragenter={onDragEnter}
+    on:dragleave={onDragLeave}
+    on:drop={onDrop}
 >
-  {#if fileName}
-    <div class="hasSelectedFileFlex">
-      <div class="containSelectedjoint">
-        <p class="selectedImageFilename"><b>Selected:</b> {fileName}</p>
-      </div>
-      <div class="containRemovalButton">
-        <BoxButton
-          on:click={resetInput}
-          tightPad={true}
-          buttonIcon={'trash'}
-          buttonText={''}
-          fullWidth={true}
-        />
-      </div>
-    </div>
+    {#if fileName}
+        <div class="mp3Up-selectedCard">
+            <div class="mp3Up-selectedInfo">
+                <p class="mp3Up-selectedEyebrow">Selected audio</p>
 
-    {#if mp3Url}
-      {#key mp3Url}
-        <div
-          class="no-open mp3VisualizerWrap"
-          role="button"
-          tabindex="-1"
-          on:click|stopPropagation
-          on:mousedown|stopPropagation
-          on:pointerdown|stopPropagation
-          on:keydown|stopPropagation
-          on:touchstart|stopPropagation
-        >
-          <AudioVisualizer showTime={false} height={30} audioUrl={mp3Url} />
+                <p class="mp3Up-fileName">{fileName}</p>
+
+                <div class="mp3Up-fileMeta">
+                    {#if formatFileSize(file?.size)}
+                        <span>{formatFileSize(file?.size)}</span>
+                    {/if}
+
+                    <span>{formatFileType(file?.type)}</span>
+                </div>
+            </div>
+
+            <div class="mp3Up-removeBtn mp3Up-noOpen">
+                <BoxButton
+                    on:click={resetInput}
+                    tightPad={true}
+                    fullWidth={true}
+                    buttonIcon={"trash"}
+                    buttonText={null}
+                    buttonStyle={"clear"}
+                />
+            </div>
         </div>
-      {/key}
+
+        {#if mp3Url}
+            {#key mp3Url}
+                <div
+                    class="mp3Up-noOpen mp3Up-visualizerWrap"
+                    role="button"
+                    tabindex="-1"
+                    on:click|stopPropagation
+                    on:mousedown|stopPropagation
+                    on:pointerdown|stopPropagation
+                    on:keydown|stopPropagation
+                    on:touchstart|stopPropagation
+                >
+                    <AudioVisualizer showTime={false} height={30} audioUrl={mp3Url} />
+                </div>
+            {/key}
+        {/if}
+    {:else}
+        <div class="mp3Up-emptyState">
+            <AddIcon color={"f7f7f7"} height="20px" />
+
+            <p class="mp3Up-emptyTitle">{dropzoneLabel}</p>
+
+            <p class="mp3Up-fileTypes">Accepted: MP3</p>
+        </div>
     {/if}
-  {:else}
-    <div class="imgUp-emptyState">
-      <p class="imgUp-emptyTitle">
-        <b><u>Click to upload</u></b> or drag and drop
-      </p>
-      <p class="imgUp-fileTypes">Accepted: MP3</p>
-    </div>
-  {/if}
 </div>
 
 <input
-  id={inputId}
-  type="file"
-  bind:this={fileInput}
-  accept=".mp3,audio/mpeg,audio/mp3,audio/x-mpeg"
-  on:change={handleFileChange}
-  style="display:none"
+    id={inputId}
+    type="file"
+    bind:this={fileInput}
+    accept=".mp3,audio/mpeg,audio/mp3,audio/x-mpeg"
+    on:change={handleFileChange}
+    aria-invalid={!!combinedError}
+    style="display: none"
 />
 
 {#if showInputError && combinedError}
-  <FormInputErrorText inputErrorText={combinedError} />
+    <div class="mp3Up-errorText">
+        <FormInputErrorText inputErrorText={combinedError} />
+    </div>
 {/if}

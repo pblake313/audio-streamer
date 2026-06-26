@@ -10,5 +10,4 @@
 
 <div class="beatTagWrapper" style="background-color: {tagColor};">
     <p class="tagText" style="color: {tagTextColor};">{tagText}</p>
-
 </div>

@@ -44,9 +44,7 @@ export async function editBeat(req: Request, res: Response) {
 
       await uploadBeatArtwork({
         file: newArtwork,
-        socketId,
         beatId: originalBeat.id,
-        io
       });
     }
 
@@ -57,9 +55,7 @@ export async function editBeat(req: Request, res: Response) {
 
       await uploadBeatMp3({
         file: newMp3,
-        socketId,
         beatId: originalBeat.id,
-        io
       });
     }
 
