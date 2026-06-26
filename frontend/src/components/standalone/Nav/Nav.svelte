@@ -72,15 +72,17 @@
                     <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/>
                 </div>
                 <div class="nav_rightFlex">
-                    <NavigationLink linkText={"Portal"} linksTo={"/portal"} />
+                             <NavigationLink
+                        linkText={"Home"}
+                        linksTo={"/"}
+                    />
+                    <NavigationLink linkText={"Tracks"} linksTo={"/portal"} />
+                    <NavigationLink linkText={"Add Track"} linksTo={"/portal/add-beat"} />
                     <NavigationLink
                         linkText={"Manage"}
                         linksTo={"/portal/manage-beats"}
                     />
-                    <NavigationLink
-                        linkText={"Project Details"}
-                        linksTo={"/"}
-                    />
+       
                     <BoxButton
                         buttonText={"Logout"}
                         on:click={logout}

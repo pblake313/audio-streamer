@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { addBeat } from "../../../controllers/Secure/Beats/AddBeat";
 import multer from 'multer';
-import { editBeat } from "../../../controllers/Secure/Beats/EditBeat";
-import { updateBeatRating } from "../../../controllers/Secure/Beats/UpdateRating";
+// import { editBeat } from "../../../controllers/Secure/Beats/EditBeat";
+// import { updateBeatRating } from "../../../controllers/Secure/Beats/UpdateRating";
 import { updateNotepad } from "../../../controllers/Secure/Beats/UpdateNotepad";
 import { deleteBeat } from "../../../controllers/Secure/Beats/DeleteBeat";
 import { getSingleBeat } from "../../../controllers/Secure/Beats/GetSingleBeat";
@@ -27,17 +27,17 @@ const editBeatFiles = multer({ storage: storage}).fields([
 
 router.post('/add-beat', addBeatFiles, addBeat)
 
-router.post('/update-beat/:beatId', editBeatFiles, editBeat);
+// router.post('/update-beat/:beatId', editBeatFiles, editBeat);
 
-router.post('/update-rating/:beatId', updateBeatRating)
+// router.post('/update-rating/:beatId', updateBeatRating)
 
-router.post('/update-notepad/:beatId', updateNotepad)
+// router.post('/update-notepad/:beatId', updateNotepad)
 
-router.get('/delete-beat/:beatId', deleteBeat);
+// router.get('/delete-beat/:beatId', deleteBeat);
 
-router.get('/get-beat/:beatId', getSingleBeat)
+// router.get('/get-beat/:beatId', getSingleBeat)
 
-router.get('/get-live-beats/:page', getLiveBeatsByPage);  
+// router.get('/get-live-beats/:page', getLiveBeatsByPage);  
 
 
 export default router

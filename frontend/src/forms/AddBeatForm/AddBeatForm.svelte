@@ -22,6 +22,7 @@
     import Mp3Uploader from "../../components/form-inputs/file-uploaders/Mp3Uploader.svelte";
     import ColorSelect from "../../components/form-inputs/select/ColorSelect.svelte";
     import FormError from "../../components/errors/FormError.svelte";
+    import { goto } from "$app/navigation";
 
     type TrackType = "Beat" | "Reference";
 
@@ -111,18 +112,13 @@
                 body: formData,
             });
 
-            if (response.newBeat) {
-                upsertBeat(response.newBeat);
+            upsertBeat(response.createdBeat);
 
-                pushNotification(
-                    "Beat added successfully!",
-                    "Success",
-                    false,
-                    1500,
-                    "New Beat Created",
-                );
-            }
+            goto('/portal')
+
         } catch (error: any) {
+            console.log(error)
+
             const errorMessage =
                 error?.message || "An unknown error has occurred.";
 

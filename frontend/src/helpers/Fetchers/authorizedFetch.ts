@@ -6,6 +6,22 @@ import { pushNotification } from "../../stores/NotificationStore";
 
 const backendLink = import.meta.env.VITE_BACKEND_URL;
 
+export type ApiErrorData = {
+    code?: string;
+    attemptsRemaining?: number;
+    blocked?: boolean;
+    blockedUntil?: string | Date;
+    forceLogout?: boolean;
+    [key: string]: any;
+};
+
+export type AuthorizedFetchError = {
+    status: number;
+    message: string;
+    data: ApiErrorData | null;
+    forceLogout?: boolean;
+};
+
 export async function authorizedFetch<T = any>(
     url: string,
     options: RequestInit = {}
@@ -21,87 +37,73 @@ export async function authorizedFetch<T = any>(
 
     const isFormData = options.body instanceof FormData;
 
-    // Only set JSON content-type when it's NOT FormData and NOT already provided
-    if (!isFormData && !headers.has("Content-Type")) {
+    if (!isFormData) {
         headers.set("Content-Type", "application/json");
     }
 
-    // Merge any headers passed in options (can override above)
     if (options.headers) {
         const extraHeaders = new Headers(options.headers as HeadersInit);
+
         extraHeaders.forEach((value, key) => {
             headers.set(key, value);
         });
     }
 
     const res = await fetch(`${backendLink}${url}`, {
+        ...options,
         method,
         headers,
         credentials: "include",
-        // For GET, ignore body
-        ...(method === "GET" ? {} : { body: options.body }),
+        ...(method === "GET" ? { body: undefined } : { body: options.body }),
     });
 
     const refreshedToken = res.headers.get("x-access-token");
+
     if (refreshedToken && refreshedToken !== token) {
         accessToken.set(refreshedToken);
-        // console.log("🔁 Access token refreshed on client");
     }
 
-    let data: any = null;
+    let body: any = null;
 
     try {
-        data = await res.json();
+        body = await res.json();
     } catch {
-        data = null;
+        body = null;
     }
 
     if (!res.ok) {
         const isForceLogout =
-            res.status === 440 || data?.forceLogout === true;
+            res.status === 440 || body?.forceLogout === true;
 
         const message =
-            data?.message ||
-            data?.error ||
+            body?.message ||
+            body?.error ||
             `Request failed with status ${res.status}`;
 
-        // 🔥 SPECIAL HANDLING: ForceLogoutError from backend
+        const error = {
+            status: body?.status || res.status,
+            message,
+            data: body?.data ?? body ?? null,
+            forceLogout: isForceLogout,
+        } satisfies AuthorizedFetchError;
+
         if (isForceLogout) {
-            console.log("🔴 Force logout triggered from backend");
-
-            // 1) Clear client-side auth state
             accessToken.set(null);
-            logout(); // your store logout: clears user, tokens, etc.
+            logout();
 
+            pushNotification(
+                message || "An unknown logout reason occurred.",
+                "Error",
+                false,
+                5000,
+                "Logout Forced"
+            );
 
-            // console.log('---- finna data ----', data)
-            // 2) Optional: show a toast
-            pushNotification(data.message || 'An unknown logout reason occurred.', 'Error', false, 5000, 'Logout Forced');
-
-            // 3) Throw a specialized error the caller can detect
-            const forceErr = new Error(message) as Error & {
-                status?: number;
-                data?: unknown;
-                forceLogout?: boolean;
-            };
-            forceErr.status = res.status;
-            forceErr.data = data;
-            forceErr.forceLogout = true;
-
-            throw forceErr;
+            throw error;
         }
-
-        // Normal error path
-        const error = new Error(message) as Error & {
-            status?: number;
-            data?: unknown;
-        };
-
-        error.status = res.status;
-        error.data = data;
 
         throw error;
     }
 
-    return data as T;
+    return body as T;
 }
