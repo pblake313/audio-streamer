@@ -18,7 +18,7 @@
     import AddTrackPreview from "../../components/previews/AddTrackPreview.svelte";
     import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
     import { audioPlayerState } from "../../stores/AudioPlayerStore";
-    import { upsertBeat } from "../../stores/AudioPlayer/beatArrayStore";
+    import { upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import { goto } from "$app/navigation";
     import { deleteBeat } from "../../stores/EditBeatStore";
     import TextInput from "../../components/form-inputs/text/TextInput.svelte";

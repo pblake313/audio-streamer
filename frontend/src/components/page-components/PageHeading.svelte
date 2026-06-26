@@ -26,8 +26,6 @@
 
 <div
     class="pageStandardWrap"
-    in:fade={{ duration: 300, delay: 150 }}
-    out:fade={{ duration: 150 }}
     class:noTopPd={!topPad}
 >
     <h3 class="shoppingATitle">{title}</h3>

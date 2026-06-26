@@ -1,12 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import HighlightedTrack from '../../components/standalone/HighlightedTrack.svelte';
-    import { beatFetchError, fetchBeats,  isFetchingBeats } from '../../stores/AudioPlayer/beatArrayStore';
+    import { beatFetchError, beats, fetchBeats,  isFetchingBeats, oneBeatFetchSuccessfull } from '../../stores/AudioPlayer/BeatsStore';
     import { selectedBeat } from '../../stores/AudioPlayer/selectedBeatStore';
     import { pauseTrack, playTrack, smartNextTrack, smartPreviousTrack } from '../../stores/AudioPlayerStore';
-    import { navStyle } from '../../stores/navstore';
     import TrackList from '../../components/lists/TrackList/TrackList.svelte';
     import Loader from '../../components/loaders/Loader.svelte';
+    import PageHeading from '../../components/page-components/PageHeading.svelte';
 
 
     // This reactive block runs every time $selectedBeat changes.
@@ -39,11 +39,13 @@
         });
     }
 
+    $: console.log($beats)
 
     onMount( async()=> {
-        navStyle.set({style:'standard', capWidth: true, addLine: false})
 
-        await fetchBeats()
+        if (!$oneBeatFetchSuccessfull){
+            await fetchBeats()
+        }
 
     })
 
@@ -59,13 +61,13 @@
     .wrapTrackList {
         margin: auto;
         padding: 25px;
-        max-width: 1550px;
+        max-width: 1250px;
     }
     @media (max-width:575px){
             .wrapTrackList {
             margin: auto;
             padding: 15px;
-            max-width: 1550px;
+            max-width: 1250px;
         }
     }
 </style>
@@ -76,9 +78,11 @@
 {#if $isFetchingBeats}
     <Loader loaderStyle={"loader_full"}/>
 {:else if $beatFetchError}
-    <p>{$beatFetchError}</p>
+    <PageHeading title={"Fetch Beats Error"} subtitle={$beatFetchError} buttonText={"Retry"} onButtonClick={() => {
+        fetchBeats()
+    }}/>
 {:else}
-    <HighlightedTrack></HighlightedTrack>
+    <HighlightedTrack />
     <div class="wrapTrackList">
         <TrackList></TrackList>
     </div>

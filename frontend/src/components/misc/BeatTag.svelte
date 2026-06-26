@@ -1,13 +1,14 @@
 <script lang="ts">
-    import './BeatTag.css'
+    import './BeatTag.css';
 
-    export let tagColor: string = '#353535'
-
-    export let tagTextColor: string = '#f7f7f7'
-    export let tagText: string
+    export let tagColor: string = '#353535';
+    export let tagTextColor: string = '#f7f7f7';
+    export let tagText: string;
 </script>
 
-
-<div class="beatTagWrapper" style="background-color: {tagColor};">
-    <p class="tagText" style="color: {tagTextColor};">{tagText}</p>
+<div
+    class="beatTagWrapper"
+    style="--tag-color: {tagColor}; --tag-text-color: {tagTextColor};"
+>
+    <p class="tagText">{tagText}</p>
 </div>

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { navStyle } from "../../../stores/navstore";
     import BoxButton from "../../../components/buttons/BoxButton.svelte";
     import { goto } from "$app/navigation";
     import { fade } from "svelte/transition";
@@ -11,7 +10,7 @@
         fetchBeats,
         fetchBeatsAttempted,
         getNextBeatPageToFetch,
-    } from "../../../stores/AudioPlayer/beatArrayStore";
+    } from "../../../stores/AudioPlayer/BeatsStore";
     import DashboardLoader from "../../../components/loaders/PageLoaders/DashboardLoader.svelte";
     import AddTrackPointer from "../../../components/page-components/AddTrackPointer.svelte";
     import FormError from "../../../components/errors/FormError.svelte";
@@ -24,7 +23,6 @@
 
     onMount(async () => {
         await loadBeats();
-        navStyle.set({ style: "standard", capWidth: false, addLine: false });
     });
 
     async function loadBeats() {

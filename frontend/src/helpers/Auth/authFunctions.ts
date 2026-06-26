@@ -4,7 +4,7 @@ import { user } from "../../stores/UserStore"
 import { authorizedFetch } from "../Fetchers/authorizedFetch"
 import { publicFetch } from "../Fetchers/publicFetch"
 import { stopTrack } from "../../stores/AudioPlayerStore"
-import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted } from "../../stores/AudioPlayer/beatArrayStore"
+import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted } from "../../stores/AudioPlayer/BeatsStore"
 import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore"
 import { goto } from "$app/navigation"
 

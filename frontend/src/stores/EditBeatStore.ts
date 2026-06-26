@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 import { authorizedFetch } from "../helpers/Fetchers/authorizedFetch";
 import type { Beat } from "../lib/types/Beats";
 import { pushNotification } from "./NotificationStore";
-import { removeBeatFromArray } from "./AudioPlayer/beatArrayStore";
+import { removeBeatFromArray } from "./AudioPlayer/BeatsStore";
 import { goto } from "$app/navigation";
 
 export const isFetchingBeatToEdit = writable<boolean>(false)

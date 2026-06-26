@@ -3,7 +3,7 @@
     import './BeatRatingForm.css'
     import type { Beat } from "../lib/types/Beats";
     import { authorizedFetch } from "../helpers/Fetchers/authorizedFetch";
-    import { upsertBeat } from "../stores/AudioPlayer/beatArrayStore";
+    import { upsertBeat } from "../stores/AudioPlayer/BeatsStore";
     import { isUpdatingBeatFromModal } from "../stores/BeatUpdatingStore";
   
     // Beat to rate

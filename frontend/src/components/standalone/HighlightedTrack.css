@@ -1,19 +1,18 @@
-.wrapHighlightedTrack {
+.ht_wrapper {
     padding-top: 60px;
     padding-bottom: 25px;
     position: relative;
     overflow: hidden;
 }
 
-.insideHighlight {
-    max-width: 1550px;
+.ht_insideContainer {
+    max-width: 1250px;
     margin: auto;
-    margin-top: 25px;
-    padding: 0px 25px 25px 25px;
+    margin-top: 45px;
     display: flex;
     justify-content: space-between;
 }
-.highlightedTrackBackground {
+.ht_background {
     position: absolute;
     min-width: 150%;
     min-height: 150%;
@@ -25,7 +24,7 @@
     opacity: .1;
     filter: blur(0px);
 }
-.topperGradient {
+.ht_topFade {
     position: absolute;
     z-index: -1;
     top: 0px;
@@ -34,7 +33,7 @@
     height: 25%;
     background: linear-gradient(to bottom, #222222, transparent);
 }
-.bommo {
+.ht_bottomFade {
     position: absolute;
     z-index: -1;
     bottom: 0px;
@@ -83,7 +82,7 @@
 }
 
 
-.highlightedTrackInfo {
+.ht_trackInfo {
     width: calc(100% - 350px);
     display: flex;
     justify-content: space-between;
@@ -141,7 +140,7 @@
     margin-right: 15px;
     margin-top: 2px;
 }
-.holdBeatArt {
+.ht_artworkContainer {
     display: flex;
     justify-content: space-between;
 }
@@ -153,17 +152,13 @@
     opacity: .5;
     font-size: 11pt;
 }
-.wrapHighlightedTitle {
+.ht_title {
     width: 100%;
     overflow: hidden;
-    margin: 10px 0px 12px 0px;
+    font-size: 60pt;
+
   }
-  
-  .wrapHighlightedTitle h2 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+
   
 .mobTrackIcon {
     width: 15px;
@@ -198,27 +193,27 @@
         justify-content: space-between;
         width:  calc(100% - 350px);
     }
-    .highlightedTrackInfo .trackInfoTop {
+    .ht_trackInfo .trackInfoTop {
         display: none;
     }
-    .highlightedTrackInfo .trackInfoBottom .trackControls {
+    .ht_trackInfo .trackInfoBottom .trackControls {
         display: none;
     }
-    .insideHighlight {
+    .ht_insideContainer {
         flex-direction: column;
 
     }
     .trackControls {
         width: 100%;
     }
-    .highlightedTrackInfo {
+    .ht_trackInfo {
         width: 100%;
     }
     .containVisualizer {
         width: 100%;
         margin-top: 15px;
     }
-    .wrapHighlightedTitle h2 {
+    .ht_title h2 {
         font-size: 20pt;
 
     }
@@ -228,19 +223,19 @@
     }
 }
 @media(max-width: 900px){
-    .wrapHighlightedTrack {
+    .ht_wrapper {
         padding-top: 55px;
     }
-    .highlightedTrackBackground{
+    .ht_background{
         filter: blur(20px);
     }
 }
 @media (max-width:850px){
-    .holdBeatArt {
+    .ht_artworkContainer {
         flex-direction: column;
         align-items: center;
     }
-    .insideHighlight {
+    .ht_insideContainer {
         margin-top: 0px;
     }
     .smallerTrackInfo {
@@ -262,7 +257,7 @@
         border: none;
         outline: none;
     }
-    .highlightedTrackBackground {
+    .ht_background {
         opacity: .35;
     }
     .highlightedTrackControls {
@@ -277,11 +272,11 @@
     .trackControls{
         margin-bottom: 0px;
     }
-    .wrapHighlightedTitle {
+    .ht_title {
         margin-top: 5px;
         margin-bottom: 5px;
     }
-    .wrapHighlightedTitle h2 {
+    .ht_title h2 {
         font-size: 18pt;
         font-weight: 450;
     }
@@ -291,7 +286,7 @@
     .trackStateFlex  {
         display: none;
     }
-    .wrapHighlightedTitle {
+    .ht_title {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -308,10 +303,10 @@
     }
 }
 @media (max-width:575px){
-    .insideHighlight {
+    .ht_insideContainer {
         padding: 0px 15px;
     }
-    .wrapHighlightedTitle {
+    .ht_title {
         overflow: visible;
       }
 }

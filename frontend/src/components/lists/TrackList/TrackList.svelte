@@ -2,7 +2,7 @@
     import { fade } from "svelte/transition";
 
     import "./Tracklist.css";
-    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch } from "../../../stores/AudioPlayer/beatArrayStore";
+    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch } from "../../../stores/AudioPlayer/BeatsStore";
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
     import TrackListItem from "../../list-items/Tracks/TrackListItem.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";

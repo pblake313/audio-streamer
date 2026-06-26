@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 import {
-    preloadNeighbors,
+	preloadNeighbors,
 	selectedBeat,
 	selectNextBeat,
 	selectPreviousBeat
@@ -10,10 +10,10 @@ import {
 	beats,
 	fetchBeats,
 	getNextBeatPageToFetch
-} from "./AudioPlayer/beatArrayStore";
+} from "./AudioPlayer/BeatsStore";
 
 // How many seconds before we show the "Still Listening?" popup
-const LISTEN_TIMEOUT_SECONDS = 60 * 30; 
+const LISTEN_TIMEOUT_SECONDS = 60 * 30;
 
 // =========================
 // Audio element initialization
@@ -28,11 +28,16 @@ if (typeof Audio !== "undefined") {
 // Stores
 // =========================
 export const audioStore = writable<HTMLAudioElement | null>(audio);
+
 export const useAutoPlay = writable<boolean>(false);
 export const audioPlayerUrl = writable<string | null>(null);
+
 export const audioPlayerState = writable<
 	"Idle" | "Loading" | "Playing" | "Paused" | "Ended" | "Buffering" | "Error"
 >("Idle");
+
+export const audioPlayerErrorMessage = writable<string | null>(null);
+
 export const userTapped = writable<boolean>(false);
 
 // Timeout-related stores
@@ -41,6 +46,51 @@ export const inTimeout = writable<boolean>(false);
 
 // Internal helper for accumulating time
 let lastAudioTime = 0;
+
+// =========================
+// Error helpers
+// =========================
+function clearAudioPlayerErrorMessage() {
+	audioPlayerErrorMessage.set(null);
+}
+
+function getAudioErrorMessage(error: MediaError | Error | any): string {
+	// HTMLAudioElement MediaError
+	if (error?.code) {
+		switch (error.code) {
+			case 1:
+				return "Audio playback was aborted.";
+			case 2:
+				return "Audio failed to load. Check your connection and try again.";
+			case 3:
+				return "Audio file could not be decoded. It may be corrupt or unsupported.";
+			case 4:
+				return "Audio file is missing, private, expired, or unsupported.";
+			default:
+				return "Unable to load audio. Please try again.";
+		}
+	}
+
+	// play() promise errors
+	if (error?.name === "NotAllowedError") {
+		return "Playback was blocked by the browser. Tap play to start the audio.";
+	}
+
+	if (error?.name === "NotSupportedError") {
+		return "This audio file type is not supported by your browser.";
+	}
+
+	return error?.message || "Unable to play audio. Please try again.";
+}
+
+function setAudioPlayerError(error: MediaError | Error | any) {
+	const message = getAudioErrorMessage(error);
+
+	audioPlayerErrorMessage.set(message);
+	audioPlayerState.set("Error");
+
+	console.error("Audio error:", error);
+}
 
 // =========================
 // Helper: Fetch more beats if needed, then advance to next track
@@ -63,8 +113,7 @@ async function advanceToNextTrackWithPagination() {
 		}
 
 		await fetchBeats(getNextBeatPageToFetch());
-        void preloadNeighbors();
-
+		void preloadNeighbors();
 	}
 
 	// Move to next beat regardless
@@ -76,30 +125,34 @@ async function advanceToNextTrackWithPagination() {
 // =========================
 if (audio) {
 	audio.addEventListener("loadstart", () => {
+		clearAudioPlayerErrorMessage();
 		audioPlayerState.set("Loading");
 	});
 
 	audio.addEventListener("canplay", () => {
+		clearAudioPlayerErrorMessage();
 		audioPlayerState.set("Idle");
 	});
 
 	audio.addEventListener("playing", () => {
+		clearAudioPlayerErrorMessage();
 		audioPlayerState.set("Playing");
+
 		// reset baseline for time tracking
 		lastAudioTime = audio?.currentTime ?? 0;
 	});
 
-    audio.addEventListener("pause", () => {
-        if (!audio) return;
-        if (audio.ended) return;
+	audio.addEventListener("pause", () => {
+		if (!audio) return;
+		if (audio.ended) return;
 
-        // If we've been "stopped" (currentTime at 0), treat this as Idle.
-        if (audio.currentTime === 0) {
-            audioPlayerState.set("Idle");
-        } else {
-            audioPlayerState.set("Paused");
-        }
-    });
+		// If we've been "stopped" (currentTime at 0), treat this as Idle.
+		if (audio.currentTime === 0) {
+			audioPlayerState.set("Idle");
+		} else {
+			audioPlayerState.set("Paused");
+		}
+	});
 
 	// When user scrubs / seeks, treat as activity & reset timeout
 	audio.addEventListener("seeking", () => {
@@ -109,6 +162,7 @@ if (audio) {
 
 	// When track ends → fetch next batch if needed → advance, THEN enable autoplay
 	audio.addEventListener("ended", async () => {
+		clearAudioPlayerErrorMessage();
 		audioPlayerState.set("Ended");
 		userTapped.set(true);
 
@@ -123,8 +177,7 @@ if (audio) {
 	});
 
 	audio.addEventListener("error", () => {
-		audioPlayerState.set("Error");
-		console.error("Audio error:", audio?.error);
+		setAudioPlayerError(audio?.error);
 	});
 
 	// timeupdate → increment listen timer + trigger timeout
@@ -180,10 +233,15 @@ function playTrackInternal(resetTimer: boolean) {
 	const a = get(audioStore);
 	if (a) {
 		userTapped.set(true);
+		clearAudioPlayerErrorMessage();
+
 		if (resetTimer) {
 			resetTrackTimer(); // only for manual actions
 		}
+
 		a.play().catch((err: any) => {
+            console.log(err)
+
 			// Browsers will throw AbortError when a new load interrupts a pending play()
 			// (for example, when the src changes quickly). That isn't a real failure.
 			if (err?.name === "AbortError") {
@@ -193,10 +251,11 @@ function playTrackInternal(resetTimer: boolean) {
 				return;
 			}
 
-			console.error("Error playing audio:", err);
-			audioPlayerState.set("Error");
+			setAudioPlayerError(err);
 		});
-	}
+	} else {
+        
+    }
 }
 
 // Manual play (buttons, "Yes" in modal, etc.)
@@ -213,11 +272,13 @@ function restartTrack() {
 	const a = get(audioStore);
 	if (a) {
 		userTapped.set(true);
+		clearAudioPlayerErrorMessage();
 		resetTrackTimer(); // user action
+
 		a.currentTime = 0;
+
 		a.play().catch((err) => {
-			console.error("Error restarting audio:", err);
-			audioPlayerState.set("Error");
+			setAudioPlayerError(err);
 		});
 	}
 }
@@ -227,14 +288,18 @@ function previousTrack() {
 	if (!allTracks || allTracks.length === 0) return;
 
 	userTapped.set(true);
+	clearAudioPlayerErrorMessage();
 	resetTrackTimer(); // user action
+
 	selectPreviousBeat();
 }
 
 // smartNextTrack — paginates + sets autoplay for new track
 async function smartNextTrack() {
 	const isPlaying = get(audioPlayerState) === "Playing";
+
 	userTapped.set(true);
+	clearAudioPlayerErrorMessage();
 	resetTrackTimer(); // user action
 
 	await advanceToNextTrackWithPagination();
@@ -246,7 +311,9 @@ async function smartNextTrack() {
 
 function nextTrack() {
 	userTapped.set(true);
+	clearAudioPlayerErrorMessage();
 	resetTrackTimer(); // user action
+
 	selectNextBeat();
 }
 
@@ -266,12 +333,14 @@ function smartPreviousTrack() {
 	const isPlaying = get(audioPlayerState) === "Playing";
 
 	userTapped.set(true);
+	clearAudioPlayerErrorMessage();
 	resetTrackTimer(); // user action
 
 	if (liveAudio.currentTime > 2) {
 		restartTrack();
 	} else {
 		previousTrack();
+
 		if (isPlaying) {
 			useAutoPlay.set(true);
 		}
@@ -282,8 +351,11 @@ function stopTrack() {
 	const a = get(audioStore);
 	if (a) {
 		userTapped.set(true);
+		clearAudioPlayerErrorMessage();
+
 		a.pause();
 		a.currentTime = 0;
+
 		audioPlayerState.set("Idle");
 		resetTrackTimer(); // fully reset
 	}
@@ -305,5 +377,6 @@ export {
 	pauseTrack,
 	smartNextTrack,
 	smartPreviousTrack,
-	stopTrack
+	stopTrack,
+	clearAudioPlayerErrorMessage
 };

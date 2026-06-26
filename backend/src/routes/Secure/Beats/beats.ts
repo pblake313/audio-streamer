@@ -37,7 +37,7 @@ router.post('/add-beat', addBeatFiles, addBeat)
 
 // router.get('/get-beat/:beatId', getSingleBeat)
 
-// router.get('/get-live-beats/:page', getLiveBeatsByPage);  
+router.get('/get-live-beats/:page', getLiveBeatsByPage);  
 
 
 export default router

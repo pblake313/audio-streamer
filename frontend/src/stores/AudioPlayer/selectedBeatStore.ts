@@ -2,8 +2,8 @@
 import { get, writable } from "svelte/store";
 import type { Beat } from "../../lib/types/Beats";
 import { audioPlayerUrl } from "../AudioPlayerStore";
-import { beats } from "./beatArrayStore";
 import { getAuthenticatedUser } from "../../helpers/Auth/authFunctions";
+import { beats } from "./BeatsStore";
 
 const selectedBeat = writable<Beat | null>(null);
 
@@ -79,7 +79,7 @@ async function preloadBeat(beat: Beat | null) {
         try {
             await getAuthenticatedUser(); // refresh token/cookie before hitting the stream
 
-            const url = beat.mp3previewUrl;
+            const url = beat.mp3Url;
             if (!url) return;
 
             const end = PRELOAD_RANGE_BYTES - 1;
@@ -165,10 +165,8 @@ function selectNewBeat(beat: Beat) {
 
 export async function setAudioUrl(beat: Beat) {
     try {
-        await getAuthenticatedUser();
-        audioPlayerUrl.set(beat.mp3previewUrl);
+        audioPlayerUrl.set(beat.mp3Url);
     } catch (err) {
-        console.error("Failed to authenticate before setting audio URL:", err);
         audioPlayerUrl.set(null);
     }
 }

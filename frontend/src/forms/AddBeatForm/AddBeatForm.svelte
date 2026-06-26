@@ -1,9 +1,8 @@
 <script lang="ts">
     import "./AddBeatForm.css";
     import { tick, onDestroy } from "svelte";
-    import { pushNotification } from "../../stores/NotificationStore";
     import BoxButton from "../../components/buttons/BoxButton.svelte";
-    import { buildAddBeatFormData, validateAddBeatForm } from "./AddBeatHelpers";
+    import { buildAddBeatFormData } from "./AddBeatHelpers";
     import BpmInput from "../../components/form-inputs/BpmInput.svelte";
     import AddTrackPreview from "../../components/previews/AddTrackPreview.svelte";
     import {
@@ -15,7 +14,7 @@
         trackTypeOptions,
     } from "../../lib/selectoptions";
     import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
-    import { upsertBeat } from "../../stores/AudioPlayer/beatArrayStore";
+    import { upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import TextInput from "../../components/form-inputs/text/TextInput.svelte";
     import SelectButton from "../../components/form-inputs/select/SelectButton.svelte";
     import ImageUploader from "../../components/form-inputs/file-uploaders/ImageUploader.svelte";
@@ -105,6 +104,7 @@
             formSubmitted = true;
             isLoading = true;
 
+            // validates form and builds data to send.
             const formData = buildAddBeatFormData(form);
 
             const response = await authorizedFetch("/secure/beats/add-beat", {

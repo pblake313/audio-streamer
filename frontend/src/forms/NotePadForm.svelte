@@ -4,7 +4,7 @@
     import { authorizedFetch } from '../helpers/Fetchers/authorizedFetch';
     import { destinationOptions } from '../lib/selectoptions';
     import type { Beat } from '../lib/types/Beats';
-    import { upsertBeat } from '../stores/AudioPlayer/beatArrayStore';
+    import { upsertBeat } from '../stores/AudioPlayer/BeatsStore';
     import { isUpdatingBeatFromModal } from '../stores/BeatUpdatingStore';
     import { pushNotification } from '../stores/NotificationStore';
     import './NotePadForm.css';
