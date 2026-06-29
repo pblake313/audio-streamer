@@ -1,21 +1,48 @@
-import { Request, Response } from "express";
-import { updateBeat } from "../../../helpers/UpdateBeatHelper";
+import { NextFunction, Request, Response } from "express";
+import admin from "firebase-admin";
+import type { Beat } from "../../../types/Beat";
 
-export async function updateBeatRating(req: Request, res: Response) {
+type BeatRating = Beat["rating"];
 
+const validRatings: BeatRating[] = [0, 1, 2, 3, 4, 5];
+
+function isBeatRating(value: unknown): value is BeatRating {
+    return typeof value === "number" && validRatings.includes(value as BeatRating);
+}
+
+export async function updateBeatRating(req: Request, res: Response, next: NextFunction) {
     try {
-        const beatId = req.params.beatId
-        const newRating = req.body.newRating
+        const beatId = req.params.beatId;
+        const newRating = req.body.newRating;
 
-        if (![0, 1, 2, 3, 4, 5].includes(newRating)) {
-            throw new Error('Invalid rating. Must be between 0 and 5.')
+        if (!beatId) {
+            throw new Error("Missing beat id.");
         }
 
-        const updatedBeat = await updateBeat(beatId, { rating: newRating });
+        if (!isBeatRating(newRating)) {
+            throw new Error("Invalid rating. Must be between 0 and 5.");
+        }
 
-        return res.status(200).send({beat: updatedBeat})
+        const beatRef = admin
+            .firestore()
+            .collection("Beats")
+            .doc(beatId);
+
+        const beatSnap = await beatRef.get();
+
+        if (!beatSnap.exists) {
+            throw new Error("Beat not found.");
+        }
+        
+        await beatRef.update({
+            rating: newRating,
+            updatedAt: new Date()
+        });
+
+        return res.status(200).send({
+            rating: newRating
+        });
     } catch (err: any) {
-        return res.status(500).json({ error: err.message || 'An unknown error has occurred.' });
-    
+        next(err);
     }
 }

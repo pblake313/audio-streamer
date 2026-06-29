@@ -1,0 +1,32 @@
+.bts_container {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    flex-wrap: nowrap;
+    white-space: nowrap;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+
+    scrollbar-width: none;
+
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-x;
+}
+
+.bts_container.isDragging {
+    cursor: grabbing;
+}
+
+.bts_container::-webkit-scrollbar {
+    display: none;
+}
+
+.bts_container :global(*) {
+    flex: 0 0 auto;
+}

@@ -13,13 +13,11 @@
         userTapped,
     } from "../../../stores/AudioPlayerStore";
     import { get } from "svelte/store";
-    import BeatRatingForm from "../../../forms/BeatRatingForm.svelte";
     import MoreIcon from "../../Icons/svg/MoreIcon.svelte";
     import StarIcon from "../../Icons/svg/StarIcon.svelte";
     import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
     import NotepadIcon from "../../Icons/svg/NotepadIcon.svelte";
     import type { Beat } from "../../../lib/types/Beats";
-    import NotePadForm from "../../../forms/NotePadForm.svelte";
     import { isUpdatingBeatFromModal } from "../../../stores/BeatUpdatingStore";
     import { fade } from "svelte/transition";
     import SpinLoader from "../../loaders/Loader.svelte";
@@ -30,6 +28,7 @@
     import Logo from "../../Icons/Logos/Logo.svelte";
     import YoutubeLogo from "../../Icons/Logos/YoutubeLogo.svelte";
     import SoundcloudLogo from "../../Icons/Logos/SoundcloudLogo.svelte";
+    import PopupBeat from "../../misc/PopupBeat.svelte";
 
     export let isEven: boolean = false;
     export let beat: Beat;
@@ -164,11 +163,11 @@
         <div class="titleWrap">
             <p class="tjoint">
                 {beat.beatTitle}
-                <span class="mobileDays"> {getDaysAgo(beat.uploadDate)}</span>
+                <!-- <span class="mobileDays"> {getDaysAgo(beat.uploadDate)}</span> -->
             </p>
             <div class="flexDaysOld">
                 <p class="smallText" style="margin-right: 8px;">
-                    {getDaysAgo(beat.uploadDate)}
+                    <!-- {getDaysAgo(beat.uploadDate)} -->
                 </p>
                 <div class="mobileDestinations">
                     <div class="destinationFlex">
@@ -301,51 +300,6 @@
 <!-- modal for updating the notepad, future destinations and ratings. -->
 {#if selectedMoreBeat}
     <Modal on:closeModal={resetSelectedMoreBeat} modalTitle={`More Details`}>
-        <div class="editBeatInfoBox">
-            <div class="beatRatingFlex">
-                <div class="containRatingJoint">
-                    <button class="ratingArt">
-                        <img
-                            class="ratea"
-                            src={beat.artworkUrl}
-                            alt={beat.beatTitle}
-                        />
-                    </button>
-                    <div>
-                        <p>{beat.beatTitle}</p>
-                        <p style="font-size: 8pt; opacity: .7;">
-                            {beat.bpm} BPM - {beat.key}
-                            {beat.mode}
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {#if $isUpdatingBeatFromModal}
-                <div class="wrapNoteLoader" in:fade={{ duration: 300 }}>
-                    <p
-                        style="font-size: 9pt; opacity: .5; margin-bottom: 20px; text-align: center;"
-                    >
-                        Updating Beat
-                    </p>
-                    <div class="wl">
-                        <AudioLoader backgroundColor={"transparent"}
-                        ></AudioLoader>
-                    </div>
-                </div>
-            {:else}
-                <div in:fade={{ duration: 300 }}>
-                    <BeatRatingForm
-                        onRatingUpdated={resetSelectedMoreBeat}
-                        beat={selectedMoreBeat}
-                    ></BeatRatingForm>
-
-                    <NotePadForm
-                        onRatingUpdated={resetSelectedMoreBeat}
-                        beat={selectedMoreBeat}
-                    ></NotePadForm>
-                </div>
-            {/if}
-        </div>
+        <PopupBeat beat={selectedMoreBeat}/>
     </Modal>
 {/if}

@@ -1,27 +1,26 @@
 
-.editBeatArea{
+.notpadForm_textarea{
     max-height: calc(100vh - 500px);
     overflow-y: scroll;
     overflow-x: visible;
+    margin-top: 25px;
 }
 
 
-.editBeatArea::-webkit-scrollbar {
+.notpadForm_textarea::-webkit-scrollbar {
     width: 0px;
 }
 
-.editBeatArea::-webkit-scrollbar-thumb {
+.notpadForm_textarea::-webkit-scrollbar-thumb {
     border-radius: 10px;
     transition: background-color 0.3s ease;
 }
 
-.flexForSave{
+.notepadForm_submitButton{
     width: 100%;
     display: flex;
     flex-direction: row-reverse;
-}
-.wrapSaveButton{
-    width: 100%;
+    margin-top: 15px;
 }
 
 @media (max-width: 600px) {

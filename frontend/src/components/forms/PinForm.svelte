@@ -1,15 +1,15 @@
 <script lang="ts">
     import { tick } from "svelte";
-    import PinInput from "../components/form-inputs/PinInput.svelte";
-    import FormError from "../components/errors/FormError.svelte";
-    import { publicFetch } from "../helpers/Fetchers/publicFetch";
     import "./PinForm.css";
     import { goto } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
-    import { user } from "../stores/UserStore";
-    import Loader from "../components/loaders/Loader.svelte";
-    import { firestoreTimestampToDate, formatTimeRemaining } from "../helpers/formatters";
-    import { accessToken } from "../stores/tokenStore";
+    import { user } from "../../stores/UserStore";
+    import { publicFetch } from "../../helpers/Fetchers/publicFetch";
+    import { accessToken } from "../../stores/tokenStore";
+    import { firestoreTimestampToDate, formatTimeRemaining } from "../../helpers/formatters";
+    import PinInput from "../form-inputs/PinInput.svelte";
+    import Loader from "../loaders/Loader.svelte";
+    import FormError from "../errors/FormError.svelte";
 
     let isLoading: boolean = false;
     let pinErrorMessage: string | null = null;
@@ -59,7 +59,7 @@
     }
 
     onMount(async () => {
-        if ($user === true) {
+        if ($user) {
             goto("/portal");
         }
     });

@@ -27,6 +27,7 @@
     import CloseButton from "../buttons/CloseButton.svelte";
     import { goto } from "$app/navigation";
     import Modal from "../misc/Modal.svelte";
+    import AlbumArtwork from "../UI/AlbumArtwork.svelte";
 
     // 👇 Track last URL we've applied to the audio element
     let lastUrl: string | null = null;
@@ -87,17 +88,12 @@
         <AudioRange
             roundedEdges={false}
             showTrackTime={false}
-            imageUrl={$selectedBeat.artworkUrl || null}
         />
 
         <div class="innerAudio">
             <!-- fade help -->
             <button class="bottomArt" on:click={() => { goto("/portal"); }}>
-                <img
-                    class="miniArt"
-                    src="{$selectedBeat.artworkUrl}"
-                    alt="{$selectedBeat.beatTitle}"
-                />
+                <AlbumArtwork width={"100%"} imageUrl={$selectedBeat.artworkUrl}/>
             </button>
 
             <div class="streamInfoFlex">
@@ -170,7 +166,6 @@
             <div style="display: flex; justify-content: space-between;">
                 <div></div>
                 <BoxButton
-                    buttonStyle={"stayWhite"}
                     fullWidth={true}
                     buttonText={"Yes"}
                     on:click={(e) => {

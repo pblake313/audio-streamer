@@ -1,25 +1,21 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
+    import './HighlightedTrack.css'
     import {
         selectedBeat,
-        setAudioUrl,
     } from "../../stores/AudioPlayer/selectedBeatStore";
-    import "./HighlightedTrack.css";
     import {
-    audioPlayerErrorMessage,
         audioPlayerState,
         pauseTrack,
         playTrack,
         resetTrackTimer,
         userTapped,
     } from "../../stores/AudioPlayerStore";
-    import SoundPlaying from "../Icons/svg/SoundPlaying.svelte";
     import AudioRange from "../misc/AudioRange.svelte";
-    import BoxButton from "../buttons/BoxButton.svelte";
-    import SpinLoader from "../loaders/Loader.svelte";
     import AudioControlBox from "./AudioPlayerControls.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import AudioPlayerState from "./AudioPlayerState.svelte";
+
 
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
@@ -88,19 +84,23 @@
 
             <div class="ht_trackInfo">
 
-                <AudioPlayerState />
-
+                <div class="ht_stateAndKey">
+                    <AudioPlayerState />
+                    
+                    <p>{$selectedBeat.key} {$selectedBeat.mode} - {$selectedBeat.bpm} BPM</p>
+                </div>
                 <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
 
-                <p class="keyandMode">
-                    {$selectedBeat.key}
-                    {$selectedBeat.mode} - {$selectedBeat.bpm} BPM
-                </p>
+
+                <!-- <BeatTagsSwiper beat={$selectedBeat}/> -->
+
 
                 <AudioControlBox {playOrPauseIcon}></AudioControlBox>
 
+
+
                 <AudioRange
-                    waveHeight={60}
+                    waveHeight={50}
                     useWaveForm={true}
                 />
             </div>

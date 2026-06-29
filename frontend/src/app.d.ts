@@ -6,6 +6,8 @@ declare module "*.lottie" {
     export default src;
 }
 
+declare module "*.css";
+
 declare global {
     namespace App {
         // interface Error {}

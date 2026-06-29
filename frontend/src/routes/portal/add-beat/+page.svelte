@@ -1,5 +1,6 @@
 <script lang="ts">
-    import AddBeatForm from "../../../forms/AddBeatForm/AddBeatForm.svelte";
+    import AddBeatForm from "../../../components/forms/AddBeatForm.svelte";
+
 </script>
 
 
@@ -8,4 +9,4 @@
 </svelte:head>
 
 
-<AddBeatForm ></AddBeatForm>
+<AddBeatForm />

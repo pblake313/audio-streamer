@@ -1,0 +1,32 @@
+.popupBeat_trackInfoFlex{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    margin-top: 15px;
+}
+.popupBeat_trackDetails{
+    width: calc(100% - 110px);
+}
+.popupBeat_trackTitle{
+    font-size: 13pt;
+    color: var(--font-color-heading);
+}
+.popupBeat_subtitle{
+    font-size: 11pt;
+    opacity: .8;
+    margin-bottom: 5px;
+}
+.popupBeat_clicksFlex{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.popupBeat_ratingAndTrash{
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+}

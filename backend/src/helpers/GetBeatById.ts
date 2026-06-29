@@ -1,8 +1,8 @@
 import * as admin from 'firebase-admin';
-import { Beat } from '../Interfaces/beat.interface';
+import { Beat } from '../types/Beat';
 const db = admin.firestore();
 
-export async function getBeatById(beatId: string): Promise<Beat | null> {
+export async function getBeatById(beatId: string): Promise<Beat> {
     try {
         const beatDoc = await db.collection('Beats').doc(beatId).get();
         

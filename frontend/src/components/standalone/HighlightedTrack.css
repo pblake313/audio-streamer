@@ -1,312 +1,98 @@
 .ht_wrapper {
-    padding-top: 60px;
-    padding-bottom: 25px;
     position: relative;
     overflow: hidden;
+    padding-top: 60px;
+    padding-bottom: 25px;
 }
 
 .ht_insideContainer {
     max-width: 1250px;
-    margin: auto;
-    margin-top: 45px;
+    margin: 45px auto 0 auto;
     display: flex;
     justify-content: space-between;
 }
+
 .ht_background {
     position: absolute;
     min-width: 150%;
     min-height: 150%;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
     z-index: -2;
-    filter: blur(0px);
-    opacity: .1;
-    filter: blur(0px);
+    transform: translate(-50%, -50%);
+    opacity: 0.1;
+    filter: blur(10px);
 }
-.ht_topFade {
+
+.ht_topFade,
+.ht_bottomFade {
     position: absolute;
-    z-index: -1;
-    top: 0px;
-    left: 0px;
+    left: 0;
     width: 100%;
+    z-index: -1;
+    color: #f7f7f736;
+}
+
+.ht_topFade {
+    top: 0;
     height: 25%;
     background: linear-gradient(to bottom, #222222, transparent);
 }
+
 .ht_bottomFade {
-    position: absolute;
-    z-index: -1;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
+    bottom: 0;
     height: 45%;
     background: linear-gradient(to top, #222222, transparent);
 }
 
+.ht_artworkContainer {
+    display: flex;
+    width: 350px;
+    height: fit-content;
+}
+
 .artPlayPause {
-    height: 320px;
-    width: 320px;
-    border-radius: 5px;
-    overflow: hidden;
     position: relative;
-    outline: none;
-    border: none;
-    box-shadow: none;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     padding: 0;
     margin: 0;
+    border: none;
+    border-radius: 5px;
+    outline: none;
     background: transparent;
-    -webkit-tap-highlight-color: transparent; /* iOS tap highlight */
-        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
-
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
 }
 
 .artPlayPause:focus,
 .artPlayPause:focus-visible,
 .artPlayPause:active {
     outline: none;
-    box-shadow: none;
     border: none;
 }
-
-/* Make sure the img fills cleanly, no inline gaps */
-.trackArtworkImage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    display: block;
-    border: none;
-}
-
 
 .ht_trackInfo {
-    width: calc(100% - 350px);
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-}
-  
-.trackArtworkImage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    border: none;
-}
-.trackStateFlex {
-    display: flex;
-    align-items: center;
-}
-.trackIcon {
-    margin-right: 15px;
-    width: 15px;
-    height: 15px;
-}
-
-.trackStateText p {
-    font-size: 9pt;
-}
-.highlightedTrackControls {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-top: 25px;
-    
-}
-
-.trackInfoBottom {
-    display: flex;  
-    justify-content: space-between;
-
-}
-.trackControls {
-    width: 100%;
+    width: calc(100% - 400px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
-.containVisualizer {
-   width: calc(100% - 400px);;
-   position: relative;
-}
-.wPlayPlauser {
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-top: 2px;
-}
-.ht_artworkContainer {
-    display: flex;
-    justify-content: space-between;
-}
 
-.smallerTrackInfo {
-    display: none;
-}
-.keyandMode {
-    opacity: .5;
-    font-size: 11pt;
-}
 .ht_title {
     width: 100%;
     overflow: hidden;
     font-size: 60pt;
-
-  }
-
-  
-.mobTrackIcon {
-    width: 15px;
-    height: 15px;
-    display: none;
-}
-.audioError{
-    opacity: 1;
-    background-color: transparent;
-    font-weight: bold;
-    padding: 0px 5px;
-    border-radius: 5px;
-    height: fit-content;
-    margin-top: 1px;
-    font-size: 9pt;
-    padding: 8px 0px;
-    color:  red;
-
+    white-space: nowrap;
+    line-height: 1.15em;
+    text-overflow: ellipsis;
 }
 
-.retryOnError{
+
+.ht_stateAndKey{
     display: flex;
-    gap: 15px;
     align-items: center;
-
-}
-
-@media(max-width: 1250px){
-    .smallerTrackInfo {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width:  calc(100% - 350px);
-    }
-    .ht_trackInfo .trackInfoTop {
-        display: none;
-    }
-    .ht_trackInfo .trackInfoBottom .trackControls {
-        display: none;
-    }
-    .ht_insideContainer {
-        flex-direction: column;
-
-    }
-    .trackControls {
-        width: 100%;
-    }
-    .ht_trackInfo {
-        width: 100%;
-    }
-    .containVisualizer {
-        width: 100%;
-        margin-top: 15px;
-    }
-    .ht_title h2 {
-        font-size: 20pt;
-
-    }
-
-    .trackInfoTop {
-        margin-bottom: 15px;
-    }
-}
-@media(max-width: 900px){
-    .ht_wrapper {
-        padding-top: 55px;
-    }
-    .ht_background{
-        filter: blur(20px);
-    }
-}
-@media (max-width:850px){
-    .ht_artworkContainer {
-        flex-direction: column;
-        align-items: center;
-    }
-    .ht_insideContainer {
-        margin-top: 0px;
-    }
-    .smallerTrackInfo {
-        width: 100%;
-        margin: auto;
-        max-width: 500px;
-        margin-top: 15px;
-    }
-    .artPlayPause {
-        height: auto;
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        max-width: 500px;
-        border: none;
-        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
-
-    }
-    .trackArtworkImage:focus {
-        border: none;
-        outline: none;
-    }
-    .ht_background {
-        opacity: .35;
-    }
-    .highlightedTrackControls {
-        width: fit-content;
-        margin: auto;
-    }
-    .wPlayPlauser {
-        margin-left: 45px;
-        margin-right: 45px;
-        margin-top: 2px;
-    }
-    .trackControls{
-        margin-bottom: 0px;
-    }
-    .ht_title {
-        margin-top: 5px;
-        margin-bottom: 5px;
-    }
-    .ht_title h2 {
-        font-size: 18pt;
-        font-weight: 450;
-    }
-    .keyandMode {
-        font-size: 9pt;
-    }
-    .trackStateFlex  {
-        display: none;
-    }
-    .ht_title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .trackIcon {
-        padding: 0px;
-        margin: 0px;
-    }
-    .mobTrackIcon {
-        display: block;
-    }
-    .retryOnError {
-        padding-bottom: 15px;
-    }
-}
-@media (max-width:575px){
-    .ht_insideContainer {
-        padding: 0px 15px;
-    }
-    .ht_title {
-        overflow: visible;
-      }
+    gap: 15px;
 }

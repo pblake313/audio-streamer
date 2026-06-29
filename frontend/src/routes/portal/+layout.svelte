@@ -24,5 +24,5 @@
 {:else if $user}
     <Nav />
     <slot />
-    <AudioStreamer />
 {/if}
+

@@ -1,11 +1,11 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import GlassSurface from "../../components/UI/GlassSurface.svelte";
-    import PinForm from "../../forms/PinForm.svelte";
     import "./LoginPage.css";
     import { onMount } from "svelte";
     import { user } from "../../stores/UserStore";
     import { goto } from "$app/navigation";
+    import PinForm from "../../components/forms/PinForm.svelte";
 
         let showVideo = false;
 

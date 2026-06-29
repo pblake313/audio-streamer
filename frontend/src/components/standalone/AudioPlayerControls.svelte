@@ -2,6 +2,7 @@
     import { audioPlayerState, pauseTrack, playTrack, resetTrackTimer, smartNextTrack, smartPreviousTrack, userTapped } from "../../stores/AudioPlayerStore";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import SeekButton from "../buttons/music/SeekButton.svelte";
+    import './AudioPlayerControls.css'
 
 
     function handlePlayPauseClick() {
@@ -25,7 +26,7 @@
 
 </script>
 
-<div class="highlightedTrackControls">
+<div class="apc_container">
     <SeekButton
         iconHeight={"12px"}
         isDisabled={["Buffering", "Loading"].includes($audioPlayerState) &&

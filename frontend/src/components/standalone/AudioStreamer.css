@@ -10,7 +10,7 @@
 }
 .innerAudio {
     margin: auto;
-    max-width: 1550px;
+    max-width: 1250px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,8 +18,8 @@
 
 }
 .bottomArt {
-    width: 55px;
-    height: 55px;
+    width: 65px;
+    aspect-ratio: 1 / 1;
     border-radius: 5px;
     overflow: hidden;
     position: relative;

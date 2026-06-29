@@ -25,8 +25,8 @@
     let duration = 0;
     let rangeInput: HTMLInputElement;
 
-    $: waveformPlayedColor = "#cacaca";
-    $: waveformBaseColor = "#474747";
+    $: waveformPlayedColor = "#f7f7f7";
+    $: waveformBaseColor = "#f7f7f736";
 
     const audio = get(audioStore);
 

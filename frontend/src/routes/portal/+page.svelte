@@ -39,8 +39,6 @@
         });
     }
 
-    $: console.log($beats)
-
     onMount( async()=> {
 
         if (!$oneBeatFetchSuccessfull){

@@ -7,6 +7,9 @@ import { updateNotepad } from "../../../controllers/Secure/Beats/UpdateNotepad";
 import { deleteBeat } from "../../../controllers/Secure/Beats/DeleteBeat";
 import { getSingleBeat } from "../../../controllers/Secure/Beats/GetSingleBeat";
 import { getLiveBeatsByPage } from "../../../controllers/Secure/Beats/GetLiveBeatsByPage";
+import { toggleBeatDestination } from "../../../controllers/Secure/Beats/ToggleDestination";
+import { updateBeatRating } from "../../../controllers/Secure/Beats/UpdateRating";
+import { markBeatAsTrash } from "../../../controllers/Secure/Beats/MarkTrash";
 const router = Router()
 
 const storage = multer.memoryStorage();
@@ -27,11 +30,15 @@ const editBeatFiles = multer({ storage: storage}).fields([
 
 router.post('/add-beat', addBeatFiles, addBeat)
 
+router.post('/toggle-destination/:beatId', toggleBeatDestination)
+
 // router.post('/update-beat/:beatId', editBeatFiles, editBeat);
 
-// router.post('/update-rating/:beatId', updateBeatRating)
+router.post('/update-rating/:beatId', updateBeatRating)
 
-// router.post('/update-notepad/:beatId', updateNotepad)
+router.get('/mark-trash/:beatId', markBeatAsTrash)
+
+router.post('/update-notepad/:beatId', updateNotepad)
 
 // router.get('/delete-beat/:beatId', deleteBeat);
 

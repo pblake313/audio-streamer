@@ -1,7 +1,7 @@
 // src/validators/validateAddBeatRequest.ts
 import type { Request } from "express";
 import { AppError } from "../errors/AppError";
-import type { Beat, TrackType } from "../types/Beat";
+import type { Beat, FutureDestination, TrackType } from "../types/Beat";
 import { isValidBpm } from "../validators/BpmValidator";
 
 export type ValidatedAddBeatRequest = Omit<
@@ -10,6 +10,12 @@ export type ValidatedAddBeatRequest = Omit<
 >;
 
 const validTrackTypes: TrackType[] = ["Beat", "Reference"];
+
+const validFutureDestinations: FutureDestination[] = [
+    "Soundcloud",
+    "Youtube",
+    "Pattsway",
+];
 
 const validKeys: Beat["key"][] = [
     "C",
@@ -83,9 +89,7 @@ function parseTrackType(value: unknown): TrackType {
 function parseKey(value: unknown): Beat["key"] {
     const key = requiredString(value, "Key");
 
-    const normalizedKey = key
-        .replace("#", "♯")
-        .replace("b", "♭");
+    const normalizedKey = key.replace("#", "♯").replace("b", "♭");
 
     if (!validKeys.includes(normalizedKey as Beat["key"])) {
         throw new AppError(400, "Invalid Request: Invalid key.");
@@ -116,17 +120,22 @@ function parseRating(value: unknown): Beat["rating"] {
     }
 
     if (!validRatings.includes(rating as Beat["rating"])) {
-        throw new AppError(400, "Invalid Request: Rating must be between 0 and 5.");
+        throw new AppError(
+            400,
+            "Invalid Request: Rating must be between 0 and 5."
+        );
     }
 
     return rating as Beat["rating"];
 }
 
-function parseFutureDestinations(value: unknown): string[] {
+function parseFutureDestinations(value: unknown): FutureDestination[] {
     if (!value) return [];
 
+    let destinations: string[] = [];
+
     if (Array.isArray(value)) {
-        return value
+        destinations = value
             .map((item) => cleanString(item))
             .filter((item): item is string => Boolean(item));
     }
@@ -140,19 +149,31 @@ function parseFutureDestinations(value: unknown): string[] {
             const parsed = JSON.parse(cleaned);
 
             if (Array.isArray(parsed)) {
-                return parsed
+                destinations = parsed
                     .map((item) => cleanString(item))
                     .filter((item): item is string => Boolean(item));
             }
         } catch {
-            return cleaned
+            destinations = cleaned
                 .split(",")
                 .map((item) => item.trim())
                 .filter(Boolean);
         }
     }
 
-    return [];
+    const invalidDestination = destinations.find(
+        (destination) =>
+            !validFutureDestinations.includes(destination as FutureDestination)
+    );
+
+    if (invalidDestination) {
+        throw new AppError(
+            400,
+            `Invalid Request: Invalid future destination "${invalidDestination}".`
+        );
+    }
+
+    return destinations as FutureDestination[];
 }
 
 function parseCustomTagColor(value: unknown): string | null {

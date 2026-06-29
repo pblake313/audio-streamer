@@ -1,5 +1,6 @@
 <script lang="ts">
     import "./styles.css";
+    import './Homepage.css'
     import {
         attemptingAutoLogin,
         autoLogin,
@@ -10,13 +11,14 @@
     import Nav from "../components/standalone/Nav/Nav.svelte";
     import Loader from "../components/loaders/Loader.svelte";
     import { fade } from "svelte/transition";
+    import AudioStreamer from "../components/standalone/AudioStreamer.svelte";
 
     onMount(async () => {
         if (!$autoLoginAttempted) {
             await autoLogin();
         }
     });
-</script>
+</script> 
 
 
 
@@ -33,3 +35,6 @@
     </div>
     
 {/if}
+
+
+<AudioStreamer />

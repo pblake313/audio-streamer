@@ -64,6 +64,85 @@ export async function fetchBeats(pageToFetch?: number) {
     }
 }
 
+export function updateBeatRatingInArray(
+    beatId: string,
+    newRating: Beat["rating"]
+) {
+    beats.update((currentBeats) =>
+        currentBeats.map((beat) =>
+            beat.id === beatId
+                ? {
+                      ...beat,
+                      rating: newRating,
+                  }
+                : beat
+        )
+    );
+
+    const currentSelectedBeat = get(selectedBeat);
+
+    if (currentSelectedBeat?.id === beatId) {
+        selectNewBeat({
+            ...currentSelectedBeat,
+            rating: newRating,
+        });
+    }
+}
+
+
+export function updateBeatCustomTagInArray(
+    beatId: string,
+    customTag: Beat["customTag"],
+    customTagColor: Beat["customTagColor"]
+) {
+    beats.update((currentBeats) =>
+        currentBeats.map((beat) =>
+            beat.id === beatId
+                ? {
+                      ...beat,
+                      customTag,
+                      customTagColor,
+                  }
+                : beat
+        )
+    );
+
+    const currentSelectedBeat = get(selectedBeat);
+
+    if (currentSelectedBeat?.id === beatId) {
+        selectNewBeat({
+            ...currentSelectedBeat,
+            customTag,
+            customTagColor,
+        });
+    }
+}
+
+export function updateBeatNotepadInArray(
+    beatId: string,
+    notepad: Beat["notepad"]
+) {
+    beats.update((currentBeats) =>
+        currentBeats.map((beat) =>
+            beat.id === beatId
+                ? {
+                      ...beat,
+                      notepad,
+                  }
+                : beat
+        )
+    );
+
+    const currentSelectedBeat = get(selectedBeat);
+
+    if (currentSelectedBeat?.id === beatId) {
+        selectNewBeat({
+            ...currentSelectedBeat,
+            notepad,
+        });
+    }
+}
+
 
 function getDateCreatedTime(beat: Beat): number {
     const dateCreated = beat.createdAt as any;

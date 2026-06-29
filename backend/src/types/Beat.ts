@@ -9,7 +9,7 @@ export type Beat = {
     trackType: TrackType
     customTag: string | null,
     customTagColor: string | null,
-    futureDestinations: string[],
+    futureDestinations: FutureDestination[],
     createdAt: Date | string,
     updatedAt: Date | string,
     artworkUrl: string,
@@ -20,3 +20,8 @@ export type Beat = {
 
 }
 export type TrackType = 'Beat' | 'Reference'
+
+export type FutureDestination =
+    | "Soundcloud"
+    | "Youtube"
+    | "Pattsway"

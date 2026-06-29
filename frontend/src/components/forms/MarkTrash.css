@@ -1,0 +1,53 @@
+.mt_button {
+    border: none;
+    aspect-ratio: 1 / 1;
+    height: 25px;
+    background-color: transparent;
+    padding: 0px;
+    margin: 0px;
+    cursor: pointer;
+    overflow: hidden;
+    margin-top: 2px;
+    transition: .3s;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mt_button:focus,
+.mt_button:focus-visible,
+.mt_button:active {
+    outline: none;
+    box-shadow: none;
+}
+
+.mt_nonActive {
+    opacity: .35;
+    filter: grayscale(1);
+    transition: .3s;
+}
+
+/* Only apply hover effects on mouse/trackpad devices */
+@media (hover: hover) and (pointer: fine) {
+    .mt_nonActive:hover {
+        opacity: .85;
+        filter: grayscale(.3);
+    }
+}
+
+/* Touch screens stay strictly active/inactive */
+@media (hover: none), (pointer: coarse) {
+    .mt_button:hover,
+    .mt_button:focus,
+    .mt_button:focus-visible,
+    .mt_button:active {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .mt_nonActive:hover,
+    .mt_nonActive:focus,
+    .mt_nonActive:active {
+        opacity: .35;
+        filter: grayscale(1);
+    }
+}
