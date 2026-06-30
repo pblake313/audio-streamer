@@ -18,29 +18,19 @@
     import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
     import NotepadIcon from "../../Icons/svg/NotepadIcon.svelte";
     import type { Beat } from "../../../lib/types/Beats";
-    import { isUpdatingBeatFromModal } from "../../../stores/BeatUpdatingStore";
-    import { fade } from "svelte/transition";
     import SpinLoader from "../../loaders/Loader.svelte";
-    import AudioLoader from "../../loaders/AudioLoader.svelte";
     import BeatTag from "../../misc/BeatTag.svelte";
     import Modal from "../../misc/Modal.svelte";
     import PlayIcon from "../../Icons/svg/PlayIcon.svelte";
-    import Logo from "../../Icons/Logos/Logo.svelte";
-    import YoutubeLogo from "../../Icons/Logos/YoutubeLogo.svelte";
-    import SoundcloudLogo from "../../Icons/Logos/SoundcloudLogo.svelte";
     import PopupBeat from "../../misc/PopupBeat.svelte";
+    import AlbumArtwork from "../../UI/AlbumArtwork.svelte";
+    import Loader from "../../loaders/Loader.svelte";
+    import { fade } from "svelte/transition";
+    import BeatTagsSwiper from "../../standalone/BeatTagsSwiper.svelte";
 
     export let isEven: boolean = false;
     export let beat: Beat;
     export let selectedMoreBeat: Beat | null = null;
-    let isUpdatingNotepad: boolean = false;
-
-    let notepadValue: string = selectedMoreBeat?.notepad || "";
-    let destinations: string[] = [];
-
-    $: sortedDestinations = [...(beat.futureDestinations || [])].sort((a, b) =>
-        a.localeCompare(b),
-    );
 
     export function selectAndPlay() {
         const currentSelection = get(selectedBeat);
@@ -68,37 +58,6 @@
     function resetSelectedMoreBeat() {
         selectedMoreBeat = null;
     }
-    function getDaysAgo(uploadDate: {
-        _seconds: number;
-        _nanoseconds: number;
-    }): string {
-        // Validate input
-        if (
-            !uploadDate ||
-            typeof uploadDate._seconds !== "number" ||
-            isNaN(uploadDate._seconds)
-        ) {
-            return "-";
-        }
-
-        const uploaded = new Date(uploadDate._seconds * 1000);
-
-        // Validate constructed date
-        if (isNaN(uploaded.getTime())) {
-            return "-";
-        }
-
-        const now = new Date();
-        const diffInMs = now.getTime() - uploaded.getTime();
-        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-        if (isNaN(diffInDays)) return "-";
-
-        if (diffInDays === 0) return "Uploaded Today";
-        if (diffInDays === 1) return "Uploaded Yesterday";
-
-        return `${diffInDays} Days Old`;
-    }
 </script>
 
 <button
@@ -108,122 +67,67 @@
     on:click={selectAndPlay}
 >
     <!-- artwork -->
-    <div class="artworkWrapper">
-        <img
-            class="artworkImage"
-            src={beat.artworkUrl}
-            alt="pattsway | {beat.beatTitle}"
-        />
+    <div class="tli_artworkContainer">
+        <AlbumArtwork width={"100%"} imageUrl={beat.artworkUrl} />
 
         <!-- if its the selected beat -->
         {#if $selectedBeat?.beatTitle === beat.beatTitle && $userTapped}
             <div
-                class="playingOverArt selTrackItem"
+                class="tli_playOverlay tli_selectedTrackOverlay"
                 class:hiderJ={["Paused", "Idle"].includes($audioPlayerState)}
                 class:goHide={$audioPlayerState === "Paused" ||
                     $audioPlayerState === "Idle"}
             >
-                <div class="wplay">
-                    {#if $audioPlayerState === "Playing"}
+                {#if $audioPlayerState === "Playing"}
+                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
                         <SoundPlaying color={"#f7f7f7"}></SoundPlaying>
-                    {/if}
+                    </div>
+                {/if}
 
-                    {#if ["Buffering", "Loading"].includes($audioPlayerState)}
-                        <SpinLoader></SpinLoader>
-                    {/if}
-                </div>
+                {#if ["Buffering", "Loading"].includes($audioPlayerState)}
+                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                        <Loader height={"30px"} />
+                    </div>
+                {/if}
             </div>
         {/if}
 
-        <div class="playingOverArt ppoverlay">
-            <div class="wplay">
-                <!-- if its the selected beat -->
-                {#if $selectedBeat?.beatTitle === beat.beatTitle}
-                    {#if ["Paused", "Idle"].includes($audioPlayerState)}
-                        <PlayIcon color={"#fff"}></PlayIcon>
-                    {/if}
-                    {#if ["Playing"].includes($audioPlayerState)}
-                        <PauseIcon color={"#fff"}></PauseIcon>
-                    {/if}
-
-                    {#if ["Loading", "Buffering"].includes($audioPlayerState)}
-                        <SpinLoader></SpinLoader>
-                    {/if}
-
-                    <!-- if it is not the selected beat -->
-                {:else}
-                    <PlayIcon color={"#fff"}></PlayIcon>
+        <div class="tli_playOverlay tli_playPauseOverlay">
+            <!-- if its the selected beat -->
+            {#if $selectedBeat?.beatTitle === beat.beatTitle}
+                {#if ["Paused", "Idle"].includes($audioPlayerState)}
+                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                        <PlayIcon color={"#f7f7f7"}></PlayIcon>
+                    </div>
                 {/if}
-            </div>
+                {#if ["Playing"].includes($audioPlayerState)}
+                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                        <PauseIcon color={"#f7f7f7"}></PauseIcon>
+                    </div>
+                {/if}
+
+                {#if ["Loading", "Buffering"].includes($audioPlayerState)}
+                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                        <Loader height={"30px"} />
+                    </div>
+                {/if}
+
+                <!-- if it is not the selected beat -->
+            {:else}
+                <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                    <PlayIcon color={"#f7f7f7"}></PlayIcon>
+                </div>
+            {/if}
         </div>
     </div>
 
     <!-- all track minus art -->
-    <div class="allButArt">
-        <div class="titleWrap">
-            <p class="tjoint">
-                {beat.beatTitle}
-                <!-- <span class="mobileDays"> {getDaysAgo(beat.uploadDate)}</span> -->
-            </p>
-            <div class="flexDaysOld">
-                <p class="smallText" style="margin-right: 8px;">
-                    <!-- {getDaysAgo(beat.uploadDate)} -->
-                </p>
-                <div class="mobileDestinations">
-                    <div class="destinationFlex">
-                        {#if beat.notepad}
-                            <div style="margin-right: 8px;  margin-top: 2px;">
-                                <NotepadIcon></NotepadIcon>
-                            </div>
-                        {/if}
+    <div class="tli_allButArtContainer">
+        <div class="tli_titleContainer">
+            <p class="tli_title">{beat.beatTitle}</p>
+            <p class="smallText">{beat.key} {beat.mode} - {beat.bpm} BPM</p>
 
-                        {#if beat.futureDestinations && beat.futureDestinations.length >= 1}
-                            {#each sortedDestinations as destination}
-                                {#if destination === "Pattsway"}
-                                    <div style="margin-right: 9px; ">
-                                        <Logo width={"60px"} color={"#f7f7f7"}
-                                        ></Logo>
-                                    </div>
-                                {/if}
-                                {#if destination === "Youtube"}
-                                    <div
-                                        style="margin-right: 9px; margin-top: 2px;"
-                                    >
-                                        <YoutubeLogo height={"20px"}
-                                        ></YoutubeLogo>
-                                    </div>
-                                {/if}
-                                {#if destination === "SoundCloud"}
-                                    <div
-                                        style="margin-right: 9px; margin-top: 2px;"
-                                    >
-                                        <SoundcloudLogo height={"20px"}
-                                        ></SoundcloudLogo>
-                                    </div>
-                                {/if}
-                            {/each}
-                        {/if}
-                    </div>
-                </div>
 
-                <div class="mobTagsFlex">
-                    {#if beat.customTag}
-                        <BeatTag
-                            tagColor={`#${beat.customTagColor || 'f7f7f7'}` || "#353535"}
-                            tagText={beat.customTag}
-                            tagTextColor={"#222222"}
-                        ></BeatTag>
-                    {/if}
-                    {#if beat.tagOne}
-                        <BeatTag tagText={beat.tagOne}></BeatTag>
-                    {/if}
-                    {#if beat.tagTwo}
-                        <BeatTag tagText={beat.tagTwo}></BeatTag>
-                    {/if}
-                </div>
-
-                <div class="daysOldFader" class:evenfade={isEven}></div>
-            </div>
         </div>
 
         <div class="futureDestinationsWrapper">
@@ -233,47 +137,11 @@
                         <NotepadIcon></NotepadIcon>
                     </div>
                 {/if}
-
-                {#if beat.futureDestinations && beat.futureDestinations.length >= 1}
-                    {#each sortedDestinations as destination}
-                        {#if destination === "Pattsway"}
-                            <div style="margin-right: 9px;">
-                                <Logo color={"#f7f7f7"}></Logo>
-                            </div>
-                        {/if}
-                        {#if destination === "Youtube"}
-                            <div style="margin-right: 9px;">
-                                <YoutubeLogo height={"20px"}></YoutubeLogo>
-                            </div>
-                        {/if}
-                        {#if destination === "SoundCloud"}
-                            <div style="margin-right: 9px;">
-                                <SoundcloudLogo height={"20px"}
-                                ></SoundcloudLogo>
-                            </div>
-                        {/if}
-                    {/each}
-                {/if}
             </div>
         </div>
 
         <div class="taggerflexer">
-            {#if beat.customTag}
-                <BeatTag
-                    tagColor={`#${beat.customTagColor || 'f7f7f7'}` || "#353535"}
-                    tagText={beat.customTag}
-                    tagTextColor={"#222222"}
-                ></BeatTag>
-            {/if}
-            {#if beat.tagOne}
-                <BeatTag tagText={beat.tagOne}></BeatTag>
-            {/if}
-            {#if beat.tagTwo}
-                <BeatTag tagText={beat.tagTwo}></BeatTag>
-            {/if}
-            {#if beat.mood}
-                <BeatTag tagText={beat.mood}></BeatTag>
-            {/if}
+            <BeatTagsSwiper beat={beat}/>
         </div>
 
         <div class="wrapb">
@@ -290,7 +158,7 @@
             </div>
             <div class="wrappamo">
                 <button class="moreIconButton" on:click={selectMoreBeat}
-                    ><MoreIcon color={"#fff"}></MoreIcon></button
+                    ><MoreIcon color={"#f7f7f7"}></MoreIcon></button
                 >
             </div>
         </div>
@@ -300,6 +168,6 @@
 <!-- modal for updating the notepad, future destinations and ratings. -->
 {#if selectedMoreBeat}
     <Modal on:closeModal={resetSelectedMoreBeat} modalTitle={`More Details`}>
-        <PopupBeat beat={selectedMoreBeat}/>
+        <PopupBeat beat={selectedMoreBeat} />
     </Modal>
 {/if}

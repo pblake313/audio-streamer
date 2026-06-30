@@ -33,7 +33,7 @@
     <AddTrackPointer /> 
 {:else}
     {#each $beats as beat, i}
-        <TrackListItem {beat} isEven={i % 2 === 0}></TrackListItem>
+        <TrackListItem {beat} isEven={i % 2 === 0}/>
     {/each}
 {/if}
 

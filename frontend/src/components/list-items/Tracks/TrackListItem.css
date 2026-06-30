@@ -4,7 +4,7 @@
     border: none;
     outline: none;
     background-color: transparent;
-    border-radius: 5px;
+    border-radius: 10px;
     width: 100%;
     text-align: left;
     padding: 1px;
@@ -13,28 +13,29 @@
     justify-content: space-between;
 
 }
-.artworkWrapper {
+.tli_artworkContainer {
     height: 65px;
     width: 65px;
-    border-radius: 5px;
+    border-radius: 10px;
     position: relative;
     overflow: hidden;
 }
-.playingOverArt {
+.tli_playOverlay {
     position: absolute;
     height: 100%;
     width: 100%;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.555);
+    background-color: rgba(0, 0, 0, 0.705);
 }
 
-.wplay {
+.tli_wrapIcon {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transition: .3s;
 }
 .flexDaysOld {
     display: flex;
@@ -55,7 +56,7 @@
     height: 100%;
     object-fit: cover;
 }
-.allButArt {
+.tli_allButArtContainer {
     width: calc(100% - 85px);
     display: flex;
     align-items: center;
@@ -67,7 +68,7 @@
     margin: 0px;
     color: rgb(140, 140, 140);
 }
-.tjoint {
+.tli_title {
     padding: 0px;
     margin: 0px;
     font-size: 12pt;
@@ -75,12 +76,13 @@
     width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
+    color: var(--font-color-heading);
 }
-.titleWrap {
+.tli_titleContainer {
     overflow: hidden;
     width: calc(20%);
 }
-.titleWrap p {
+.tli_titleContainer p {
     white-space: nowrap;
 }
 
@@ -267,16 +269,18 @@
     transition: .3s;
 
 }
-.ppoverlay {
+.tli_playPauseOverlay {
+    transition: .3s;
     opacity: 0;
 }
-.trackButton:hover .artworkWrapper .ppoverlay {
+.trackButton:hover .tli_artworkContainer .tli_playPauseOverlay {
     opacity: 1;
 }
-.selTrackItem{
+.tli_selectedTrackOverlay{
     /* background-color: rgba(255, 217, 0, 0.596); */
+    transition: .3s;
 }
-.trackButton:hover .artworkWrapper .selTrackItem {
+.trackButton:hover .tli_artworkContainer .tli_selectedTrackOverlay {
     opacity: 0;
 }
 .hiderJ {
@@ -307,10 +311,10 @@
     transition: .3s;
 }
 
-.trackButton:hover .allButArt .titleWrap .flexDaysOld .daysOldFader {
+.trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .daysOldFader {
     background: linear-gradient(to right, #38383800, #272727);
 }
-.trackButton:hover .allButArt .titleWrap .flexDaysOld .evenfade {
+.trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .evenfade {
     background: linear-gradient(to right, #38383800, #272727);
 
 }
@@ -322,7 +326,7 @@
     .futureDestinationsWrapper {
         display: none;
     }
-    .titleWrap {
+    .tli_titleContainer {
         width: 30%;
     }
     .taggerflexer {
@@ -339,7 +343,7 @@
         width: 30%;
 
     }
-    .titleWrap {
+    .tli_titleContainer {
         width: calc(50% - 65px);
     }
 }
@@ -347,7 +351,7 @@
     .taggerflexer {
         display: none;
     }
-    .titleWrap {
+    .tli_titleContainer {
         width: calc(100% - 80px);
         margin-right: 15px;
     }
@@ -389,7 +393,7 @@
         transform: rotate(90deg);
         padding-top: 11px;
     }
-    .playingOverArt {
+    .tli_playOverlay {
         display: block;
     }
     .spacefilla {
@@ -398,15 +402,15 @@
     .wrapOpper {
         top: 300px;
     }
-    .artworkWrapper {
+    .tli_artworkContainer {
         height: 60px;
         width: 60px;
     }
-    .allButArt {
+    .tli_allButArtContainer {
         width: calc(100% - 70px);
         gap: 0px;
     }
-    .titleWrap {
+    .tli_titleContainer {
         padding-left: 10px;
     }
     .finnaTag {
@@ -428,7 +432,7 @@
     .trackWrap {
         width: 80px;
     }
-    .titleWrap {
+    .tli_titleContainer {
         width: calc(100% - 60px);
         margin-right: 15px;
     }
@@ -447,14 +451,14 @@
         background-color: hsla(0, 0%, 89%, 0.02);
 
     }
-    .ppoverlay {
+    .tli_playPauseOverlay {
         display: none;
     }
 
-    .selTrackItem {
+    .tli_selectedTrackOverlay {
         opacity: 1;
     }
-    .trackButton:hover .artworkWrapper .selTrackItem {
+    .trackButton:hover .tli_artworkContainer .tli_selectedTrackOverlay {
         opacity: 1;
     }
     .goHide {
@@ -462,10 +466,10 @@
         display: none;
     }
 
-    .trackButton:hover .allButArt .titleWrap .flexDaysOld .daysOldFader {
+    .trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .daysOldFader {
         background: linear-gradient(to right, #38383800, #222);
     }
-    .trackButton:hover .allButArt .titleWrap .flexDaysOld .evenfade {
+    .trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .evenfade {
         background: linear-gradient(to right, #38383800, #252525);
 
     }

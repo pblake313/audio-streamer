@@ -50,17 +50,21 @@
     display: flex;
     width: 350px;
     height: fit-content;
+    border-radius: 8px;
+
+    overflow: hidden;
 }
 
-.artPlayPause {
+.ht_artworkButton {
     position: relative;
     overflow: hidden;
     width: 100%;
     aspect-ratio: 1 / 1;
+
     padding: 0;
     margin: 0;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     outline: none;
     background: transparent;
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
@@ -68,11 +72,31 @@
     cursor: pointer;
 }
 
-.artPlayPause:focus,
-.artPlayPause:focus-visible,
-.artPlayPause:active {
+.ht_artworkButton:focus,
+.ht_artworkButton:focus-visible,
+.ht_artworkButton:active {
     outline: none;
     border: none;
+}
+
+.ht_albumOverlay{
+    background-color: rgba(0, 0, 0, 0.562);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    opacity: 0;
+    transition: .3s;
+}
+.ht_largePP{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.ht_artworkButton:hover .ht_albumOverlay {
+    opacity: 1;
 }
 
 .ht_trackInfo {

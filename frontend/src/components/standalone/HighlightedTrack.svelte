@@ -15,6 +15,7 @@
     import AudioControlBox from "./AudioPlayerControls.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import AudioPlayerState from "./AudioPlayerState.svelte";
+    import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
 
 
     // controls the icon ONLY
@@ -72,13 +73,21 @@
         <div class="ht_insideContainer">
             <div class="ht_artworkContainer">
                 <!-- ARTWORK CLICK = user gesture play/pause -->
-                <button class="artPlayPause" on:click={handleArtworkClick}>
+                <button class="ht_artworkButton" on:click={handleArtworkClick}>
                     {#key $selectedBeat}
                         <AlbumArtwork
                             width={"100%"}
                             imageUrl={$selectedBeat.artworkUrl}
                         />
                     {/key}
+
+                    <div class="ht_albumOverlay">
+                        <div class="ht_largePP">
+                            <PlayPauseButton height={"85px"} playIconHeight={"50px"} pauseIconHeight={"55px"} playOrPause={playOrPauseIcon} color={"#f7f7f7"}/>
+                        </div>
+
+                    </div>
+
                 </button>
             </div>
 
