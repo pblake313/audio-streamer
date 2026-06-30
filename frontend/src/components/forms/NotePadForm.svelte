@@ -34,10 +34,6 @@
                 }
             );
 
-            console.log(response);
-
-            // here i need an update beatNotepadinArray...
-
             updateBeatNotepadInArray(beat.id, response.notepad);
 
             localNotepad = response.notepad || "";

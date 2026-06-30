@@ -1,10 +1,10 @@
-.audioStreamWrapper {
+.as_wrapper {
     position: fixed;
-    z-index: 99999;
+    z-index: 999;
     width: 100%;
     bottom: 0px;
     background-color: #222222;
-    height: 78px;
+    height: 90px;
     overflow: visible;
     transition: .5s;
 }
@@ -17,7 +17,7 @@
     padding: 8px 25px 8px 25px;
 
 }
-.bottomArt {
+.as_albumArtwork {
     width: 65px;
     aspect-ratio: 1 / 1;
     border-radius: 5px;
@@ -25,6 +25,9 @@
     position: relative;
     border: none;
     padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
 }
 
 .miniArt {
@@ -96,6 +99,12 @@
     }
     .buffForPlayer{
         padding-bottom: 20px;
+    }
+    .as_wrapper{
+        height: 75px;
+    }
+    .as_albumArtwork{
+        width: 50px;
     }
 }
 @media (max-width: 575px){

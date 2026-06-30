@@ -82,7 +82,7 @@
 
 {#if $selectedBeat}
     <div
-        class="audioStreamWrapper"
+        class="as_wrapper"
         class:hideStreamPlayer={hideStreamPlayer || $inTimeout}
     >
         <AudioRange
@@ -92,7 +92,7 @@
 
         <div class="innerAudio">
             <!-- fade help -->
-            <button class="bottomArt" on:click={() => { goto("/portal"); }}>
+            <button class="as_albumArtwork" on:click={() => { goto("/portal"); }}>
                 <AlbumArtwork width={"100%"} imageUrl={$selectedBeat.artworkUrl}/>
             </button>
 

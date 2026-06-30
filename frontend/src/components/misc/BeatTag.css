@@ -12,22 +12,16 @@
 
     border-radius: 50px;
 
-    background:
-        linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--tag-color) 94%, white),
-            color-mix(in srgb, var(--tag-color) 94%, black)
-        );
+    background: color-mix(in srgb, var(--tag-color) 82%, transparent);
 
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(115%);
+    -webkit-backdrop-filter: blur(12px) saturate(115%);
 
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.06),
-        0 6px 14px rgba(0, 0, 0, 0.10);
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 5px 12px rgba(0, 0, 0, 0.12);
 }
 
 .beatTagWrapper::before {
@@ -35,13 +29,7 @@
     position: absolute;
     inset: 0;
 
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.10),
-            rgba(255, 255, 255, 0.025) 55%,
-            rgba(255, 255, 255, 0)
-        );
+    background: rgba(255, 255, 255, 0.025);
 
     pointer-events: none;
 }

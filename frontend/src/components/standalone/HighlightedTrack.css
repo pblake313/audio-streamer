@@ -10,18 +10,19 @@
     margin: 45px auto 0 auto;
     display: flex;
     justify-content: space-between;
+    padding: 0px 25px;
 }
 
 .ht_background {
     position: absolute;
-    min-width: 150%;
-    min-height: 150%;
+    min-width: 115%;
+    min-height: 115%;
     top: 50%;
     left: 50%;
     z-index: -2;
     transform: translate(-50%, -50%);
     opacity: 0.1;
-    filter: blur(10px);
+    filter: blur(20px) saturate(250%);
 }
 
 .ht_topFade,
@@ -79,6 +80,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
 }
 
 .ht_title {
@@ -94,5 +96,65 @@
 .ht_stateAndKey{
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+}
+.ht_keyAndMode{
+    font-size: 10pt;
+    padding-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ht_mobileRange{
+    display: none;
+}
+@media (max-width: 1000px) {
+    .ht_title {
+        font-size: 45pt;
+    }
+    
+}
+@media (max-width: 850px) {
+    .ht_insideContainer{
+        flex-direction:column;   
+    }
+    .ht_artworkContainer{
+        width: 100%;
+        margin: auto;
+        max-width: 550px;
+    }
+    .ht_trackInfo {
+        width: 100%;
+        margin: auto;
+        max-width: 550px;
+        margin-top: 25px;
+    }
+    .ht_title {
+        font-size: 35pt;
+    }
+    .ht_wrapper{
+        padding-top: 35px;
+    }
+}
+@media (max-width: 750px) {
+        .ht_wrapper{
+        padding-top: 25px;
+    }
+}
+@media (max-width: 650px) {
+    .ht_title {
+        font-size: 25pt;
+    }
+    .ht_stateAndKey{
+        width: 100%;
+        justify-content: space-between;
+        flex-direction: row-reverse;
+    }
+    .ht_deskRange{
+        display: none;
+    }
+    .ht_mobileRange{
+        display: block;
+    }
+
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let color: string = "#1b1b1b";
+  export let color: string = "#f7f7f7";
   export let size: number = 2;
   export let status: "idle" | "playing" = "playing";
 

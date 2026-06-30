@@ -59,7 +59,7 @@
             <div class="nav_userFlex">
                 <div class="nav_githubFlex">
                     <GitHubLink gitText={"@pblake313"} />
-                    <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/>
+                    <!-- <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/> -->
                 </div>
                 <div class="nav_rightFlex">
                              <NavigationLink

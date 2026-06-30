@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { selectedBeat, setAudioUrl } from "../../stores/AudioPlayer/selectedBeatStore";
+    import { fade } from "svelte/transition";
+    import {
+        selectedBeat,
+        setAudioUrl,
+    } from "../../stores/AudioPlayer/selectedBeatStore";
     import {
         audioPlayerErrorMessage,
         audioPlayerState,
@@ -34,21 +38,28 @@
     <p style="color: red;">{$audioPlayerErrorMessage}</p>
 {:else if $userTapped}
     <div class="aps_flex">
+        {#if $audioPlayerState === "Playing" || $audioPlayerState === "Loading" || $audioPlayerState === "Paused"}
+            <div class="aps_containIcon" >
+                {#if $audioPlayerState === "Playing" || $audioPlayerState === "Paused"}
 
-        {#if $audioPlayerState === "Playing" || $audioPlayerState === "Loading"}
-            <div class="trackIcon">
-                {#if $audioPlayerState === "Playing"}
-                    <SoundPlaying color={"#f7f7f7"} />
+                    <!-- aslo, when its idle display the same thbing as when its paused. -->
+                    <div class="aps_iconWrapper">
+                        <SoundPlaying
+                            status={$audioPlayerState === "Paused"
+                                ? "idle"
+                                : "playing"}
+                        />
+                    </div>
                 {:else if $audioPlayerState === "Loading" && $userTapped}
-                    <Loader height={"15px"} />
+                    <div class="aps_iconWrapper aps_loader">
+                        <Loader height={"20px"} />
+                    </div>
                 {/if}
             </div>
         {/if}
 
         <div class="trackStateText">
-            {#if $audioPlayerState === "Idle"}
-                <p>Waiting</p>
-            {:else if $audioPlayerState === "Error"}
+            {#if $audioPlayerState === "Error"}
                 <div class="retryOnError">
                     <p class="audioError">Load Audio Error</p>
                     <BoxButton
@@ -58,20 +69,23 @@
                         on:click={handleRetryClick}
                     />
                 </div>
-            {:else}
-                <p>{$audioPlayerState}</p>
+            {:else if $audioPlayerState !== "Playing" && $audioPlayerState !== "Paused" && $audioPlayerState !== "Loading"}
+                <p class="aps_text">{$audioPlayerState}</p>
             {/if}
         </div>
     </div>
 {:else if !$userTapped}
-    <div class="aps_flex">
-        <p>Not Tapped: {$audioPlayerState}</p>
+    <div class="aps_flex" >
+        <div class="aps_containIcon">
+            <div class="aps_iconWrapper" >
+                <SoundPlaying
+                    status={$audioPlayerState === "Playing"
+                        ? "playing"
+                        : "idle"}
+                />
+            </div>
+        </div>
+
+        <p class="aps_text">{$audioPlayerState}</p>
     </div>
 {/if}
-
-<!-- old jaunt. -->
-
-<!-- <div class="trackStateFlex">
-
-
-</div> -->

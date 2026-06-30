@@ -792,7 +792,7 @@
     .wrap {
         width: 100%;
         min-height: var(--wave-height);
-        overflow-x: auto;
+        overflow-x: hidden;
         overflow-y: hidden;
         cursor: pointer;
         position: relative;

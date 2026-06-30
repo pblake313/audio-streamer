@@ -84,25 +84,39 @@
 
             <div class="ht_trackInfo">
 
-                <div class="ht_stateAndKey">
-                    <AudioPlayerState />
-                    
-                    <p>{$selectedBeat.key} {$selectedBeat.mode} - {$selectedBeat.bpm} BPM</p>
+                <div class="ht_details">
+                    <div class="ht_stateAndKey">
+                        <AudioPlayerState />
+                        
+                        <p class="ht_keyAndMode">{$selectedBeat.key} {$selectedBeat.mode} - {$selectedBeat.bpm} BPM</p>
+                    </div>
+                    <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
                 </div>
-                <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
 
 
                 <!-- <BeatTagsSwiper beat={$selectedBeat}/> -->
 
+                <div class="ht_rangeControls">
 
-                <AudioControlBox {playOrPauseIcon}></AudioControlBox>
+                    <AudioControlBox {playOrPauseIcon}></AudioControlBox>
 
+                    <div class="ht_deskRange">
+                        <AudioRange
+                            waveHeight={50}
+                            useWaveForm={true}
+                        />
+                    </div>
 
+                    <div class="ht_mobileRange">
+                        <AudioRange
+                            waveHeight={25}
+                            useWaveForm={true}
+                            
+                        />
+                    </div>
 
-                <AudioRange
-                    waveHeight={50}
-                    useWaveForm={true}
-                />
+                </div>
+
             </div>
         </div>
     </div>

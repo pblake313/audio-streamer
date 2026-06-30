@@ -198,6 +198,31 @@ export function upsertBeat(newBeat: Beat) {
     });
 }
 
+export function updateBeatFutureDestinationsInArray(
+    beatId: string,
+    futureDestinations: Beat["futureDestinations"]
+) {
+    beats.update((currentBeats) =>
+        currentBeats.map((beat) =>
+            beat.id === beatId
+                ? {
+                      ...beat,
+                      futureDestinations,
+                  }
+                : beat
+        )
+    );
+
+    const currentSelectedBeat = get(selectedBeat);
+
+    if (currentSelectedBeat?.id === beatId) {
+        selectNewBeat({
+            ...currentSelectedBeat,
+            futureDestinations,
+        });
+    }
+}
+
 export function removeBeatFromArray(beatId: string) {
     beats.update((currentBeats) =>
         currentBeats.filter((beat) => beat.id !== beatId)

@@ -47,7 +47,7 @@ export async function toggleBeatDestination(req: Request, res: Response, next: N
             });
 
         return res.status(200).send({
-            beat: updatedBeat,
+            futureDestinations: updatedFutureDestinations
         });
 
 

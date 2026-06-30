@@ -1,7 +1,7 @@
 <script lang="ts">
     import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
     import type { Beat, FutureDestination } from "../../lib/types/Beats";
-    import { upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
+    import { updateBeatFutureDestinationsInArray, upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import { setPopupError } from "../../stores/PopupBeatStore";
     import AppLogo from "../Icons/Logos/AppLogo.svelte";
     import Logo from "../Icons/Logos/Logo.svelte";
@@ -30,8 +30,12 @@
                 },
             );
 
-            beat = response.beat;
-            upsertBeat(response.beat);
+
+            updateBeatFutureDestinationsInArray(
+                beat.id,
+                response.futureDestinations
+            );
+
         } catch (err: any) {
             const errorMessage =
                 err.message || "An unknown error has occurred.";

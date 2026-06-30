@@ -1,3 +1,23 @@
 .aps_flex{
     display: flex;
+    align-items: center;
+}
+.aps_containIcon{
+    height: 20px;
+    aspect-ratio: 1 /1;
+    position: relative;
+
+}
+.aps_iconWrapper{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+}
+.aps_loader{
+    width: fit-content;
+
+}
+.aps_text{
+    font-size: 10pt;
+    padding-top: 5px;
 }
