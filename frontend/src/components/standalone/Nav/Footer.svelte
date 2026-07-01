@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { showAudioPlayer } from '../../../stores/AudioPlayer/BeatsStore';
     import Logo from '../../Icons/Logos/Logo.svelte';
     import SocialButton from '../../UI/SocialButton.svelte';
 import './Footer.css'
 </script>
 
 
-<div class="footer_container">
+<div class="footer_container" class:footer_padForPlayer={$showAudioPlayer}>
     <div class="footer_insideContainer">
         <p class="footer_eyebrow">A project by</p>
         <a href="https://www.pattsway.com" class="footer_containLogo">

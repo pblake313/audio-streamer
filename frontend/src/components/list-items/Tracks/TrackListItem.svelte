@@ -16,10 +16,7 @@
     import MoreIcon from "../../Icons/svg/MoreIcon.svelte";
     import StarIcon from "../../Icons/svg/StarIcon.svelte";
     import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
-    import NotepadIcon from "../../Icons/svg/NotepadIcon.svelte";
     import type { Beat } from "../../../lib/types/Beats";
-    import SpinLoader from "../../loaders/Loader.svelte";
-    import BeatTag from "../../misc/BeatTag.svelte";
     import Modal from "../../misc/Modal.svelte";
     import PlayIcon from "../../Icons/svg/PlayIcon.svelte";
     import PopupBeat from "../../misc/PopupBeat.svelte";
@@ -27,6 +24,8 @@
     import Loader from "../../loaders/Loader.svelte";
     import { fade } from "svelte/transition";
     import BeatTagsSwiper from "../../standalone/BeatTagsSwiper.svelte";
+    import { getDateAgeInDays } from "../../../helpers/formatters";
+    import Destinations from "./Destinations.svelte";
 
     export let isEven: boolean = false;
     export let beat: Beat;
@@ -35,7 +34,7 @@
     export function selectAndPlay() {
         const currentSelection = get(selectedBeat);
 
-        if (currentSelection === beat && $audioPlayerState !== "Idle") {
+        if (currentSelection === beat ) {
             // console.log('already the same beat')
 
             if (currentSelection === beat && $audioPlayerState === "Playing") {
@@ -58,11 +57,13 @@
     function resetSelectedMoreBeat() {
         selectedMoreBeat = null;
     }
+
+
 </script>
 
 <button
     type="button"
-    class="trackButton"
+    class="tli_button"
     class:evenButton={isEven}
     on:click={selectAndPlay}
 >
@@ -125,43 +126,54 @@
     <div class="tli_allButArtContainer">
         <div class="tli_titleContainer">
             <p class="tli_title">{beat.beatTitle}</p>
-            <p class="smallText">{beat.key} {beat.mode} - {beat.bpm} BPM</p>
+            
+            <div class="tli_keyReference">
 
+                {#if beat.trackType === 'Reference'}
+                    <p class="tli_reference">Reference</p>
+                {:else if getDateAgeInDays(beat.createdAt) >= 29}
+                    <div class="tli_dot"></div>
+                {/if}
 
-        </div>
-
-        <div class="futureDestinationsWrapper">
-            <div class="destinationFlex">
-                {#if beat.notepad}
-                    <div style="margin-right: 8px;">
-                        <NotepadIcon></NotepadIcon>
+                {#if beat.futureDestinations.length >= 1}
+                    <div class="tli_mobileDestinations">
+                        <Destinations {beat}/>
                     </div>
                 {/if}
+           
+    
+                <p class="smallText">
+                    {beat.key} {beat.mode} - {beat.bpm} BPM
+                </p>
             </div>
+                 
         </div>
 
-        <div class="taggerflexer">
+        <div class="tli_tags">
             <BeatTagsSwiper beat={beat}/>
         </div>
 
-        <div class="wrapb">
-            <p class="smallText">{beat.key} {beat.mode} - {beat.bpm} BPM</p>
+        <div class="tli_destinations">
+            <Destinations {beat}/>
         </div>
 
-        <div class="moreInfoC">
-            <div class="ratingJ">
-                {#each Array(beat.rating) as _}
-                    <div style="margin-right: 3px; width: fit-content">
-                        <StarIcon></StarIcon>
-                    </div>
-                {/each}
-            </div>
-            <div class="wrappamo">
-                <button class="moreIconButton" on:click={selectMoreBeat}
-                    ><MoreIcon color={"#f7f7f7"}></MoreIcon></button
-                >
-            </div>
+        <div class="tli_rating">
+            {#each Array(beat.rating) as _}
+                <div style="margin-right: 3px; width: fit-content">
+                    <StarIcon color={'#f7f7f7'}/>
+                </div>
+            {/each}
         </div>
+
+
+        <div class="tli_moreInfoContainer">
+
+            <button class="moreIconButton" on:click={selectMoreBeat}>
+                <MoreIcon color={"#f7f7f7"}/>
+            </button>
+        </div>
+
+
     </div>
 </button>
 

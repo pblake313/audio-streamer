@@ -10,6 +10,7 @@
     import BeatTagsSwiper from "../standalone/BeatTagsSwiper.svelte";
     import { beats } from "../../stores/AudioPlayer/BeatsStore";
     import MarkTrash from "../forms/MarkTrash.svelte";
+    import { getDateAgeInDays, getUploadedAtString } from "../../helpers/formatters";
 
     export let beat: Beat;
 
@@ -21,14 +22,22 @@
         <AlbumArtwork width="90px" imageUrl={beatToUse.artworkUrl} />
 
         <div class="popupBeat_trackDetails">
+
+
+
             <p class="popupBeat_trackTitle">{beatToUse.beatTitle}</p>
 
             <p class="popupBeat_subtitle">
                 {beatToUse.bpm} BPM - {beatToUse.key}
                 {beatToUse.mode}
+
+                <span style="padding-left: 10px;">
+                </span>
+
             </p>
 
-            <BeatTagsSwiper beat={beatToUse} />
+            <p class="popupBeat_subtitle popupBeat_mini">{getUploadedAtString(beat.createdAt)}</p>
+                    
         </div>
     </div>
 

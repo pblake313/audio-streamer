@@ -65,3 +65,9 @@
         display: block;
     }
 }
+@media (max-width: 600px) {
+    .nav_inside{
+        padding: 15px;
+    }
+    
+}

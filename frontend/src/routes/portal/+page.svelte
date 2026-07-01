@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import HighlightedTrack from '../../components/standalone/HighlightedTrack.svelte';
-    import { beatFetchError, beats, fetchBeats,  isFetchingBeats, oneBeatFetchSuccessfull } from '../../stores/AudioPlayer/BeatsStore';
+    import { beatFetchError, beats, fetchBeats,  isFetchingBeats, oneBeatFetchSuccessfull, showAudioPlayer } from '../../stores/AudioPlayer/BeatsStore';
     import { selectedBeat } from '../../stores/AudioPlayer/selectedBeatStore';
     import { pauseTrack, playTrack, smartNextTrack, smartPreviousTrack } from '../../stores/AudioPlayerStore';
     import TrackList from '../../components/lists/TrackList/TrackList.svelte';
@@ -61,11 +61,14 @@
         padding: 25px;
         max-width: 1250px;
     }
+    .tracklist_padForPlayer{
+        padding-bottom: 100px;
+    }
     @media (max-width:575px){
             .wrapTrackList {
             margin: auto;
-            padding: 15px;
             max-width: 1250px;
+            padding: 0px 15px;
         }
     }
 </style>
@@ -73,7 +76,7 @@
 
 
 
-{#if $isFetchingBeats}
+{#if $isFetchingBeats && !$oneBeatFetchSuccessfull}
     <Loader loaderStyle={"loader_full"}/>
 {:else if $beatFetchError}
     <PageHeading title={"Fetch Beats Error"} subtitle={$beatFetchError} buttonText={"Retry"} onButtonClick={() => {
@@ -81,7 +84,7 @@
     }}/>
 {:else}
     <HighlightedTrack />
-    <div class="wrapTrackList">
+    <div class="wrapTrackList" class:tracklist_padForPlayer={$showAudioPlayer}>
         <TrackList></TrackList>
     </div>
 {/if}

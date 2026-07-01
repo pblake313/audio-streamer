@@ -5,6 +5,8 @@ import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
 
 // all beats
 
+export const showAudioPlayer = writable<boolean>(false)
+
 export const beats = writable<Beat[]>([]);
 
 export const beatPagesFetched = writable<number[]>([]);
@@ -31,6 +33,8 @@ export async function fetchBeats(pageToFetch?: number) {
     fetchBeatsAttempted.set(true);
     beatFetchError.set(null);
     isFetchingBeats.set(true);
+
+// here i need to separate a more pages beats fetch from the first fetch with booleans.
 
     try {
         const result = await authorizedFetch(`/secure/beats/get-live-beats/${nextPage}`, {

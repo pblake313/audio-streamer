@@ -15,7 +15,10 @@
 .popupBeat_subtitle{
     font-size: 11pt;
     opacity: .8;
-    margin-bottom: 5px;
+}
+.popupBeat_mini{
+    font-size: 10pt;
+
 }
 .popupBeat_clicksFlex{
     display: flex;

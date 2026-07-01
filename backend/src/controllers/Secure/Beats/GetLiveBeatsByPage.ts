@@ -12,7 +12,7 @@ export async function getLiveBeatsByPage(
 ) {
     try {
         const page = Number(req.params.page || 1);
-        const limit = 12;
+        const limit = 6;
 
         if (!Number.isInteger(page) || page < 1) {
             return res.status(400).send({

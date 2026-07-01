@@ -1,33 +1,73 @@
-.trackButton {
+.tli_button {
     display: flex;
     align-items: center;
+    gap: 12px;
+
     border: none;
     outline: none;
     background-color: transparent;
     border-radius: 10px;
+
     width: 100%;
     text-align: left;
-    padding: 1px;
-    margin-bottom: 6px;
     position: relative;
-    justify-content: space-between;
 
+    padding: 0px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
+
+.tli_button:hover {
+    background-color: #2e2e2e;
+}
+
+.evenButton {
+    background-color: #252525;
+}
+
+/* ========================= */
+/* ARTWORK                   */
+/* ========================= */
+
 .tli_artworkContainer {
     height: 65px;
     width: 65px;
+    flex: 0 0 65px;
+
     border-radius: 10px;
     position: relative;
     overflow: hidden;
 }
+
 .tli_playOverlay {
     position: absolute;
     height: 100%;
     width: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0%;
+    left: 0%;
     background-color: rgba(0, 0, 0, 0.705);
+}
+
+.tli_playPauseOverlay {
+    transition: 0.3s;
+    opacity: 0;
+}
+
+.tli_button:hover .tli_artworkContainer .tli_playPauseOverlay {
+    opacity: 1;
+}
+
+.tli_selectedTrackOverlay {
+    transition: 0.3s;
+}
+
+.tli_button:hover .tli_artworkContainer .tli_selectedTrackOverlay {
+    opacity: 0;
+}
+
+.hiderJ {
+    opacity: 0;
 }
 
 .tli_wrapIcon {
@@ -35,422 +75,210 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    transition: .3s;
+    transition: 0.3s;
 }
-.flexDaysOld {
-    display: flex;
-    align-items: center;
-}
-.mobileDestinations {
-    display: none;
-}
-.trackButton:hover {
-    cursor: pointer;
-    background-color: #272727;
-}
-.artworkImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+
+/* ========================= */
+/* CONTENT BESIDE ARTWORK    */
+/* ========================= */
+
 .tli_allButArtContainer {
-    width: calc(100% - 85px);
+    flex: 1 1 auto;
+    min-width: 0;
+
     display: flex;
     align-items: center;
     gap: 12px;
+
+    overflow: hidden;
 }
-.smallText {
-    font-size: 10pt;
-    padding: 0px;
-    margin: 0px;
-    color: rgb(140, 140, 140);
+
+/* Purple title area - does NOT shrink */
+.tli_titleContainer {
+    flex: 0 0 300px;
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+    overflow: hidden;
 }
+
+.tli_titleContainer p {
+    white-space: nowrap;
+}
+
 .tli_title {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
+
     font-size: 12pt;
     white-space: nowrap;
+
     width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
+
     color: var(--font-color-heading);
 }
-.tli_titleContainer {
+
+.tli_keyReference {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
     overflow: hidden;
-    width: calc(20%);
 }
-.tli_titleContainer p {
+
+.tli_dot {
+    height: 10px;
+    width: 10px;
+    flex: 0 0 10px;
+
+    border-radius: 50%;
+    background-color: rgba(53, 235, 93, 0.644);
+    margin-bottom: 2px;
+}
+
+.tli_reference {
+    font-size: 9pt;
+    margin: 0 0 2px 0;
+
+    color: #21d3ff;
+    border: 1px solid #4abdff3a;
+    padding: 1px 5px;
+    line-height: 1.13em;
+    border-radius: 50px;
+    background-color: #4abdff36;
+
     white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.smallText {
+    font-size: 10pt;
+    padding: 0;
+    margin: 0;
+
+    color: rgb(140, 140, 140);
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Orange tags area - fills remaining space */
+.tli_tags {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.tli_tags > * {
+    width: 100%;
+    min-width: 0;
 }
 
 .taggerflexer {
     display: flex;
     align-items: center;
-    overflow: hidden;
-    width: calc(30%);
     gap: 8px;
-}
-.futureDestinationsWrapper {
-    width: 20%;
-}
-.destinationFlex {
-    display: flex;
-    align-items: center;
-}
-.wrapb {
-    overflow: hidden;
-    width: calc(15%);
-}
-.ratingJ {
-    width: calc(100% - 50px);
-    display: flex;
-    align-items: center;
 
-}
-.mobileDays {
-    opacity: .5;
-    font-size: 8pt;
-    margin-left: 5pt;
-    display: none;
-}
-.moreInfoC {
-    width: 15%;
-    display: flex;
-    justify-content: space-between;
-}
-.wrappamo {
-    margin-right: 5px;
-}
-.trackWrap {
-    display: flex;
-    width: 100px;
-    flex-direction: row-reverse;
-}
-
-.wrapMoreJoint {
-    width: 50px;
-    display: flex;
-    flex-direction: row-reverse;
-}
-
-.finnaTag {
-    padding: 0px;
-    margin: 0px;
-    color: rgb(145, 145, 145);
-    font-size: 9pt;
-    margin-right: 8px;
-    padding: 3px 10px 2px 10px;
-    border-radius: 50px;
-    background-color: transparent;
-    border: 1px solid #424242f1;
-    white-space: nowrap;
-    background-color: transparent;
-}
-
-.wrappricer {
-    width: 100px;
-}
-.mobileAddCart {
-    display: none;
-}
-
-.mobBeatPrice {
-    display: none;
-}
-
-
-.dontshowhighlight {
-    background-color: transparent;
-}
-.dontshowhighlight:hover {
-    background-color: transparent;
-}
-
-.moreButtonCity {
-    padding: 0px;
-    margin: 0px;
-    padding-top: 2px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    opacity: .7;
-    transition: .3s;
-}
-.moreButtonCity:hover {
-    opacity: 1;
-}
-
-.MoreOpTop {
-    padding: 10px;
-    overflow: hidden;
-    position: relative;
-    border-bottom: 1px solid lightgray;
-}
-.morOPBack {
-    position: absolute;
-    filter: blur(35px);
-    opacity: .15;
-    top: 50%;
-    left: 50%;
-    height: 100%;
     width: 100%;
-    object-fit: cover;
-    z-index: -1;
+    min-width: 0;
+    overflow: hidden;
 }
-.moreOpIn{
+
+/* Right-side fixed sections */
+.tli_destinations {
+    flex: 0 0 125px;
+    width: 125px;
+    min-width: 125px;
+    max-width: 125px;
+    overflow: hidden;
+}
+
+.tli_rating {
+    flex: 0 0 90px;
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+
     display: flex;
     align-items: center;
 
+    overflow: hidden;
+}
 
-}
-.moreOpArtWrap {
-    height: 35px;
-    width: 35px;
-    overflow: hidden;
-    position: relative;
-    border-radius: 3px;
-    overflow: hidden;
-}
-.fullerTitle {
-    width: calc(100% - 45px);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    margin-left: 10px;
-}
-.wrapOpper {
+.tli_moreInfoContainer {
+    flex: 0 0 auto;
     display: flex;
-    justify-content: space-between;
-    position: sticky;
-    top: 330px;
-    background-color: #f7f7f7;
-    z-index: 6;
-    height: 0px;    
+    justify-content: flex-end;
+    align-items: center;
 }
-.moreOptionsWrapper {
-    width: 210px;
-    border-radius: 6px;
-    background-color: #f7f7f7;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.261);
-    z-index: 6;
-    right: 0px;
-    bottom: 0px;
-    position: absolute;
-    overflow: hidden;
-}
-.mobTagsFlex {
-    display: none;
-}
-.evenButton {
-    background-color: #252525;
 
-}
-.editBeatInfoBox {
-    width: 100%;
-    text-align: left;
-    margin-top: 10px;
-    overflow: visible;
-}
 .moreIconButton {
     border: none;
-    padding: 11px 8px 8px 8px;
-    margin: 0px;
+    padding: 8px 4px 4px 4px;
+    margin: 0;
+    margin-right: 10px;
+
     background-color: transparent;
     cursor: pointer;
     border-radius: 4px;
+
     transform: rotate(90deg);
-    transition: .3s;
+    transition: 0.3s;
+
+    -webkit-tap-highlight-color: transparent;
 }
+
 .moreIconButton:hover {
     background-color: rgba(255, 255, 255, 0.192);
-    transition: .3s;
-
 }
-.tli_playPauseOverlay {
-    transition: .3s;
-    opacity: 0;
-}
-.trackButton:hover .tli_artworkContainer .tli_playPauseOverlay {
-    opacity: 1;
-}
-.tli_selectedTrackOverlay{
-    /* background-color: rgba(255, 217, 0, 0.596); */
-    transition: .3s;
-}
-.trackButton:hover .tli_artworkContainer .tli_selectedTrackOverlay {
-    opacity: 0;
-}
-.hiderJ {
-    opacity: 0;
-}
-.wrapNoteLoader{
-    padding: 50px 0px 20px 0px;
-
-}
-.wl{
-    margin: auto;
-}
-.flexDaysOld {
-    position: relative;
-}
-.daysOldFader {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 15px;
-    background: linear-gradient(to right, #38383800, #222);
-    transition: .5s;
+.tli_mobileDestinations{
+    display: none;
 }
 
-.evenfade{
-    background: linear-gradient(to right, #38383800, #252525);
-    transition: .3s;
-}
-
-.trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .daysOldFader {
-    background: linear-gradient(to right, #38383800, #272727);
-}
-.trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .evenfade {
-    background: linear-gradient(to right, #38383800, #272727);
-
-}
-
-@media (max-width: 1300px) {
-    .mobileDestinations {
+@media (max-width: 1050px) {
+    /* remove the green rating item */
+    .tli_rating {
+        display: none;
+    }
+    .tli_mobileDestinations{
         display: block;
     }
-    .futureDestinationsWrapper {
+    .tli_destinations{
         display: none;
     }
+}
+
+@media (max-width: 850px) {
+    .tli_destinations{
+        display: none;
+    }
+}
+@media (max-width: 725px) {
+    .tli_tags {
+        display: none;
+    }
+
+    /* make purple fill remaining space */
     .tli_titleContainer {
-        width: 30%;
-    }
-    .taggerflexer {
-        width: 40%;
-    color: #b8b8b8;
-
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        max-width: none;
     }
 }
-@media(max-width: 1125px) {
-    .wrapb {
-        display: none;
-    }
-    .moreInfoC {
-        width: 30%;
-
-    }
-    .tli_titleContainer {
-        width: calc(50% - 65px);
-    }
-}
-@media(max-width: 850px) {
-    .taggerflexer {
-        display: none;
-    }
-    .tli_titleContainer {
-        width: calc(100% - 80px);
-        margin-right: 15px;
-    }
-    .trackButton {
-        width: calc(100% + 5px);
-    }
-    .moreOptionsWrapper {
-        right: 5px;
-    }
-    .mobTagsFlex {
-        display: flex;
-        gap: 8px;
-    }   
-    .smallText {
-        display: none;
-    }
-    .finnaTag {
-        font-size: 8pt;
-        padding: 1px 5px 0px 5px;
-    }
-    .mobileDays {
-        display: inline-block;
-
-    }
-
-}
-@media(max-width: 650px){
-    .trackWrap {
-        display: none;
-    }
-    .ratingJ {
-        width: 0px;
-        overflow: hidden;
-    }
-    .moreInfoC {
-        width: 50px;
-    }
-    .moreButtonCity {
-        transform: rotate(90deg);
-        padding-top: 11px;
-    }
-    .tli_playOverlay {
-        display: block;
-    }
-    .spacefilla {
-        display: none;   
-    }
-    .wrapOpper {
-        top: 300px;
-    }
-    .tli_artworkContainer {
-        height: 60px;
-        width: 60px;
-    }
-    .tli_allButArtContainer {
-        width: calc(100% - 70px);
-        gap: 0px;
-    }
-    .tli_titleContainer {
-        padding-left: 10px;
-    }
-    .finnaTag {
-        font-size: 7pt;
-    }
-}
-@media(max-width: 600px){
-    .wrapSaveButton{
-        width: 100%;
-    }
-}
-@media (max-width: 575px){
-    .hideout {
-        display: none;
-    }
-}
-@media(max-width: 500px) {
-
-    .trackWrap {
-        width: 80px;
-    }
-    .tli_titleContainer {
-        width: calc(100% - 60px);
-        margin-right: 15px;
-    }
-    .wrapMoreJoint {
-        width: 25px;
-        padding-left: 5px;
-    }
-
-}
-@media(pointer: coarse) {
-    .trackButton:hover {
-        cursor: pointer;
+@media (pointer: coarse) {
+    .tli_button:hover {
         background-color: transparent;
     }
+
     .evenButton:hover {
         background-color: hsla(0, 0%, 89%, 0.02);
-
     }
+
     .tli_playPauseOverlay {
         display: none;
     }
@@ -458,20 +286,17 @@
     .tli_selectedTrackOverlay {
         opacity: 1;
     }
-    .trackButton:hover .tli_artworkContainer .tli_selectedTrackOverlay {
+
+    .tli_button:hover .tli_artworkContainer .tli_selectedTrackOverlay {
         opacity: 1;
     }
+
     .goHide {
         opacity: 0;
         display: none;
     }
 
-    .trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .daysOldFader {
-        background: linear-gradient(to right, #38383800, #222);
+    .moreIconButton:hover {
+        background-color: transparent;
     }
-    .trackButton:hover .tli_allButArtContainer .tli_titleContainer .flexDaysOld .evenfade {
-        background: linear-gradient(to right, #38383800, #252525);
-
-    }
-
 }

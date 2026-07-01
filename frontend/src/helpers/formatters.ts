@@ -50,3 +50,56 @@ export function formatTimeRemaining(ms: number): string {
 
     return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 }
+
+export function getDateAgeInDays(timestamp: any): number {
+    const date = firestoreTimestampToDate(timestamp);
+
+    if (!date || isNaN(date.getTime())) {
+        return 0;
+    }
+
+    const diffMs = Date.now() - date.getTime();
+
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+
+export function getUploadedAtString(timestamp: any): string | null {
+    const date = firestoreTimestampToDate(timestamp);
+    if (!date) return null;
+
+    const now = new Date();
+
+    const diffMs = now.getTime() - date.getTime();
+
+    const minute = 1000 * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+    const week = day * 7;
+    const month = day * 30.44;
+    const year = day * 365.25;
+
+    if (diffMs < day) {
+        return "Uploaded today.";
+    }
+
+    if (diffMs < day * 2) {
+        return "Uploaded yesterday.";
+    }
+
+    if (diffMs < week) {
+        return "Uploaded this week.";
+    }
+
+    if (diffMs < month) {
+        const weeks = Math.floor(diffMs / week);
+        return `Uploaded ${weeks} ${weeks === 1 ? "week" : "weeks"} ago.`;
+    }
+
+    if (diffMs < year) {
+        const months = Math.floor(diffMs / month);
+        return `Uploaded ${months} ${months === 1 ? "month" : "months"} ago.`;
+    }
+
+    const years = Math.floor(diffMs / year);
+    return `Uploaded ${years} ${years === 1 ? "year" : "years"} ago.`;
+}

@@ -2,31 +2,19 @@
     import { fade } from "svelte/transition";
 
     import "./Tracklist.css";
-    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch } from "../../../stores/AudioPlayer/BeatsStore";
+    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch, isFetchingBeats, showAudioPlayer } from "../../../stores/AudioPlayer/BeatsStore";
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
     import TrackListItem from "../../list-items/Tracks/TrackListItem.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";
-    import SpinLoader from "../../loaders/Loader.svelte";
     import Loader from "../../loaders/Loader.svelte";
 
-    let loadingNewBeats: boolean = false;
 
     async function loadMoreBeats() {
         // console.log($beatPagesFetched)
-        if ($allBeatPagesFetched) {
-            // console.log('Already fetched all beat pages!')
-            return;
-        }
-
-        loadingNewBeats = true;
-
-        try {
-            await fetchBeats(getNextBeatPageToFetch());
-        } finally {
-            loadingNewBeats = false;
-        }
+        await fetchBeats(getNextBeatPageToFetch());
     }
 </script>
+
 
 
 {#if $beats.length === 0}
@@ -39,17 +27,15 @@
 
 {#if !$allBeatPagesFetched}
     <div class="wrapOnlyButton">
-        {#if loadingNewBeats}
-            <div in:fade={{duration: 300, delay: 200}}>
-                <div style="padding: 50px; 0px">
-                    <SpinLoader></SpinLoader>
-                </div>
-            </div>
-        {:else}
-            <div in:fade={{ duration: 500, delay: 200 }} out:fade={{duration: 200}}>
-                <BoxButton tightPad={true} buttonText={'Fetch More'} on:click={loadMoreBeats}></BoxButton>
-            </div>
-        {/if}
+
+        <BoxButton 
+            tightPad={true} 
+            buttonText={$isFetchingBeats ? null : 'Fetch More'} 
+            buttonIcon={$isFetchingBeats ? 'loading' : null}
+            isDisabled={$isFetchingBeats} 
+            on:click={loadMoreBeats} 
+        />
+
     </div>
 {/if}
 

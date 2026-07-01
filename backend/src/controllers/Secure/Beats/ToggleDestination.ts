@@ -15,9 +15,7 @@ export async function toggleBeatDestination(req: Request, res: Response, next: N
 
         const beat = await getBeatById(beatId)
 
-
         // update the beats future destinantions... basically if the destination isnt there, add it, and if it is there remove it. return the updated beat
-
 
         const currentFutureDestinations = Array.isArray(
             beat.futureDestinations
