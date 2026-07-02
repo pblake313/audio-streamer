@@ -34,44 +34,51 @@
     export function selectAndPlay() {
         const currentSelection = get(selectedBeat);
 
-        if (currentSelection === beat ) {
-            // console.log('already the same beat')
-
-            if (currentSelection === beat && $audioPlayerState === "Playing") {
+        if (currentSelection === beat) {
+            if ($audioPlayerState === "Playing") {
                 pauseTrack();
-            }
-            if (currentSelection === beat && $audioPlayerState !== "Playing") {
+            } else {
                 playTrack();
             }
 
             return;
         }
+
         useAutoPlay.set(true);
         selectNewBeat(beat);
     }
 
-    function selectMoreBeat(e: MouseEvent) {
-        e.stopPropagation(); // prevents triggering the outer button
+    function handleRowKeydown(event: KeyboardEvent) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+
+        event.preventDefault();
+        selectAndPlay();
+    }
+
+    function selectMoreBeat(event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
         selectedMoreBeat = beat;
     }
+
     function resetSelectedMoreBeat() {
         selectedMoreBeat = null;
     }
-
-
 </script>
 
-<button
-    type="button"
+<div
+    role="button"
+    tabindex="0"
     class="tli_button"
     class:evenButton={isEven}
     on:click={selectAndPlay}
+    on:keydown={handleRowKeydown}
 >
     <!-- artwork -->
     <div class="tli_artworkContainer">
         <AlbumArtwork width={"100%"} imageUrl={beat.artworkUrl} />
 
-        <!-- if its the selected beat -->
         {#if $selectedBeat?.beatTitle === beat.beatTitle && $userTapped}
             <div
                 class="tli_playOverlay tli_selectedTrackOverlay"
@@ -80,13 +87,21 @@
                     $audioPlayerState === "Idle"}
             >
                 {#if $audioPlayerState === "Playing"}
-                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
-                        <SoundPlaying color={"#f7f7f7"}></SoundPlaying>
+                    <div
+                        class="tli_wrapIcon"
+                        in:fade={{ duration: 150 }}
+                        out:fade={{ duration: 150 }}
+                    >
+                        <SoundPlaying color={"#f7f7f7"} />
                     </div>
                 {/if}
 
                 {#if ["Buffering", "Loading"].includes($audioPlayerState)}
-                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                    <div
+                        class="tli_wrapIcon"
+                        in:fade={{ duration: 150 }}
+                        out:fade={{ duration: 150 }}
+                    >
                         <Loader height={"30px"} />
                     </div>
                 {/if}
@@ -94,29 +109,43 @@
         {/if}
 
         <div class="tli_playOverlay tli_playPauseOverlay">
-            <!-- if its the selected beat -->
             {#if $selectedBeat?.beatTitle === beat.beatTitle}
                 {#if ["Paused", "Idle"].includes($audioPlayerState)}
-                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
-                        <PlayIcon color={"#f7f7f7"}></PlayIcon>
+                    <div
+                        class="tli_wrapIcon"
+                        in:fade={{ duration: 150 }}
+                        out:fade={{ duration: 150 }}
+                    >
+                        <PlayIcon color={"#f7f7f7"} />
                     </div>
                 {/if}
+
                 {#if ["Playing"].includes($audioPlayerState)}
-                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
-                        <PauseIcon color={"#f7f7f7"}></PauseIcon>
+                    <div
+                        class="tli_wrapIcon"
+                        in:fade={{ duration: 150 }}
+                        out:fade={{ duration: 150 }}
+                    >
+                        <PauseIcon color={"#f7f7f7"} />
                     </div>
                 {/if}
 
                 {#if ["Loading", "Buffering"].includes($audioPlayerState)}
-                    <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
+                    <div
+                        class="tli_wrapIcon"
+                        in:fade={{ duration: 150 }}
+                        out:fade={{ duration: 150 }}
+                    >
                         <Loader height={"30px"} />
                     </div>
                 {/if}
-
-                <!-- if it is not the selected beat -->
             {:else}
-                <div class="tli_wrapIcon" in:fade={{duration: 150}} out:fade={{duration:150}}>
-                    <PlayIcon color={"#f7f7f7"}></PlayIcon>
+                <div
+                    class="tli_wrapIcon"
+                    in:fade={{ duration: 150 }}
+                    out:fade={{ duration: 150 }}
+                >
+                    <PlayIcon color={"#f7f7f7"} />
                 </div>
             {/if}
         </div>
@@ -126,10 +155,9 @@
     <div class="tli_allButArtContainer">
         <div class="tli_titleContainer">
             <p class="tli_title">{beat.beatTitle}</p>
-            
-            <div class="tli_keyReference">
 
-                {#if beat.trackType === 'Reference'}
+            <div class="tli_keyReference">
+                {#if beat.trackType === "Reference"}
                     <p class="tli_reference">Reference</p>
                 {:else if getDateAgeInDays(beat.createdAt) >= 29}
                     <div class="tli_dot"></div>
@@ -137,47 +165,52 @@
 
                 {#if beat.futureDestinations.length >= 1}
                     <div class="tli_mobileDestinations">
-                        <Destinations {beat}/>
+                        <Destinations {beat} />
                     </div>
                 {/if}
-           
-    
+
                 <p class="smallText">
                     {beat.key} {beat.mode} - {beat.bpm} BPM
                 </p>
             </div>
-                 
         </div>
 
-        <div class="tli_tags">
-            <BeatTagsSwiper beat={beat}/>
+        <div
+            class="tli_tags"
+            on:click|stopPropagation
+            on:pointerdown|stopPropagation
+            on:pointermove|stopPropagation
+            on:pointerup|stopPropagation
+            on:pointercancel|stopPropagation
+        >
+            <BeatTagsSwiper {beat} />
         </div>
 
         <div class="tli_destinations">
-            <Destinations {beat}/>
+            <Destinations {beat} />
         </div>
 
         <div class="tli_rating">
             {#each Array(beat.rating) as _}
                 <div style="margin-right: 3px; width: fit-content">
-                    <StarIcon color={'#f7f7f7'}/>
+                    <StarIcon color={"#f7f7f7"} />
                 </div>
             {/each}
         </div>
 
-
         <div class="tli_moreInfoContainer">
-
-            <button class="moreIconButton" on:click={selectMoreBeat}>
-                <MoreIcon color={"#f7f7f7"}/>
+            <button
+                type="button"
+                class="moreIconButton"
+                on:click={selectMoreBeat}
+                on:pointerdown|stopPropagation
+            >
+                <MoreIcon color={"#f7f7f7"} />
             </button>
         </div>
-
-
     </div>
-</button>
+</div>
 
-<!-- modal for updating the notepad, future destinations and ratings. -->
 {#if selectedMoreBeat}
     <Modal on:closeModal={resetSelectedMoreBeat} modalTitle={`More Details`}>
         <PopupBeat beat={selectedMoreBeat} />

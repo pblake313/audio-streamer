@@ -28,16 +28,10 @@
             <p class="popupBeat_trackTitle">{beatToUse.beatTitle}</p>
 
             <p class="popupBeat_subtitle">
-                {beatToUse.bpm} BPM - {beatToUse.key}
-                {beatToUse.mode}
-
-                <span style="padding-left: 10px;">
-                </span>
-
+                {getUploadedAtString(beat.createdAt)} 
             </p>
-
-            <p class="popupBeat_subtitle popupBeat_mini">{getUploadedAtString(beat.createdAt)}</p>
                     
+            <BeatTagsSwiper {beat}/>
         </div>
     </div>
 

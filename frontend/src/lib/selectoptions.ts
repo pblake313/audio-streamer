@@ -263,10 +263,6 @@ export let colorOptions: {
     color: string;
     colorName: string;
 }[] = [
-    // --------------------
-    // WHITE
-    // --------------------
-    { color: "ffffff", colorName: "White" },
 
     // --------------------
     // REDS & PINKS (OG + Vibrant)

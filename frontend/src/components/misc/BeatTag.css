@@ -9,6 +9,7 @@
     min-width: max-content;
     max-width: none;
     flex: 0 0 auto;
+    cursor: pointer;
 
     border-radius: 50px;
 
@@ -22,6 +23,10 @@
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
         0 5px 12px rgba(0, 0, 0, 0.12);
+
+    transition: 0.3s;
+
+    -webkit-tap-highlight-color: transparent;
 }
 
 .beatTagWrapper::before {
@@ -41,11 +46,13 @@
     color: var(--tag-text-color);
     font-size: 10pt;
     line-height: 1.25;
-    padding: 3px 12px 2px 12px;
+    padding: 3px 6px 2px 6px;
     margin: 0;
 
     font-weight: 400;
     white-space: nowrap;
+
+    transition: 0.3s;
 }
 
 .wrapAudLoad {
@@ -54,6 +61,148 @@
     padding-top: 30px;
     margin-top: 35px;
 }
+
+/* ========================= */
+/* NORMAL HOVER              */
+/* ========================= */
+
+/* Normal buttons keep original hover on mouse / trackpad */
+@media (hover: hover) and (pointer: fine) {
+    .beatTagWrapper:hover,
+    .beatTagWrapper:focus-visible {
+        background: #f7f7f7;
+    }
+
+    .beatTagWrapper:hover .tagText,
+    .beatTagWrapper:focus-visible .tagText {
+        color: #222222;
+    }
+}
+
+/* Touch devices: no hover/focus/active color changes for normal buttons */
+@media (hover: none), (pointer: coarse) {
+    .beatTagWrapper:hover,
+    .beatTagWrapper:focus,
+    .beatTagWrapper:focus-visible,
+    .beatTagWrapper:active {
+        background: color-mix(in srgb, var(--tag-color) 82%, transparent);
+        border-color: rgba(255, 255, 255, 0.08);
+        outline: none;
+    }
+
+    .beatTagWrapper:hover .tagText,
+    .beatTagWrapper:focus .tagText,
+    .beatTagWrapper:focus-visible .tagText,
+    .beatTagWrapper:active .tagText {
+        color: var(--tag-text-color);
+    }
+}
+
+/* ========================= */
+/* NORMAL ACTIVE             */
+/* ========================= */
+
+/* Normal selected button stays white */
+.beatTagWrapper.beatTag_active {
+    background: #f7f7f7;
+    border-color: #f7f7f7;
+}
+
+.beatTagWrapper.beatTag_active::before {
+    background: transparent;
+}
+
+.beatTagWrapper.beatTag_active .tagText {
+    color: #222222;
+}
+
+/* Normal active hover stays white */
+@media (hover: hover) and (pointer: fine) {
+    .beatTagWrapper.beatTag_active:hover,
+    .beatTagWrapper.beatTag_active:focus-visible {
+        background: #f7f7f7;
+        border-color: #f7f7f7;
+    }
+
+    .beatTagWrapper.beatTag_active:hover .tagText,
+    .beatTagWrapper.beatTag_active:focus-visible .tagText {
+        color: #222222;
+    }
+}
+
+/* Touch normal active stays active, no extra focus bullshit */
+@media (hover: none), (pointer: coarse) {
+    .beatTagWrapper.beatTag_active:hover,
+    .beatTagWrapper.beatTag_active:focus,
+    .beatTagWrapper.beatTag_active:focus-visible,
+    .beatTagWrapper.beatTag_active:active {
+        background: #f7f7f7;
+        border-color: #f7f7f7;
+        outline: none;
+    }
+
+    .beatTagWrapper.beatTag_active:hover .tagText,
+    .beatTagWrapper.beatTag_active:focus .tagText,
+    .beatTagWrapper.beatTag_active:focus-visible .tagText,
+    .beatTagWrapper.beatTag_active:active .tagText {
+        color: #222222;
+    }
+}
+
+/* ========================= */
+/* COLORED ACTIVE            */
+/* ========================= */
+
+/* Active state when the tag has a custom color */
+.beatTagWrapper.beatTag_active.beatTag_activeColor {
+    background: transparent;
+    border-color: var(--tag-color);
+}
+
+.beatTagWrapper.beatTag_active.beatTag_activeColor::before {
+    background: transparent;
+}
+
+.beatTagWrapper.beatTag_active.beatTag_activeColor .tagText {
+    color: var(--tag-color);
+}
+
+/* Colored active hover on mouse / trackpad */
+@media (hover: hover) and (pointer: fine) {
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible {
+        background: color-mix(in srgb, var(--tag-color) 20%, transparent);
+        border-color: var(--tag-color);
+    }
+
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover .tagText,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible .tagText {
+        color: var(--tag-color);
+    }
+}
+
+/* Touch colored active stays active, no hover/focus color shift */
+@media (hover: none), (pointer: coarse) {
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:active {
+        background: transparent;
+        border-color: var(--tag-color);
+        outline: none;
+    }
+
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover .tagText,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus .tagText,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible .tagText,
+    .beatTagWrapper.beatTag_active.beatTag_activeColor:active .tagText {
+        color: var(--tag-color);
+    }
+}
+
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
 
 @media (max-width: 600px) {
     .tagText {

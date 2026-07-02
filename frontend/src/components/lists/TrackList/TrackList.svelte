@@ -2,11 +2,12 @@
     import { fade } from "svelte/transition";
 
     import "./Tracklist.css";
-    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch, isFetchingBeats, showAudioPlayer } from "../../../stores/AudioPlayer/BeatsStore";
+    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch, isFetchingBeats } from "../../../stores/AudioPlayer/BeatsStore";
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
     import TrackListItem from "../../list-items/Tracks/TrackListItem.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";
     import Loader from "../../loaders/Loader.svelte";
+    import BeatFilters from "../../standalone/BeatFilters.svelte";
 
 
     async function loadMoreBeats() {
@@ -17,9 +18,15 @@
 
 
 
+
+
 {#if $beats.length === 0}
     <AddTrackPointer /> 
 {:else}
+
+    <BeatFilters />
+
+
     {#each $beats as beat, i}
         <TrackListItem {beat} isEven={i % 2 === 0}/>
     {/each}

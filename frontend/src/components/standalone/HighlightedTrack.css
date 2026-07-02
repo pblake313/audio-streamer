@@ -180,6 +180,9 @@
     .ht_mobileRange{
         display: block;
     }
+    .ht_trackInfo{
+        margin-top: 10px;
+    }
 
 }
 @media (max-width: 600px) {

@@ -19,8 +19,6 @@ export async function autoLogin(){
 
         if (get(autoLoginAttempted)) return
         
-        console.log('attemtping autologin')
-
         attemptingAutoLogin.set(true)
         // try to get an authenticated user with an access token or refresh cookie.
         await getAuthenticatedUser()

@@ -2,12 +2,11 @@ import { get, writable } from "svelte/store";
 import {
 	preloadNeighbors,
 	selectedBeat,
-	selectNextBeat,
-	selectPreviousBeat
+	selectNewBeat
 } from "./AudioPlayer/selectedBeatStore";
 import {
 	allBeatPagesFetched,
-	beats,
+	filteredBeats,
 	fetchBeats,
 	getNextBeatPageToFetch
 } from "./AudioPlayer/BeatsStore";
@@ -47,6 +46,59 @@ export const inTimeout = writable<boolean>(false);
 
 // Internal helper for accumulating time
 let lastAudioTime = 0;
+
+// =========================
+// Filtered playlist helpers
+// =========================
+function selectNextFilteredBeat() {
+	const allTracks = get(filteredBeats);
+	const current = get(selectedBeat);
+
+	if (!allTracks || allTracks.length === 0) return;
+
+	if (!current) {
+		selectNewBeat(allTracks[0]);
+		return;
+	}
+
+	const currentIndex = allTracks.findIndex((beat) => beat.id === current.id);
+
+	if (currentIndex === -1) {
+		selectNewBeat(allTracks[0]);
+		return;
+	}
+
+	const nextIndex = currentIndex + 1;
+
+	if (nextIndex >= allTracks.length) return;
+
+	selectNewBeat(allTracks[nextIndex]);
+}
+
+function selectPreviousFilteredBeat() {
+	const allTracks = get(filteredBeats);
+	const current = get(selectedBeat);
+
+	if (!allTracks || allTracks.length === 0) return;
+
+	if (!current) {
+		selectNewBeat(allTracks[0]);
+		return;
+	}
+
+	const currentIndex = allTracks.findIndex((beat) => beat.id === current.id);
+
+	if (currentIndex === -1) {
+		selectNewBeat(allTracks[0]);
+		return;
+	}
+
+	const previousIndex = currentIndex - 1;
+
+	if (previousIndex < 0) return;
+
+	selectNewBeat(allTracks[previousIndex]);
+}
 
 // =========================
 // Error helpers
@@ -95,7 +147,7 @@ function setAudioPlayerError(error: MediaError | Error | any) {
 // Helper: Fetch more beats if needed, then advance
 // =========================
 async function advanceToNextTrackWithPagination(shouldAutoPlay: boolean = false) {
-	const allTracks = get(beats);
+	const allTracks = get(filteredBeats);
 	const current = get(selectedBeat);
 
 	const isLastTrack =
@@ -122,7 +174,7 @@ async function advanceToNextTrackWithPagination(shouldAutoPlay: boolean = false)
 		useAutoPlay.set(true);
 	}
 
-	selectNextBeat();
+	selectNextFilteredBeat();
 }
 
 // =========================
@@ -271,14 +323,14 @@ function restartTrack() {
 }
 
 function previousTrack() {
-	const allTracks = get(beats);
+	const allTracks = get(filteredBeats);
 	if (!allTracks || allTracks.length === 0) return;
 
 	userTapped.set(true);
 	clearAudioPlayerErrorMessage();
 	resetTrackTimer();
 
-	selectPreviousBeat();
+	selectPreviousFilteredBeat();
 }
 
 async function smartNextTrack() {
@@ -306,7 +358,7 @@ function nextTrack() {
 		useAutoPlay.set(true);
 	}
 
-	selectNextBeat();
+	selectNextFilteredBeat();
 }
 
 function pauseTrack() {

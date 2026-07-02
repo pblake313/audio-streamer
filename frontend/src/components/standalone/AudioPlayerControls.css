@@ -16,6 +16,7 @@
 @media (max-width: 500px) {
     .apc_container {
         width: 70%;
+        margin-top: 15px;
     }
     
 }

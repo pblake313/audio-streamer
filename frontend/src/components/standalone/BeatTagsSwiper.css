@@ -1,5 +1,6 @@
 .bts_container {
-    width: 100%;
+    max-width: 100%;
+    width: fit-content;
     display: flex;
     gap: 8px;
 
@@ -16,6 +17,9 @@
 
     cursor: grab;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+
     touch-action: pan-x;
 }
 
@@ -29,4 +33,7 @@
 
 .bts_container :global(*) {
     flex: 0 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
 }

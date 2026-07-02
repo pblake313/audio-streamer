@@ -5,6 +5,8 @@ import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
 
 const db = admin.firestore();
 
+const beatPageSize = Number(process.env.BEATS_PAGE_SIZE) || 10;
+
 export async function getLiveBeatsByPage(
     req: Request,
     res: Response,
@@ -12,7 +14,7 @@ export async function getLiveBeatsByPage(
 ) {
     try {
         const page = Number(req.params.page || 1);
-        const limit = 6;
+        const limit = beatPageSize ?? 10;
 
         if (!Number.isInteger(page) || page < 1) {
             return res.status(400).send({

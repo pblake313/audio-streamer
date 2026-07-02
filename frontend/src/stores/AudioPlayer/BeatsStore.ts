@@ -1,20 +1,24 @@
-import { get, writable } from "svelte/store";
+import { derived, get, writable } from "svelte/store";
 import type { Beat } from "../../lib/types/Beats";
 import { selectedBeat, selectNewBeat } from "./selectedBeatStore";
 import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
 
-// all beats
 
 export const showAudioPlayer = writable<boolean>(false)
 
+// all beats
 export const beats = writable<Beat[]>([]);
-
 export const beatPagesFetched = writable<number[]>([]);
 export const allBeatPagesFetched = writable<boolean>(false);
 export const fetchBeatsAttempted = writable<boolean>(false);
 export const isFetchingBeats = writable<boolean>(false);
 export const beatFetchError = writable<string | null>(null);
 export const oneBeatFetchSuccessfull = writable<boolean>(false);
+
+// filters
+export const filteredBeats = derived(beats, ($beats) => {
+    return $beats;
+});
 
 // Fetch beats from the backend
 
@@ -258,4 +262,57 @@ export function updateBeatInArray(updatedBeat: Beat) {
     );
 }
 
+export function runMoodFilter(){
 
+}
+
+
+// mood filters
+export const moodFilter = writable<string[]>([])
+
+export function toggleMoodFilter(mood: string) {
+    moodFilter.update((currentMoods) => {
+        if (currentMoods.includes(mood)) {
+            return currentMoods.filter((currentMood) => currentMood !== mood);
+        }
+
+        return [...currentMoods, mood];
+    });
+}
+export function clearMoodFilter() {
+    moodFilter.set([])
+}
+
+// custom tag filters
+export const tagFilter = writable<string[]>([]);
+
+export function toggleTagFilter(tag: string) {
+    tagFilter.update((currentTags) => {
+        if (currentTags.includes(tag)) {
+            return currentTags.filter((currentTag) => currentTag !== tag);
+        }
+
+        return [...currentTags, tag];
+    });
+}
+
+export function clearTagFilter() {
+    tagFilter.set([]);
+}
+
+// artist filters
+export const artistFilter = writable<string[]>([]);
+
+export function toggleArtistFilter(artist: string) {
+    artistFilter.update((currentArtists) => {
+        if (currentArtists.includes(artist)) {
+            return currentArtists.filter((currentArtist) => currentArtist !== artist);
+        }
+
+        return [...currentArtists, artist];
+    });
+}
+
+export function clearArtistFilter() {
+    artistFilter.set([]);
+}

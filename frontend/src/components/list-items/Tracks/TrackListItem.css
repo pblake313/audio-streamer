@@ -18,6 +18,13 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.tli_button:focus,
+.tli_button:focus-visible,
+.tli_button:active {
+    outline: none;
+    box-shadow: none;
+}
+
 .tli_button:hover {
     background-color: #2e2e2e;
 }
@@ -93,7 +100,6 @@
     overflow: hidden;
 }
 
-/* Purple title area - does NOT shrink */
 .tli_titleContainer {
     flex: 0 0 300px;
     width: 300px;
@@ -166,15 +172,21 @@
     overflow: hidden;
 }
 
-/* Orange tags area - fills remaining space */
+/* ========================= */
+/* TAGS                      */
+/* ========================= */
+
 .tli_tags {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
+    width: fit-content;
+    max-width: 100%;
     min-width: 0;
     overflow: hidden;
 }
 
 .tli_tags > * {
-    width: 100%;
+    width: max-content;
+    max-width: 100%;
     min-width: 0;
 }
 
@@ -183,17 +195,25 @@
     align-items: center;
     gap: 8px;
 
-    width: 100%;
+    width: max-content;
+    max-width: 100%;
     min-width: 0;
+
     overflow: hidden;
 }
 
-/* Right-side fixed sections */
+/* ========================= */
+/* RIGHT SIDE                */
+/* ========================= */
+
 .tli_destinations {
     flex: 0 0 125px;
     width: 125px;
     min-width: 125px;
     max-width: 125px;
+
+    margin-left: auto;
+
     overflow: hidden;
 }
 
@@ -232,44 +252,70 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.moreIconButton:focus,
+.moreIconButton:focus-visible,
+.moreIconButton:active {
+    outline: none;
+    box-shadow: none;
+}
+
 .moreIconButton:hover {
     background-color: rgba(255, 255, 255, 0.192);
 }
-.tli_mobileDestinations{
+
+.tli_mobileDestinations {
     display: none;
 }
 
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
+
 @media (max-width: 1050px) {
-    /* remove the green rating item */
     .tli_rating {
         display: none;
     }
-    .tli_mobileDestinations{
+
+    .tli_mobileDestinations {
         display: block;
     }
-    .tli_destinations{
+
+    .tli_destinations {
         display: none;
+    }
+
+    .tli_moreInfoContainer {
+        margin-left: auto;
     }
 }
 
 @media (max-width: 850px) {
-    .tli_destinations{
+    .tli_destinations {
         display: none;
     }
+
+    .tli_moreInfoContainer {
+        margin-left: auto;
+    }
 }
+
 @media (max-width: 725px) {
     .tli_tags {
         display: none;
     }
 
-    /* make purple fill remaining space */
     .tli_titleContainer {
         flex: 1 1 auto;
         width: auto;
         min-width: 0;
         max-width: none;
     }
+
+    .tli_moreInfoContainer {
+        margin-left: auto;
+    }
 }
+
 @media (pointer: coarse) {
     .tli_button:hover {
         background-color: transparent;
