@@ -15,10 +15,6 @@ export const isFetchingBeats = writable<boolean>(false);
 export const beatFetchError = writable<string | null>(null);
 export const oneBeatFetchSuccessfull = writable<boolean>(false);
 
-// filters
-export const filteredBeats = derived(beats, ($beats) => {
-    return $beats;
-});
 
 // Fetch beats from the backend
 
@@ -267,10 +263,6 @@ export function updateBeatInArray(updatedBeat: Beat) {
     );
 }
 
-export function runMoodFilter(){
-
-}
-
 
 // mood filters
 export const moodFilter = writable<string[]>([])
@@ -300,7 +292,6 @@ export function toggleTagFilter(tag: string) {
         return [...currentTags, tag];
     });
 }
-
 export function clearTagFilter() {
     tagFilter.set([]);
 }
@@ -317,7 +308,263 @@ export function toggleArtistFilter(artist: string) {
         return [...currentArtists, artist];
     });
 }
-
 export function clearArtistFilter() {
     artistFilter.set([]);
+}
+
+// beat type filter
+export const beatTypeFilter = writable<string[]>([]);
+
+export function toggleBeatTypeFilter(beatType: string) {
+    beatTypeFilter.update((currentBeatTypes) => {
+        if (currentBeatTypes.includes(beatType)) {
+            return currentBeatTypes.filter(
+                (currentBeatType) => currentBeatType !== beatType
+            );
+        }
+
+        return [...currentBeatTypes, beatType];
+    });
+}
+export function clearBeatTypeFilter() {
+    beatTypeFilter.set([]);
+}
+
+// all filters
+export function clearAllFilters(){
+    clearBeatTypeFilter()
+    clearArtistFilter()
+    clearTagFilter()
+    clearMoodFilter()
+}
+
+
+export const filteredBeats = derived(
+    [
+        beats,
+        moodFilter,
+        tagFilter,
+        artistFilter,
+        beatTypeFilter,
+    ],
+    ([
+        $beats,
+        $moodFilter,
+        $tagFilter,
+        $artistFilter,
+        $beatTypeFilter,
+    ]) => {
+        const hasActiveFilters =
+            $moodFilter.length > 0 ||
+            $tagFilter.length > 0 ||
+            $artistFilter.length > 0 ||
+            $beatTypeFilter.length > 0;
+
+        // No filters selected: show every beat.
+        if (!hasActiveFilters) {
+            return $beats;
+        }
+
+        return $beats.filter((beat) => {
+            const matchesMood =
+                $moodFilter.length > 0 &&
+                beat.mood !== null &&
+                $moodFilter.includes(beat.mood);
+
+            const matchesCustomTag =
+                $tagFilter.length > 0 &&
+                beat.customTag !== null &&
+                $tagFilter.includes(beat.customTag);
+
+            const beatArtists = [
+                beat.tagOne,
+                beat.tagTwo,
+            ].filter((artist): artist is string => artist !== null);
+
+            const matchesArtist =
+                $artistFilter.length > 0 &&
+                beatArtists.some((artist) =>
+                    $artistFilter.includes(artist)
+                );
+
+            const matchesBeatType =
+                $beatTypeFilter.length > 0 &&
+                $beatTypeFilter.includes(beat.trackType);
+
+            return (
+                matchesMood ||
+                matchesCustomTag ||
+                matchesArtist ||
+                matchesBeatType
+            );
+        });
+    }
+);
+
+
+// fetching filtered beats
+export const isFetchingFilteredBeats = writable<boolean>(false);
+export const fetchFilteredBeatsError = writable<string | null>(null);
+
+export const filteredBeatPagesFetched = writable<number[]>([]);
+export const allFilteredBeatPagesFetched = writable<boolean>(false);
+
+
+let activeFilteredBeatRequestKey: string | null = null;
+
+let filteredBeatsErrorTimeout: ReturnType<typeof setTimeout> | null = null;
+
+
+function setFilteredBeatsError(message: string) {
+    if (filteredBeatsErrorTimeout) {
+        clearTimeout(filteredBeatsErrorTimeout);
+    }
+
+
+    fetchFilteredBeatsError.set(message);
+
+
+    filteredBeatsErrorTimeout = setTimeout(() => {
+        fetchFilteredBeatsError.set(null);
+        filteredBeatsErrorTimeout = null;
+    }, 6000);
+}
+
+
+function getNextFilteredBeatPageToFetch() {
+    const pagesFetched = get(filteredBeatPagesFetched);
+
+    let nextPage = 1;
+
+
+    while (pagesFetched.includes(nextPage)) {
+        nextPage += 1;
+    }
+
+
+    return nextPage;
+}
+
+
+export function resetFilteredBeatPagination() {
+    filteredBeatPagesFetched.set([]);
+    allFilteredBeatPagesFetched.set(false);
+
+    activeFilteredBeatRequestKey = null;
+}
+
+export async function fetchBeatsWithFilters(pageToFetch?: number) {
+    if (get(isFetchingFilteredBeats)) return;
+
+
+    const currentArtistFilters = get(artistFilter);
+    const currentBeatTypeFilters = get(beatTypeFilter);
+    const currentTagFilters = get(tagFilter);
+    const currentMoodFilters = get(moodFilter);
+
+
+    const hasFilters =
+        currentArtistFilters.length > 0 ||
+        currentBeatTypeFilters.length > 0 ||
+        currentTagFilters.length > 0 ||
+        currentMoodFilters.length > 0;
+
+
+    if (!hasFilters) {
+        resetFilteredBeatPagination();
+        return;
+    }
+
+
+    const postObj = {
+        artistFilter: currentArtistFilters,
+        beatTypeFilter: currentBeatTypeFilters,
+        tagFilter: currentTagFilters,
+        moodFilter: currentMoodFilters,
+    };
+
+
+    /*
+        This lets us know when the filters changed.
+
+        When they change, page 1 needs to be fetched again instead
+        of continuing from the previous filter combination.
+    */
+    const requestKey = JSON.stringify({
+        artistFilter: [...currentArtistFilters].sort(),
+        beatTypeFilter: [...currentBeatTypeFilters].sort(),
+        tagFilter: [...currentTagFilters].sort(),
+        moodFilter: [...currentMoodFilters].sort(),
+    });
+
+
+    if (requestKey !== activeFilteredBeatRequestKey) {
+        filteredBeatPagesFetched.set([]);
+        allFilteredBeatPagesFetched.set(false);
+
+        activeFilteredBeatRequestKey = requestKey;
+    }
+
+
+    if (get(allFilteredBeatPagesFetched)) return;
+
+
+    const page = pageToFetch ?? getNextFilteredBeatPageToFetch();
+
+    const pagesFetched = get(filteredBeatPagesFetched);
+
+
+    if (pagesFetched.includes(page)) return;
+
+
+    try {
+        isFetchingFilteredBeats.set(true);
+        fetchFilteredBeatsError.set(null);
+
+
+        if (filteredBeatsErrorTimeout) {
+            clearTimeout(filteredBeatsErrorTimeout);
+            filteredBeatsErrorTimeout = null;
+        }
+
+
+        const response = await authorizedFetch(
+            `/secure/beats/get-filtered-beats/${page}`,
+            {
+                method: "POST",
+                body: JSON.stringify(postObj),
+            }
+        );
+
+
+        if (!Array.isArray(response.beats)) {
+            throw new Error("Invalid filtered beats response.");
+        }
+
+
+        response.beats.forEach((beat: Beat) => {
+            upsertBeat(beat);
+        });
+
+
+        filteredBeatPagesFetched.update((currentPages) => {
+            if (currentPages.includes(page)) {
+                return currentPages;
+            }
+
+
+            return [...currentPages, page].sort((a, b) => a - b);
+        });
+
+
+        if (response.hasMore === false) {
+            allFilteredBeatPagesFetched.set(true);
+        }
+    } catch (err: any) {
+        setFilteredBeatsError(
+            err.message || "Failed to fetch filtered beats."
+        );
+    } finally {
+        isFetchingFilteredBeats.set(false);
+    }
 }

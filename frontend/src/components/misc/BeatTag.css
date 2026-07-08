@@ -9,8 +9,8 @@
     min-width: max-content;
     max-width: none;
     flex: 0 0 auto;
-    cursor: pointer;
 
+    cursor: pointer;
     border-radius: 50px;
 
     background: color-mix(
@@ -28,7 +28,11 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
         0 5px 12px rgba(0, 0, 0, 0.12);
 
-    transition: 0.3s;
+    transition:
+        background-color 0.3s,
+        border-color 0.3s,
+        box-shadow 0.3s,
+        transform 0.3s;
 
     -webkit-tap-highlight-color: transparent;
 }
@@ -41,6 +45,7 @@
     background: rgba(255, 255, 255, 0.025);
 
     pointer-events: none;
+    transition: background-color 0.3s;
 }
 
 .tagText {
@@ -51,133 +56,94 @@
 
     font-size: var(--tag-font-size);
     line-height: 1.25;
+
     padding: var(--tag-padding);
     margin: 0;
 
     font-weight: 400;
     white-space: nowrap;
 
-    transition: 0.3s;
+    transition: color 0.3s;
 }
 
 .wrapAudLoad {
     width: 100px;
-    margin: auto;
+    margin: 35px auto 0;
     padding-top: 30px;
-    margin-top: 35px;
 }
 
-/* ========================= */
-/* NORMAL HOVER              */
-/* ========================= */
+/* ========================================= */
+/* NORMAL HOVER                              */
+/* ========================================= */
 
 @media (hover: hover) and (pointer: fine) {
-    .beatTagWrapper:hover,
-    .beatTagWrapper:focus-visible {
+    .beatTagWrapper:not(.beatTag_customColor):hover,
+    .beatTagWrapper:not(.beatTag_customColor):focus-visible {
         background: #f7f7f7;
     }
 
-    .beatTagWrapper:hover .tagText,
-    .beatTagWrapper:focus-visible .tagText {
+    .beatTagWrapper:not(.beatTag_customColor):hover .tagText,
+    .beatTagWrapper:not(.beatTag_customColor):focus-visible .tagText {
         color: #222222;
     }
 }
 
-/* Touch devices: no hover/focus/active color changes */
-@media (hover: none), (pointer: coarse) {
-    .beatTagWrapper:hover,
-    .beatTagWrapper:focus,
-    .beatTagWrapper:focus-visible,
-    .beatTagWrapper:active {
-        background: color-mix(
-            in srgb,
-            var(--tag-color) 82%,
-            transparent
-        );
+/* ========================================= */
+/* NORMAL ACTIVE                             */
+/* ========================================= */
 
-        border-color: rgba(255, 255, 255, 0.08);
-        outline: none;
-    }
-
-    .beatTagWrapper:hover .tagText,
-    .beatTagWrapper:focus .tagText,
-    .beatTagWrapper:focus-visible .tagText,
-    .beatTagWrapper:active .tagText {
-        color: var(--tag-text-color);
-    }
-}
-
-/* ========================= */
-/* NORMAL ACTIVE             */
-/* ========================= */
-
-.beatTagWrapper.beatTag_active {
+.beatTagWrapper.beatTag_active:not(.beatTag_customColor) {
     background: #f7f7f7;
     border-color: #f7f7f7;
 }
 
-.beatTagWrapper.beatTag_active::before {
+.beatTagWrapper.beatTag_active:not(.beatTag_customColor)::before {
     background: transparent;
 }
 
-.beatTagWrapper.beatTag_active .tagText {
+.beatTagWrapper.beatTag_active:not(.beatTag_customColor) .tagText {
     color: #222222;
 }
 
-/* Normal active hover stays white */
 @media (hover: hover) and (pointer: fine) {
-    .beatTagWrapper.beatTag_active:hover,
-    .beatTagWrapper.beatTag_active:focus-visible {
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):hover,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):focus-visible {
         background: #f7f7f7;
         border-color: #f7f7f7;
     }
 
-    .beatTagWrapper.beatTag_active:hover .tagText,
-    .beatTagWrapper.beatTag_active:focus-visible .tagText {
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):hover
+        .tagText,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):focus-visible
+        .tagText {
         color: #222222;
     }
 }
 
-/* Touch normal active stays active */
-@media (hover: none), (pointer: coarse) {
-    .beatTagWrapper.beatTag_active:hover,
-    .beatTagWrapper.beatTag_active:focus,
-    .beatTagWrapper.beatTag_active:focus-visible,
-    .beatTagWrapper.beatTag_active:active {
-        background: #f7f7f7;
-        border-color: #f7f7f7;
-        outline: none;
-    }
+/* ========================================= */
+/* CUSTOM COLOR - INACTIVE                   */
+/* Transparent background with colored text  */
+/* and border.                               */
+/* ========================================= */
 
-    .beatTagWrapper.beatTag_active:hover .tagText,
-    .beatTagWrapper.beatTag_active:focus .tagText,
-    .beatTagWrapper.beatTag_active:focus-visible .tagText,
-    .beatTagWrapper.beatTag_active:active .tagText {
-        color: #222222;
-    }
-}
-
-/* ========================= */
-/* COLORED ACTIVE            */
-/* ========================= */
-
-.beatTagWrapper.beatTag_active.beatTag_activeColor {
+.beatTagWrapper.beatTag_customColor:not(.beatTag_active) {
     background: transparent;
     border-color: var(--tag-color);
 }
 
-.beatTagWrapper.beatTag_active.beatTag_activeColor::before {
+.beatTagWrapper.beatTag_customColor:not(.beatTag_active)::before {
     background: transparent;
 }
 
-.beatTagWrapper.beatTag_active.beatTag_activeColor .tagText {
+.beatTagWrapper.beatTag_customColor:not(.beatTag_active) .tagText {
     color: var(--tag-color);
 }
 
-/* Colored active hover */
+/* Custom inactive hover gets a light fill */
+
 @media (hover: hover) and (pointer: fine) {
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible {
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):hover,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):focus-visible {
         background: color-mix(
             in srgb,
             var(--tag-color) 20%,
@@ -187,36 +153,151 @@
         border-color: var(--tag-color);
     }
 
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover .tagText,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):hover
+        .tagText,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):focus-visible
         .tagText {
         color: var(--tag-color);
     }
 }
 
-/* Touch colored active stays active */
-@media (hover: none), (pointer: coarse) {
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:active {
-        background: transparent;
+/* ========================================= */
+/* CUSTOM COLOR - ACTIVE                     */
+/* Filled custom-color background.           */
+/* ========================================= */
+
+.beatTagWrapper.beatTag_customColor.beatTag_active {
+    background: var(--tag-color);
+    border-color: var(--tag-color);
+}
+
+.beatTagWrapper.beatTag_customColor.beatTag_active::before {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.beatTagWrapper.beatTag_customColor.beatTag_active .tagText {
+    color: var(--tag-text-color);
+}
+
+/* Custom active hover stays filled */
+
+@media (hover: hover) and (pointer: fine) {
+    .beatTagWrapper.beatTag_customColor.beatTag_active:hover,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:focus-visible {
+        background: var(--tag-color);
         border-color: var(--tag-color);
-        outline: none;
     }
 
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:hover .tagText,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus .tagText,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:focus-visible
-        .tagText,
-    .beatTagWrapper.beatTag_active.beatTag_activeColor:active .tagText {
-        color: var(--tag-color);
+    .beatTagWrapper.beatTag_customColor.beatTag_active:hover .tagText,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:focus-visible
+        .tagText {
+        color: var(--tag-text-color);
     }
 }
 
-/* ========================= */
-/* RESPONSIVE                */
-/* ========================= */
+/* ========================================= */
+/* TOUCH DEVICES                             */
+/* No fake hover/focus color changes.        */
+/* ========================================= */
+
+@media (hover: none), (pointer: coarse) {
+    .beatTagWrapper:hover,
+    .beatTagWrapper:focus,
+    .beatTagWrapper:focus-visible,
+    .beatTagWrapper:active {
+        outline: none;
+    }
+
+    /* Normal inactive */
+
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):hover,
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):focus,
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):focus-visible,
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):active {
+        background: color-mix(
+            in srgb,
+            var(--tag-color) 82%,
+            transparent
+        );
+
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):hover
+        .tagText,
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):focus
+        .tagText,
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):focus-visible
+        .tagText,
+    .beatTagWrapper:not(.beatTag_customColor):not(.beatTag_active):active
+        .tagText {
+        color: var(--tag-text-color);
+    }
+
+    /* Normal active */
+
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):hover,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):focus,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):focus-visible,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):active {
+        background: #f7f7f7;
+        border-color: #f7f7f7;
+    }
+
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):hover
+        .tagText,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):focus
+        .tagText,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):focus-visible
+        .tagText,
+    .beatTagWrapper.beatTag_active:not(.beatTag_customColor):active
+        .tagText {
+        color: #222222;
+    }
+
+    /* Custom inactive */
+
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):hover,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):focus,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):focus-visible,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):active {
+        background: transparent;
+        border-color: var(--tag-color);
+    }
+
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):hover
+        .tagText,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):focus
+        .tagText,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):focus-visible
+        .tagText,
+    .beatTagWrapper.beatTag_customColor:not(.beatTag_active):active
+        .tagText {
+        color: var(--tag-color);
+    }
+
+    /* Custom active */
+
+    .beatTagWrapper.beatTag_customColor.beatTag_active:hover,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:focus,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:focus-visible,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:active {
+        background: var(--tag-color);
+        border-color: var(--tag-color);
+    }
+
+    .beatTagWrapper.beatTag_customColor.beatTag_active:hover .tagText,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:focus .tagText,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:focus-visible
+        .tagText,
+    .beatTagWrapper.beatTag_customColor.beatTag_active:active .tagText {
+        color: var(--tag-text-color);
+    }
+}
+
+/* ========================================= */
+/* RESPONSIVE                                */
+/* ========================================= */
 
 @media (max-width: 600px) {
     .tagText {

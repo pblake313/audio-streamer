@@ -9,6 +9,7 @@ import { getLiveBeatsByPage } from "../../../controllers/Secure/Beats/GetLiveBea
 import { toggleBeatDestination } from "../../../controllers/Secure/Beats/ToggleDestination";
 import { updateBeatRating } from "../../../controllers/Secure/Beats/UpdateRating";
 import { markBeatAsTrash } from "../../../controllers/Secure/Beats/MarkTrash";
+import { getFilteredBeatsByPage } from "../../../controllers/Secure/Beats/GetFilteredBeatsByPage";
 const router = Router()
 
 const storage = multer.memoryStorage();
@@ -44,6 +45,8 @@ router.get('/delete-beat/:beatId', deleteBeat);
 router.get('/get-beat/:beatId', getSingleBeat)
  
 router.get('/get-live-beats/:page', getLiveBeatsByPage);  
+
+router.post('/get-filtered-beats/:page', getFilteredBeatsByPage)
 
 
 export default router

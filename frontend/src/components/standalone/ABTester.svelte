@@ -6,10 +6,8 @@
         trackBAudioElement,
         selectedAB,
         abAudioPlayerState,
-        toggleAB,
         abHandlePlayPause,
         abError,
-        clearABTrack,
         selectAB,
     } from "../../stores/ABTestStore";
     import ABToggler from "../buttons/music/ABToggler.svelte";
@@ -108,21 +106,7 @@
 
     <br />
     {#if $abError}
-        <p style="color: red;">{$abError}</p>
+        <p class="ab_error">{$abError}</p>
     {/if}
 
-    <!-- {#if $trackA}
-        <button
-            on:click={() => {
-                clearABTrack($trackA);
-            }}>Clear track A</button
-        >
-    {/if}
-    {#if $trackB}
-        <button
-            on:click={() => {
-                clearABTrack($trackB);
-            }}>Clear track B</button
-        >
-    {/if} -->
 </div>

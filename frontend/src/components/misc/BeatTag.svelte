@@ -18,7 +18,7 @@
     type="button"
     class="beatTagWrapper"
     class:beatTag_active={isActive}
-    class:beatTag_activeColor={isActive && hasCustomTagColor}
+    class:beatTag_customColor={hasCustomTagColor}
     style="
         --tag-color: {tagColor};
         --tag-text-color: {tagTextColor};

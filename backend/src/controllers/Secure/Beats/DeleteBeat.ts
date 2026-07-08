@@ -7,7 +7,6 @@ export async function deleteBeat(req: Request, res: Response, next: NextFunction
     try {
         const beatId = req.params.beatId;
 
-
         await db.collection('Beats').doc(beatId).delete();
         return res.status(200).json({ message: 'Beat deleted successfully' });
     } catch (error: any) {

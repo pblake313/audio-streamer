@@ -1,0 +1,294 @@
+/* ========================================= */
+/* SCROLL WRAPPER                            */
+/* ========================================= */
+
+.beatFilters_wrapper {
+    --beat-filters-fade-color: #222222;
+
+    position: relative;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Left fade */
+.beatFilters_wrapper::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    width: 35px;
+
+    background: linear-gradient(
+        to right,
+        var(--beat-filters-fade-color) 0%,
+        color-mix(
+            in srgb,
+            var(--beat-filters-fade-color) 80%,
+            transparent
+        ) 40%,
+        transparent 100%
+    );
+
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+
+    transition: opacity 0.2s ease;
+}
+
+/* Right fade */
+.beatFilters_wrapper::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 35px;
+
+    background: linear-gradient(
+        to left,
+        var(--beat-filters-fade-color) 0%,
+        color-mix(
+            in srgb,
+            var(--beat-filters-fade-color) 80%,
+            transparent
+        ) 40%,
+        transparent 100%
+    );
+
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+
+    transition: opacity 0.2s ease;
+}
+
+.beatFilters_wrapper.canScrollLeft::before {
+    opacity: 1;
+}
+
+.beatFilters_wrapper.canScrollRight::after {
+    opacity: 1;
+}
+
+/* ========================================= */
+/* SCROLL CONTAINER                          */
+/* ========================================= */
+
+.beatFilters_flex {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-right: 2px;
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+
+    cursor: grab;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+
+    /*
+     * Vertical page scrolling remains available.
+     * Horizontal movement is handled by the pointer logic.
+     */
+    touch-action: pan-y;
+}
+
+.beatFilters_flex::-webkit-scrollbar {
+    display: none;
+}
+
+.beatFilters_flex.isDragging {
+    cursor: grabbing;
+}
+
+.beatFilters_flex.isBlockingClicks {
+    cursor: grabbing;
+}
+
+.beatFilters_flex.isBlockingClicks
+    .beatFilters_button {
+    pointer-events: none;
+}
+
+/* ========================================= */
+/* FILTER BUTTON                             */
+/* ========================================= */
+
+.beatFilters_button {
+    position: relative;
+    overflow: hidden;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+
+    width: max-content;
+    min-width: max-content;
+    max-width: none;
+    flex: 0 0 auto;
+
+    padding: 3px 10px 3px 6px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    outline: none;
+
+    background: color-mix(
+        in srgb,
+        #353535 82%,
+        transparent
+    );
+
+    color: #f7f7f7;
+    cursor: pointer;
+
+    backdrop-filter: blur(12px) saturate(115%);
+    -webkit-backdrop-filter: blur(12px) saturate(115%);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 5px 12px rgba(0, 0, 0, 0.12);
+
+    transition:
+        background-color 0.3s,
+        border-color 0.3s,
+        color 0.3s,
+        transform 0.15s;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.beatFilters_button::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background: rgba(255, 255, 255, 0.025);
+
+    pointer-events: none;
+}
+
+.beatFilter_text {
+    position: relative;
+    z-index: 1;
+
+    margin: 0;
+
+    color: inherit;
+    font-size: 11pt;
+    font-weight: 400;
+    line-height: 1.15;
+    white-space: nowrap;
+
+    pointer-events: none;
+
+    transition: color 0.3s;
+}
+
+.beatFilter_iconContainer {
+    position: relative;
+    z-index: 1;
+
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+.beatFilter_icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: translate(-50%, -50%);
+
+    color: inherit;
+    pointer-events: none;
+
+    transition: color 0.3s;
+}
+
+.beatFilters_lastButton {
+    background: transparent;
+}
+
+/* ========================================= */
+/* DESKTOP HOVER                             */
+/* ========================================= */
+
+@media (hover: hover) and (pointer: fine) {
+    .beatFilters_button:hover,
+    .beatFilters_button:focus-visible {
+        background: #f7f7f7;
+        border-color: #f7f7f7;
+        color: #222222;
+    }
+
+    .beatFilters_button:active {
+        transform: scale(0.97);
+    }
+}
+
+/* ========================================= */
+/* TOUCH DEVICES                             */
+/* ========================================= */
+
+@media (hover: none), (pointer: coarse) {
+    .beatFilters_button:hover,
+    .beatFilters_button:focus,
+    .beatFilters_button:focus-visible,
+    .beatFilters_button:active {
+        background: color-mix(
+            in srgb,
+            #353535 82%,
+            transparent
+        );
+
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #f7f7f7;
+
+        outline: none;
+        transform: none;
+    }
+
+    .beatFilters_lastButton:hover,
+    .beatFilters_lastButton:focus,
+    .beatFilters_lastButton:focus-visible,
+    .beatFilters_lastButton:active {
+        background: transparent;
+    }
+}

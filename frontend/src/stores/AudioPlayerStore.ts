@@ -8,9 +8,10 @@ import {
 	allBeatPagesFetched,
 	filteredBeats,
 	fetchBeats,
-	getNextBeatPageToFetch
+	getNextBeatPageToFetch,
+    beats
 } from "./AudioPlayer/BeatsStore";
-import { resetABTester } from "./ABTestStore";
+import { resetABTester, trackA, trackB } from "./ABTestStore";
 
 // How many seconds before we show the "Still Listening?" popup
 const LISTEN_TIMEOUT_SECONDS = 60 * 30;
@@ -27,7 +28,7 @@ if (typeof Audio !== "undefined") {
 
 // audio mode
 export type AudioMode = "abTester" | "streamer";
-export const audioMode = writable<AudioMode>("abTester");
+export const audioMode = writable<AudioMode>("streamer");
 export function toggleAudioMode() {
     const currentMode = get(audioMode);
 
@@ -37,12 +38,24 @@ export function toggleAudioMode() {
             : "streamer";
 
     if (nextMode === "abTester") {
-        console.log("Switched to A/B Tester mode");
+        // console.log("Switched to A/B Tester mode");
 
         // Stop the normal streamer so both players do not run together.
         stopTrack();
+
+        const currentBeats = get(beats)
+
+        if (currentBeats[0]){
+            trackA.set(currentBeats[0])
+        }
+
+        if (currentBeats[1]){
+            trackB.set(currentBeats[1])
+        }
+
+
     } else {
-        console.log("Switched to Streamer mode");
+        // console.log("Switched to Streamer mode");
 
         // Completely clear and stop the A/B tester.
         resetABTester();

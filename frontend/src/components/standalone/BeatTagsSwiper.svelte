@@ -6,9 +6,11 @@
 
     import {
         artistFilter,
+        beatTypeFilter,
         moodFilter,
         tagFilter,
         toggleArtistFilter,
+        toggleBeatTypeFilter,
         toggleMoodFilter,
         toggleTagFilter,
     } from "../../stores/AudioPlayer/BeatsStore";
@@ -18,7 +20,7 @@
     export let tagPadding: string = "3px 6px 2px 6px";
     export let tagFontSize: string = "10pt";
 
-    type TagType = "mood" | "tag" | "custom";
+    type TagType = "mood" | "tag" | "custom" | 'beatType';
     type GestureDirection = "horizontal" | "vertical" | null;
 
     let scrollEl: HTMLDivElement;
@@ -223,6 +225,11 @@
             return;
         }
 
+        if (tagType === 'beatType'){
+            toggleBeatTypeFilter(tag)
+            return
+        }
+
         toggleTagFilter(tag);
     }
 
@@ -338,11 +345,19 @@
 
         {#if beat.trackType === "Reference"}
             <BeatTag
-                tagColor="#4abdff36"
+                tagColor="#4abdff"
                 tagText="Reference"
-                tagTextColor="#21d3ff"
+                tagTextColor="#222222"
                 padding={tagPadding}
                 fontSize={tagFontSize}
+                isActive={$beatTypeFilter.includes(beat.trackType)}
+                on:click={(event) => {
+                    handleTagClick(
+                        event,
+                        beat.trackType,
+                        'beatType'
+                    )
+                }}
             />
         {/if}
     </div>
