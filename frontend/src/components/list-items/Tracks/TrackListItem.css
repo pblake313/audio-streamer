@@ -12,8 +12,9 @@
     text-align: left;
     position: relative;
 
-    padding: 0px;
+    padding: 0;
     margin-bottom: 12px;
+
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
 }
@@ -29,9 +30,6 @@
     background-color: #2e2e2e;
 }
 
-.evenButton {
-    background-color: #252525;
-}
 
 /* ========================= */
 /* ARTWORK                   */
@@ -51,8 +49,9 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    top: 0%;
-    left: 0%;
+    top: 0;
+    left: 0;
+
     background-color: rgba(0, 0, 0, 0.705);
 }
 
@@ -81,6 +80,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
+
     transform: translate(-50%, -50%);
     transition: 0.3s;
 }
@@ -102,9 +102,11 @@
 
 .tli_titleContainer {
     flex: 0 0 300px;
+
     width: 300px;
     min-width: 300px;
     max-width: 300px;
+
     overflow: hidden;
 }
 
@@ -112,14 +114,27 @@
     white-space: nowrap;
 }
 
+.tli_titleNotepadFlex {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    min-width: 0;
+}
+
+.tli_notepadContainer {
+    flex: 0 0 auto;
+    padding-top: 2px;
+}
+
 .tli_title {
+    min-width: 0;
+
     padding: 0;
     margin: 0;
 
     font-size: 12pt;
     white-space: nowrap;
-
-    width: 100%;
     text-overflow: ellipsis;
     overflow: hidden;
 
@@ -131,7 +146,9 @@
     align-items: center;
     gap: 10px;
 
+    width: 100%;
     min-width: 0;
+
     overflow: hidden;
 }
 
@@ -141,27 +158,35 @@
     flex: 0 0 10px;
 
     border-radius: 50%;
-    background-color: rgba(53, 235, 93, 0.644);
+    background-color: rgba(13, 255, 66, 0.932);
+
     margin-bottom: 2px;
 }
 
 .tli_reference {
+    flex: 0 0 auto;
+
     font-size: 9pt;
-    margin: 0 0 2px 0;
+    line-height: 1.13em;
+
+    margin: 0 0 2px;
+    padding: 1px 5px;
 
     color: #21d3ff;
+
     border: 1px solid #4abdff3a;
-    padding: 1px 5px;
-    line-height: 1.13em;
     border-radius: 50px;
+
     background-color: #4abdff36;
 
     white-space: nowrap;
-    flex: 0 0 auto;
 }
 
 .smallText {
+    min-width: 0;
+
     font-size: 10pt;
+
     padding: 0;
     margin: 0;
 
@@ -173,14 +198,16 @@
 }
 
 /* ========================= */
-/* TAGS                      */
+/* DESKTOP TAGS              */
 /* ========================= */
 
 .tli_tags {
     flex: 0 1 auto;
+
     width: fit-content;
     max-width: 100%;
     min-width: 0;
+
     overflow: hidden;
 }
 
@@ -203,11 +230,21 @@
 }
 
 /* ========================= */
+/* MOBILE TAGS               */
+/* ========================= */
+
+.tli_mobileTags {
+    display: none;
+    min-width: 0;
+}
+
+/* ========================= */
 /* RIGHT SIDE                */
 /* ========================= */
 
 .tli_destinations {
     flex: 0 0 125px;
+
     width: 125px;
     min-width: 125px;
     max-width: 125px;
@@ -219,6 +256,7 @@
 
 .tli_rating {
     flex: 0 0 90px;
+
     width: 90px;
     min-width: 90px;
     max-width: 90px;
@@ -231,6 +269,7 @@
 
 .tli_moreInfoContainer {
     flex: 0 0 auto;
+
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -238,11 +277,12 @@
 
 .moreIconButton {
     border: none;
-    padding: 8px 4px 4px 4px;
-    margin: 0;
-    margin-right: 10px;
+
+    padding: 8px 4px 4px;
+    margin: 0 10px 0 0;
 
     background-color: transparent;
+
     cursor: pointer;
     border-radius: 4px;
 
@@ -278,6 +318,7 @@
 
     .tli_mobileDestinations {
         display: block;
+        flex: 0 0 auto;
     }
 
     .tli_destinations {
@@ -304,17 +345,65 @@
         display: none;
     }
 
+    .tli_mobileTags {
+        display: block;
+
+        flex: 0 1 auto;
+
+        width: fit-content;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow: hidden;
+    }
+
+    .tli_mobileTags > * {
+        width: fit-content;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .tli_mobileTags .bts_container {
+        width: fit-content;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tli_mobileTags .bts_container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .smallText {
+        display: none;
+    }
+
     .tli_titleContainer {
         flex: 1 1 auto;
+
         width: auto;
         min-width: 0;
         max-width: none;
+    }
+
+    .tli_keyReference {
+        width: 100%;
+        min-width: 0;
     }
 
     .tli_moreInfoContainer {
         margin-left: auto;
     }
 }
+
+/* ========================= */
+/* TOUCH DEVICES             */
+/* ========================= */
 
 @media (pointer: coarse) {
     .tli_button:hover {

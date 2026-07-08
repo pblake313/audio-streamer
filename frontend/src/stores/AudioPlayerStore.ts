@@ -10,6 +10,7 @@ import {
 	fetchBeats,
 	getNextBeatPageToFetch
 } from "./AudioPlayer/BeatsStore";
+import { resetABTester } from "./ABTestStore";
 
 // How many seconds before we show the "Still Listening?" popup
 const LISTEN_TIMEOUT_SECONDS = 60 * 30;
@@ -24,9 +25,33 @@ if (typeof Audio !== "undefined") {
 	audio.crossOrigin = "anonymous"; // Required for visualizer to work
 }
 
-// =========================
-// Stores
-// =========================
+// audio mode
+export type AudioMode = "abTester" | "streamer";
+export const audioMode = writable<AudioMode>("abTester");
+export function toggleAudioMode() {
+    const currentMode = get(audioMode);
+
+    const nextMode: AudioMode =
+        currentMode === "streamer"
+            ? "abTester"
+            : "streamer";
+
+    if (nextMode === "abTester") {
+        console.log("Switched to A/B Tester mode");
+
+        // Stop the normal streamer so both players do not run together.
+        stopTrack();
+    } else {
+        console.log("Switched to Streamer mode");
+
+        // Completely clear and stop the A/B tester.
+        resetABTester();
+    }
+
+    audioMode.set(nextMode);
+}
+
+// streamer stores
 export const audioStore = writable<HTMLAudioElement | null>(audio);
 
 export const useAutoPlay = writable<boolean>(false);

@@ -10,6 +10,7 @@
     export let buttonStyle:
         | "stockButton"
         | "secondary"
+        | "opacityIncrease"
         | "clear"
         | "glass" = "stockButton";
     export let buttonIcon:

@@ -31,7 +31,7 @@
                 {getUploadedAtString(beat.createdAt)} 
             </p>
                     
-            <BeatTagsSwiper {beat}/>
+            <BeatTagsSwiper beat={beatToUse}/>
         </div>
     </div>
 

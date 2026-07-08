@@ -6,6 +6,7 @@
     } from "../../stores/AudioPlayer/selectedBeatStore";
     import {
         audioPlayerState,
+        audioStore,
         pauseTrack,
         playTrack,
         resetTrackTimer,
@@ -113,16 +114,18 @@
                         <AudioRange
                             waveHeight={50}
                             useWaveForm={true}
+        audio={$audioStore ?? undefined}
+
                         />
                     </div>
 
-                    <div class="ht_mobileRange">
-                        <AudioRange
-                            waveHeight={25}
-                            useWaveForm={true}
-                            
-                        />
-                    </div>
+<div class="ht_mobileRange">
+    <AudioRange
+        audio={$audioStore ?? undefined}
+        waveHeight={25}
+        useWaveForm={true}
+    />
+</div>
 
                 </div>
 

@@ -13,6 +13,7 @@ export async function getLiveBeatsByPage(
     next: NextFunction
 ) {
     try {
+
         const page = Number(req.params.page || 1);
         const limit = beatPageSize ?? 10;
 

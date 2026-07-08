@@ -264,6 +264,7 @@
                     buttonIcon={"trash"}
                     buttonText={null}
                     buttonStyle={"clear"}
+                    iconColor={"#f7f7f7"}
                 />
             </div>
         </div>

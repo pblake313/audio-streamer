@@ -105,6 +105,9 @@
 
     pointer-events: none;
 }
+.addTrackPreview_wrapDeleteBeat{
+    margin-top: 20px;
+}
 
 @media (max-width: 720px) {
     .addTrackPreview_wrapper {

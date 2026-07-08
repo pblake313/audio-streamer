@@ -72,6 +72,10 @@ export async function fetchBeats(pageToFetch?: number) {
     }
 }
 
+
+
+
+
 export function updateBeatRatingInArray(
     beatId: string,
     newRating: Beat["rating"]
@@ -96,7 +100,6 @@ export function updateBeatRatingInArray(
         });
     }
 }
-
 
 export function updateBeatCustomTagInArray(
     beatId: string,
@@ -147,6 +150,31 @@ export function updateBeatNotepadInArray(
         selectNewBeat({
             ...currentSelectedBeat,
             notepad,
+        });
+    }
+}
+
+export function updateBeatFutureDestinationsInArray(
+    beatId: string,
+    futureDestinations: Beat["futureDestinations"]
+) {
+    beats.update((currentBeats) =>
+        currentBeats.map((beat) =>
+            beat.id === beatId
+                ? {
+                      ...beat,
+                      futureDestinations,
+                  }
+                : beat
+        )
+    );
+
+    const currentSelectedBeat = get(selectedBeat);
+
+    if (currentSelectedBeat?.id === beatId) {
+        selectNewBeat({
+            ...currentSelectedBeat,
+            futureDestinations,
         });
     }
 }
@@ -206,30 +234,7 @@ export function upsertBeat(newBeat: Beat) {
     });
 }
 
-export function updateBeatFutureDestinationsInArray(
-    beatId: string,
-    futureDestinations: Beat["futureDestinations"]
-) {
-    beats.update((currentBeats) =>
-        currentBeats.map((beat) =>
-            beat.id === beatId
-                ? {
-                      ...beat,
-                      futureDestinations,
-                  }
-                : beat
-        )
-    );
 
-    const currentSelectedBeat = get(selectedBeat);
-
-    if (currentSelectedBeat?.id === beatId) {
-        selectNewBeat({
-            ...currentSelectedBeat,
-            futureDestinations,
-        });
-    }
-}
 
 export function removeBeatFromArray(beatId: string) {
     beats.update((currentBeats) =>

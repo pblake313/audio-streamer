@@ -99,32 +99,13 @@
 
 }
 
-/* Responsive styles */
-@media (max-width: 780px) {
-    .adwrapbeat {
-        display: none;
-    }
-
-    .mobileAdWRap {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-radius: 5px;
-        overflow: hidden;
-        background-color: #222222;
-        cursor: pointer;
-        border: none;
-    }
-
-    .mobileAdWRap:hover {
-        background-color: rgba(211, 211, 211, 0.096);
-    }
-
-    .aworkwrap {
-        height: 50px;
-        width: 50px;
-    }
+.mbli_title{
+    color: var(--font-color-heading);
+    font-size: 12pt;
+    text-align: center;
+    margin-top: 10px;
 }
+
 
 /* disable hover effects on touch devices */
 @media (pointer: coarse) {

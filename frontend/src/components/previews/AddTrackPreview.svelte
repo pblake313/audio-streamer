@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { Beat } from "../../lib/types/Beats";
+    import DeleteTrackForm from "../forms/DeleteTrackForm.svelte";
     import Logo from "../Icons/Logos/Logo.svelte";
     import SoundcloudLogo from "../Icons/Logos/SoundcloudLogo.svelte";
     import YoutubeLogo from "../Icons/Logos/YoutubeLogo.svelte";
@@ -6,8 +8,10 @@
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import "./AddTrackPreview.css";
 
+    export let deleteBeat: Beat | null = null
+
     export let title: string | null = null;
-    export let bpm: number | null;
+    export let bpm: number | null = null;
     export let tagOne: string | null = null;
     export let tagTwo: string | null = null;
     export let albumUrl: string | null = null;
@@ -65,6 +69,12 @@
                 {/if}
 
             </div>
+
+            {#if deleteBeat}
+                <div class="addTrackPreview_wrapDeleteBeat">
+                    <DeleteTrackForm beat={deleteBeat}/>
+                </div>
+            {/if}
 
 
 

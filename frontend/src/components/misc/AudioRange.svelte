@@ -1,11 +1,8 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import { onDestroy } from "svelte";
-    import { get } from "svelte/store";
     import {
         audioPlayerState,
-        audioPlayerUrl,
-        audioStore,
         resetTrackTimer,
         userTapped,
     } from "../../stores/AudioPlayerStore";
@@ -13,59 +10,180 @@
     import AudioLoader from "../loaders/AudioLoader.svelte";
     import SeekableWavForm from "./SeekableWavForm.svelte";
 
+    /**
+     * The audio element controlled by this range.
+     *
+     * It starts as undefined because bind:this is not populated
+     * until the parent component mounts.
+     */
+    export let audio: HTMLAudioElement | undefined = undefined;
+
     /** Whether the progress bar should have rounded edges */
     export let roundedEdges: boolean = true;
 
     export let showTrackTime: boolean = true;
 
     export let useWaveForm: boolean = false;
+
     export let waveHeight: number = 60;
 
     let currentTime = 0;
     let duration = 0;
+    let waveformUrl = "";
+
     let rangeInput: HTMLInputElement;
+
+    /**
+     * Tracks the audio element that currently has listeners attached.
+     */
+    let connectedAudio: HTMLAudioElement | null = null;
 
     $: waveformPlayedColor = "#f7f7f7";
     $: waveformBaseColor = "#f7f7f736";
 
-    const audio = get(audioStore);
+    function updateAudioState() {
+        if (!connectedAudio) {
+            currentTime = 0;
+            duration = 0;
+            waveformUrl = "";
+            return;
+        }
 
-    if (audio) {
-        const update = () => {
-            currentTime = Math.floor(audio.currentTime);
-            duration = Math.floor(audio.duration || 0);
-        };
+        currentTime = Number.isFinite(connectedAudio.currentTime)
+            ? Math.floor(connectedAudio.currentTime)
+            : 0;
 
-        audio.addEventListener("timeupdate", update);
-        audio.addEventListener("loadedmetadata", update);
+        duration = Number.isFinite(connectedAudio.duration)
+            ? Math.floor(connectedAudio.duration)
+            : 0;
 
-        onDestroy(() => {
-            audio.removeEventListener("timeupdate", update);
-            audio.removeEventListener("loadedmetadata", update);
-        });
+        waveformUrl =
+            connectedAudio.currentSrc ||
+            connectedAudio.src ||
+            "";
     }
+
+    function disconnectAudio() {
+        if (!connectedAudio) return;
+
+        connectedAudio.removeEventListener(
+            "timeupdate",
+            updateAudioState,
+        );
+
+        connectedAudio.removeEventListener(
+            "loadedmetadata",
+            updateAudioState,
+        );
+
+        connectedAudio.removeEventListener(
+            "durationchange",
+            updateAudioState,
+        );
+
+        connectedAudio.removeEventListener(
+            "loadstart",
+            updateAudioState,
+        );
+
+        connectedAudio.removeEventListener(
+            "emptied",
+            updateAudioState,
+        );
+
+        connectedAudio = null;
+    }
+
+    function connectAudio(
+        nextAudio: HTMLAudioElement | undefined,
+    ) {
+        if (connectedAudio === nextAudio) return;
+
+        disconnectAudio();
+
+        if (!nextAudio) {
+            currentTime = 0;
+            duration = 0;
+            waveformUrl = "";
+            return;
+        }
+
+        connectedAudio = nextAudio;
+
+        connectedAudio.addEventListener(
+            "timeupdate",
+            updateAudioState,
+        );
+
+        connectedAudio.addEventListener(
+            "loadedmetadata",
+            updateAudioState,
+        );
+
+        connectedAudio.addEventListener(
+            "durationchange",
+            updateAudioState,
+        );
+
+        connectedAudio.addEventListener(
+            "loadstart",
+            updateAudioState,
+        );
+
+        connectedAudio.addEventListener(
+            "emptied",
+            updateAudioState,
+        );
+
+        updateAudioState();
+    }
+
+    /*
+     * Reconnect the event listeners whenever the parent passes
+     * a different audio element.
+     */
+    $: connectAudio(audio);
 
     function seek(event: Event) {
         resetTrackTimer();
 
-        const input = event.target as HTMLInputElement;
+        const input = event.currentTarget as HTMLInputElement;
+        const nextTime = Number(input.value);
 
-        if (audio) {
-            audio.currentTime = parseInt(input.value);
-        }
+        if (!audio || !Number.isFinite(nextTime)) return;
+
+        audio.currentTime = nextTime;
+        currentTime = Math.floor(nextTime);
     }
 
     $: {
-        if (rangeInput && duration > 0) {
-            const percent = (currentTime / duration) * 100;
+        if (rangeInput) {
+            const percentage =
+                duration > 0
+                    ? Math.min(
+                          100,
+                          Math.max(
+                              0,
+                              (currentTime / duration) * 100,
+                          ),
+                      )
+                    : 0;
 
-            rangeInput.style.setProperty("--progress", `${percent}%`);
+            rangeInput.style.setProperty(
+                "--progress",
+                `${percentage}%`,
+            );
+
             rangeInput.style.setProperty(
                 "--border-radius",
                 roundedEdges ? "5px" : "0px",
             );
         }
     }
+
+    onDestroy(() => {
+        disconnectAudio();
+    });
 </script>
 
 {#if useWaveForm}
@@ -77,42 +195,45 @@
     {/if}
 
     <SeekableWavForm
+        audio={audio}
+        audioUrl={waveformUrl}
         playedColor={waveformPlayedColor}
         baseColor={waveformBaseColor}
-        audioUrl={$audioPlayerUrl}
         height={waveHeight}
         zoom={1}
     />
 {:else if $userTapped}
-    <div class="wrapEntireRange" class:smallRange={!showTrackTime}>
+    <div
+        class="wrapEntireRange"
+        class:smallRange={!showTrackTime}
+    >
         {#if $audioPlayerState !== "Loading"}
-            {#if duration >= 0}
-                <div
-                    in:fade={{ duration: 150 }}
-                    out:fade={{ duration: 150 }}
-                    class="contentWrapper"
-                >
-                    <div class="rangeWrapper">
-                        <input
-                            bind:this={rangeInput}
-                            class="audioRangeInput"
-                            type="range"
-                            min="0"
-                            max={duration}
-                            step="1"
-                            bind:value={currentTime}
-                            on:input={seek}
-                        />
-                    </div>
-
-                    {#if showTrackTime}
-                        <div class="timeFlex">
-                            <p>{formatTime(currentTime)}</p>
-                            <p>{formatTime(duration)}</p>
-                        </div>
-                    {/if}
+            <div
+                in:fade={{ duration: 150 }}
+                out:fade={{ duration: 150 }}
+                class="contentWrapper"
+            >
+                <div class="rangeWrapper">
+                    <input
+                        bind:this={rangeInput}
+                        class="audioRangeInput"
+                        type="range"
+                        min="0"
+                        max={duration}
+                        step="1"
+                        bind:value={currentTime}
+                        on:input={seek}
+                        disabled={!audio || duration <= 0}
+                    />
                 </div>
-            {/if}
+
+                {#if showTrackTime}
+                    <div class="timeFlex">
+                        <p>{formatTime(currentTime)}</p>
+                        <p>{formatTime(duration)}</p>
+                    </div>
+                {/if}
+            </div>
         {:else}
             <div
                 in:fade={{ duration: 150 }}
@@ -121,15 +242,18 @@
             >
                 <div class="wrapLoaderJ">
                     <AudioLoader
-                        height={"7px"}
-                        backgroundColor={"transparent"}
+                        height="7px"
+                        backgroundColor="transparent"
                     />
                 </div>
             </div>
         {/if}
     </div>
 {:else}
-    <div class="wrapEntireRange" class:smallRange={!showTrackTime}>
+    <div
+        class="wrapEntireRange"
+        class:smallRange={!showTrackTime}
+    >
         <div class="contentWrapper">
             <div class="rangeWrapper">
                 <input
@@ -197,13 +321,21 @@
         cursor: pointer;
     }
 
+    .audioRangeInput:disabled {
+        cursor: default;
+    }
+
     .audioRangeInput::-webkit-slider-runnable-track {
         height: 7px;
 
         background: linear-gradient(
             to right,
             var(--accent, #d1d1d1) var(--progress, 0%),
-            var(--accent-faded, rgba(196, 196, 196, 0.267)) var(--progress, 0%)
+            var(
+                    --accent-faded,
+                    rgba(196, 196, 196, 0.267)
+                )
+                var(--progress, 0%)
         );
 
         border-radius: var(--border-radius, 5px);
@@ -227,7 +359,11 @@
     .audioRangeInput::-moz-range-track {
         height: 7px;
 
-        background: var(--accent-faded, rgba(196, 196, 196, 0.267));
+        background: var(
+            --accent-faded,
+            rgba(196, 196, 196, 0.267)
+        );
+
         border-radius: var(--border-radius, 5px);
     }
 

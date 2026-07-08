@@ -1,0 +1,109 @@
+.abTrack_container {
+    opacity: 1;
+    transition:
+        opacity 0.5s ease,
+        border-color 0.3s ease;
+
+    display: flex;
+    align-items: stretch;
+    gap: 25px;
+
+    width: 100%;
+    min-width: 0;
+    padding: 15px;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.09),
+            rgba(255, 255, 255, 0.025)
+        ),
+        rgba(20, 20, 20, 0.48);
+
+    backdrop-filter: blur(18px) saturate(125%);
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+
+
+    color: inherit;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.abTrack_container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0.07),
+        transparent 40%
+    );
+
+    pointer-events: none;
+}
+
+.abTrack_notActive {
+    opacity: 0.4;
+}
+
+.abTrack_artwork {
+    width: 150px;
+    min-width: 150px;
+    flex: 0 0 150px;
+
+    border-radius: 8px;
+    overflow: hidden;
+
+}
+
+.abTrack_details {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.abTrack_top {
+    min-width: 0;
+}
+
+.abTrack_titleFlex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+.abTrack_titleFlex h5 {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.abTrack_bottom {
+    width: 100%;
+    min-width: 0;
+    transition: opacity 0.5s ease;
+}
+
+.abTrack_rangeNotActive {
+    opacity: 0.15;
+}
+
+.abTrack_selected {
+    border-color: white;
+}

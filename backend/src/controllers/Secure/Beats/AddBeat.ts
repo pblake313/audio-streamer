@@ -15,7 +15,6 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
     try {
         // validate request
         const validatedObject = validateAddBeatRequest(req)
-        console.log(validatedObject)
 
         // make sure we have files...
         const files = req.files as {
@@ -32,7 +31,6 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
         
         // create the beat id.
         const beatId = crypto.randomUUID()
-        console.log(beatId)
 
         // ---- UPLOAD ARTWORK ----
 

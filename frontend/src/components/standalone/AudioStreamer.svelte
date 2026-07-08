@@ -85,6 +85,8 @@
         <AudioRange
             roundedEdges={false}
             showTrackTime={false}
+            audio={$audioStore ?? undefined}
+
         />
 
         <div class="innerAudio">

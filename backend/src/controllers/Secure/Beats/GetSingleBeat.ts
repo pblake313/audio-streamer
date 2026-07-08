@@ -1,19 +1,18 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { getBeatById } from "../../../helpers/GetBeatById";
 import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
 
-export async function getSingleBeat(req: Request, res: Response) {
+export async function getSingleBeat(req: Request, res: Response, next: NextFunction) {
     const beatId = req.params.beatId
 
     try {
+        if (!beatId) throw new Error('Missing Beat Id')
+
         const fetchedBeat = await getBeatById(beatId)
+        fetchedBeat.mp3Url = await signFirestoreUrl(fetchedBeat.mp3Url, 0, 1)
 
-        if (fetchedBeat){
-            fetchedBeat.artworkUrl = await signFirestoreUrl(fetchedBeat.artworkUrl, 0, 45)
-        }
-
-        return res.status(200).send({message: 'ok 4 now', beat: fetchedBeat})
-    } catch {
-        return res.status(500).send({ error: 'An error occurred while getting the beat.' });
+        return res.status(200).send({beat: fetchedBeat})
+    } catch (error: any) {
+        next(error)
     }
 }

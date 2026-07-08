@@ -1,123 +1,64 @@
-
-.editFormWrapper{
-    max-width: 1550px;
+.ebf_container{
     margin: auto;
-    padding: 0px 25px;
+    max-width: 1250px; 
+    margin-bottom: 125px;
 }
-.editAreaFlex{
+.ebf_formArea{
     display: flex;
     justify-content: space-between;
-    gap: 50px;
-    margin-bottom: 90px;
-}
-.halfEdit{
-    width: 50%;
-}
-.wrapAddBeatSub{
-    padding: 15px 0px;
-    background-color: #222;
-    width: calc(100% - 0px);
-    left: 0%;
-    position: fixed;
-    bottom: 0px;
-    transition: .5s;
+    gap: 20px;
 
 }
-.innerSubmitButton{
-    max-width: 1550px;
-    margin: auto;
-    padding: 0px 25px;
-    margin: auto;
+.ebf_detials{
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
+.ebf_files{
+    width: 50%;
+}
+.ebf_bpmKeyMode{
+    display: flex;
+    width: 100%;
+    gap: 20px;
+}
+.ebf_bpm{
+    width: 40%;
+}
+.ebf_mode{
+    width: 35%;
+}
+.ebf_key{
+    width: 25%;
+}
+.ebf_tagFlex{
+    display: flex;
+    gap: 20px;
+}
+.ebf_tag{
+    width: 50%;
+}
+.ebf_customTagFlex{
+    display: flex;
+    gap: 20px;
+}
+.ebf_color{
+    width: 40%;
+}
+.ebf_customTag{
+    width: 60%;
+}
+.ebf_submitButton{
+    margin-top: 20px;
 
-.editInputsFlex {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
 }
-.wrapbpmJ{
-    width: 30%;
-}
-.wrapkeyJoint{
-    width: 100px;
-}
-.wrapModeJoint{
-    width: calc(70% - 100px);
-}
-.singleEditInput{
-    margin-bottom: 20px;
-}
-.goHalfEdit {
-    width: 50%;
-}
-.goHalfRightEdit{
-    width: 50%;
-}
-.padforPlayer{
-    padding-bottom: 90px;
-}
-.padFormForPlayer{
-    padding-bottom: 50px;
-}
-.paddFormForPlay{
-    margin-bottom: 180px;
-}
-.trackDetailsInputFlex{
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-}
-.deleteBeatArea{
-    max-width: 1550px;
-    padding: 0px 25px;
+.ebf_containDeleteTrackForm{
+    margin-bottom: 25px;
     display: flex;
     flex-direction: row-reverse;
-    margin: auto;
-    margin-bottom: 15px;
 }
-.holdHeadings{
-    margin-bottom: 8px;
-}
-@media(max-width: 880px){
-    .goHalfRightEdit {
-        width: 100%;
-    }
-    .editInputsFlex{
-        flex-direction: column;
-        gap: 10px;
-
-    }
-    .editInputsFlex {
-        margin-bottom: 10px;
-    }
-    .singleEditInput{
-        margin-bottom: 10px;
-    }
-    .trackDetailsInputFlex{
-        margin-bottom: 10px;
-    }
-    .editAreaFlex {
-        gap: 25px;
-    }
-}
-
-@media(max-width: 645px){
-    .editAreaFlex {
-        flex-direction: column;
-    }
-    .halfEdit {
-        width: 100%;
-    }
-}
-@media(max-width:575px){
-    .editFormWrapper{
-        padding: 0px 15px;
-    }
-    .innerSubmitButton{
-        padding: 0px 15px;
-    }
-    .deleteBeatArea{
-        padding: 0px 15px;
-
-    }
+.ebf_error{
+    margin-top: 15px;
+    color: var(--color-red);
 }

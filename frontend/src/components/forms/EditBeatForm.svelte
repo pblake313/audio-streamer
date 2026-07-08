@@ -1,470 +1,343 @@
 <script lang="ts">
     import "./EditBeatForm.css";
-    import { onMount } from "svelte";
-    import { pushNotification } from "../../stores/NotificationStore";
-    import { getSocket } from "../../stores/socketStore";
+
+    import BoxButton from "../../components/buttons/BoxButton.svelte";
+    import type { Beat } from "../../lib/types/Beats";
+    import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
+    import AddTrackPreview from "../previews/AddTrackPreview.svelte";
+    import { onMount, tick } from "svelte";
+    import TextInput from "../form-inputs/text/TextInput.svelte";
+    import SelectButton from "../form-inputs/select/SelectButton.svelte";
     import {
         beatMoodOptions,
         colorOptions,
-        destinationOptions,
         songKeyOptions,
         songModeOptions,
         tagOptions,
-    } from "$lib/selectoptions";
-    import BoxButton from "../../components/buttons/BoxButton.svelte";
-    import BpmInput from "../../components/form-inputs/BpmInput.svelte";
-    import { createEditBeatFormData } from "./EditBeatFormHelpers";
-    import type { Beat } from "../../lib/types/Beats";
-    import AddTrackPreview from "../../components/previews/AddTrackPreview.svelte";
-    import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
-    import { audioPlayerState } from "../../stores/AudioPlayerStore";
+        trackTypeOptions,
+    } from "../../lib/selectoptions";
+    import ColorSelect from "../form-inputs/select/ColorSelect.svelte";
+    import BpmInput from "../form-inputs/BpmInput.svelte";
+    import ImageUploader from "../form-inputs/file-uploaders/ImageUploader.svelte";
+    import Mp3Uploader from "../form-inputs/file-uploaders/Mp3Uploader.svelte";
+    import { createValidEditBeatFormObject, editBeatFormError, setEditBeatFormError } from "../../stores/EditBeatStore";
     import { upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import { goto } from "$app/navigation";
-    import { deleteBeat } from "../../stores/EditBeatStore";
-    import TextInput from "../../components/form-inputs/text/TextInput.svelte";
-    import SelectButton from "../../components/form-inputs/select/SelectButton.svelte";
-    import ImageUploader from "../../components/form-inputs/file-uploaders/ImageUploader.svelte";
-    import Mp3Uploader from "../../components/form-inputs/file-uploaders/Mp3Uploader.svelte";
-    import ColorSelect from "../../components/form-inputs/select/ColorSelect.svelte";
-    import MultiSelect from "../../components/form-inputs/select/MultiSelect.svelte";
-    import AudioLoader from "../../components/loaders/AudioLoader.svelte";
-    import BackendStatusBlock from "../../components/misc/BackendStatusBlock.svelte";
+    import { pushNotification } from "../../stores/NotificationStore";
 
-    const backendLink = import.meta.env.VITE_BACKEND_URL;
+    export let beat: Beat;
 
-    export let beatCopy: Beat;
+    let isUpdatingBeat: boolean = false
+    let formSubmitted: boolean = false
 
-    let socket: any;
+    // files
+    let newArtworkFile: File | null;
+    let newMp3File: File | null;
 
-    // for previews
-    let temporaryArtworkUrl: string | null = null;
-    let temporaryMp3PreviewUrl: string | null = null;
+    // initial file values
+    let artworkUrl: string | null = beat.artworkUrl;
+    let mp3Url: string | null = beat.mp3Url;
 
-    // form status
-    let shaking: boolean = false;
-    let formSubmitted: boolean = false;
+    let errorElement: HTMLParagraphElement | null = null;
 
-    // loading status
-    let artUploadStatus: "Waiting" | "Uploading" | "Upload Success" = "Waiting";
-    let mp3UploadStatus: "Waiting" | "Uploading" | "Upload Success" = "Waiting";
-    let loadingStatusText: string | null = null;
+    let form: {
+        title: string | null;
+        tagOne: string | null;
+        tagTwo: string | null;
+        customTagColor: string | null;
+        customTag: string | null;
+        mood: string | null;
+        key: string;
+        mode: string;
+        trackType: string;
+        bpm: number;
+    } = {
+        title: beat.beatTitle,
+        tagOne: beat.tagOne,
+        tagTwo: beat.tagTwo,
+        customTagColor: beat.customTagColor,
+        customTag: beat.customTag,
+        mood: beat.mood,
+        key: beat.key,
+        mode: beat.mode,
+        trackType: beat.trackType,
+        bpm: beat.bpm,
+    };
 
-    let isLoading: boolean = true;
-    let updatingBeat: boolean = false;
+    onMount(() => {});
 
-    // temporary variables for file uploaders
-
-    let newMp3File: File | null = null;
-    let newArtworkFile: File | null = null;
-
-    onMount(async () => {
-        setTemporaryFiles();
-        socket = await getSocket();
-        if (socket && typeof socket.on === "function") {
-            socket.on("updateStatus", (status: string | null) => {
-                loadingStatusText = status;
-            });
-            socket.on("uploadStarted", (status: string) => {
-                if (status === "artwork") {
-                    artUploadStatus = "Uploading";
-                }
-                if (status === "mp3") {
-                    mp3UploadStatus = "Uploading";
-                }
-            });
-            socket.on("uploadComplete", (status: string) => {
-                if (status === "artwork") {
-                    artUploadStatus = "Upload Success";
-                }
-                if (status === "mp3") {
-                    mp3UploadStatus = "Upload Success";
-                }
-            });
-        }
-    });
-
-    function setTemporaryFiles() {
-        temporaryArtworkUrl = beatCopy.artworkUrl;
-        temporaryMp3PreviewUrl = beatCopy.mp3previewUrl;
+    $: if ($editBeatFormError) {
+        scrollToError();
     }
 
-    function isValidForm(): boolean {
-        if (
-            !beatCopy.beatTitle ||
-            !beatCopy.bpm ||
-            beatCopy.bpm <= 0 ||
-            beatCopy.bpm >= 200 ||
-            !beatCopy.key ||
-            !temporaryArtworkUrl ||
-            !temporaryMp3PreviewUrl
-        ) {
-            return false;
-        }
+    async function scrollToError() {
+        await tick();
 
-        return true;
-    }
+        if (!errorElement) return;
 
-    // setting values
-    function resetUploadStatuses() {
-        artUploadStatus = "Waiting";
-        mp3UploadStatus = "Waiting";
+        const rect = errorElement.getBoundingClientRect();
+
+        const isOnScreen =
+            rect.bottom > 0 &&
+            rect.top < window.innerHeight;
+
+        if (isOnScreen) return;
+
+        window.scrollTo({
+            top: Math.max(
+                0,
+                window.scrollY +
+                    rect.top -
+                    window.innerHeight * 0.5,
+            ),
+            behavior: "smooth",
+        });
     }
 
     async function updateBeat() {
-        formSubmitted = true;
-
-        if (!isValidForm()) {
-            shake();
-            return;
-        }
-
-        // create the formdata.
-        const formData = createEditBeatFormData({
-            tagOne: beatCopy.tagOne,
-            tagTwo: beatCopy.tagTwo,
-            mood: beatCopy.mood,
-            key: beatCopy.key,
-            mode: beatCopy.mode,
-            beatTitle: beatCopy.beatTitle,
-            bpm: beatCopy.bpm,
-            newArtworkFile,
-            newMp3File,
-            customTag: beatCopy.customTag || "",
-            customTagColor: beatCopy.customTagColor || "",
-            futureDestinations: beatCopy.futureDestinations || [],
-        });
-
         try {
-            loadingStatusText = "Validating Request";
-            updatingBeat = true;
+            formSubmitted = true
 
-            const socketId = socket.id;
+            if (isUpdatingBeat) return
 
-            const response = await authorizedFetch(
-                `/secure/beats/update-beat/${beatCopy.id}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "x-socket-id": socketId,
-                    },
-                    body: formData,
-                },
-            );
-            console.log(response);
+            // validate beat obj.
 
-            if (response.updatedBeat) {
-                upsertBeat(response.updatedBeat);
-                pushNotification(
-                    "Beat updated successfully.",
-                    "Success",
-                    false,
-                    1500,
-                    "Updated!",
-                );
-            } else {
-                pushNotification(
-                    "The beat returned a successful response, but an updated beat wasnt returned.",
-                    "Error",
-                    false,
-                    5000,
-                    "Returned Beat Error",
-                );
+            const validObj: FormData = createValidEditBeatFormObject(form)
+
+            console.log(validObj)
+
+            if (!artworkUrl && !newArtworkFile){
+                throw new Error('Please select an artwork file.')
+            }
+            if (newArtworkFile) {
+                validObj.append("newArtwork", newArtworkFile);
             }
 
-            goto("/portal/manage-beats");
+            if (!mp3Url && !newMp3File) {
+                throw new Error("Please select an audio file.");
+            }
+
+            if (newMp3File) {
+                validObj.append("newMp3File", newMp3File);
+            }
+
+
+            editBeatFormError.set(null)
+            isUpdatingBeat = true
+
+            const response = await authorizedFetch(`/secure/beats/update-beat/${beat.id}`, {
+                method: "POST",
+                body: validObj,
+            });
+
+            upsertBeat(response.updatedBeat)
+            pushNotification('Beat updated successfully.', 'Success', false, 1700, "Updated!")
+            goto('/portal/manage-beats')
+
         } catch (err: any) {
             console.log(err);
-            pushNotification(
-                err.message || "An unknown error has occurred.",
-                "Error",
-                false,
-                5000,
-                "Edit Beat Error",
-            );
+
+            const errorMessage = err.message || 'An unknown error has occurred.'
+            setEditBeatFormError(errorMessage)
+
         } finally {
-            resetUploadStatuses(); // reset status texts....
-            updatingBeat = false;
-        }
-    }
-
-    // shaking
-    function shake() {
-        shaking = true;
-        setTimeout(() => {
-            shaking = false;
-        }, 600); // reset shaking
-    }
-
-    function handleKeySelect(value: string) {
-        beatCopy.key = value as Beat["key"];
-    }
-    function handleModeSelect(value: string) {
-        beatCopy.mode = value as Beat["mode"];
-    }
-
-    async function removeBeat(beatId: string) {
-        try {
-            updatingBeat = true;
-            await deleteBeat(beatId);
-        } catch (err) {
-        } finally {
-            updatingBeat = false;
+            isUpdatingBeat = false
         }
     }
 </script>
 
-<!-- preview -->
-<div class="wrapEditPreview">
-    <AddTrackPreview
-        heading={`Edit Track - ${beatCopy.beatTitle}`}
-        albumUrl={temporaryArtworkUrl}
-        bpm={beatCopy.bpm}
-        key={beatCopy.key}
-        mode={beatCopy.mode}
-        tagOne={beatCopy.tagOne}
-        tagTwo={beatCopy.tagTwo}
-        title={beatCopy.beatTitle}
-        mood={beatCopy.mood}
-        customTag={beatCopy.customTag}
-        customTagColor={beatCopy.customTagColor}
-        futureDestinations={beatCopy.futureDestinations}
-    ></AddTrackPreview>
-</div>
+<AddTrackPreview
+    title={form.title}
+    bpm={form.bpm}
+    tagOne={form.tagOne}
+    tagTwo={form.tagTwo}
+    albumUrl={artworkUrl}
+    key={form.key}
+    mode={form.mode}
+    mood={form.mood}
+    customTag={form.customTag}
+    customTagColor={form.customTagColor}
+    deleteBeat={beat}
+/>
 
-{#if !updatingBeat}
-    <div class="deleteBeatArea">
-        <BoxButton
-            on:click={() => {
-                removeBeat(beatCopy.id);
-            }}
-            buttonIcon={"trash"}
-            buttonText={"Delete Track"}
-            buttonStyle={"danger"}
-            noPad={true}
-            iconColor={"c30d0d"}
-        ></BoxButton>
-    </div>
-{/if}
+<div class="ebf_container">
+    <div class="ebf_formArea">
+        <!-- LEFT -->
+        <div class="ebf_detials">
+            <div class="ebf_single">
+                <TextInput
+                    label={"Track Title"}
+                    onTextChange={(v) => {
+                        form.title = v;
+                    }}
+                    value={form.title}
+                    inputError={(formSubmitted && !form.title) ? "Missing Track Title" : null}
+                />
+            </div>
 
-<div class="editFormWrapper">
-    {#if !updatingBeat}
-        <div
-            class="editAreaFlex"
-            class:paddFormForPlay={$audioPlayerState !== "Idle"}
-        >
-            <!-- left side -->
-            <div class="halfEdit">
-                <div class="holdHeadings">
-                    <p><b>Track Details</b></p>
+            <div class="ebf_bpmKeyMode">
+                <div class="ebf_bpm">
+                    <BpmInput
+                        bpmChanged={(v) => {
+                            form.bpm = v;
+                        }}
+                        bpm={form.bpm}
+                        inputError={(formSubmitted && form.bpm <= 0) ? "Invalid BPM" : null}
+                    />
                 </div>
-                <div class="singleEditInput">
+
+                <div class="ebf_mode">
+                    <SelectButton
+                        onSelect={(v) => {
+                            form.mode = v;
+                        }}
+                        selectedOption={form.mode}
+                        label={"Mode"}
+                        options={songModeOptions}
+                        inputError={(formSubmitted && !form.mode) ? "Missing Mode" : null}
+
+                    />
+                </div>
+
+                <div class="ebf_key">
+                    <SelectButton
+                        label={"Key"}
+                        onSelect={(v) => {
+                            form.key = v;
+                        }}
+                        options={songKeyOptions}
+                        selectedOption={form.key}
+                        inputError={(formSubmitted && !form.key) ? "Missing Key" : null}
+
+                    />
+                </div>
+            </div>
+
+            <div class="ebf_tagFlex">
+                <div class="ebf_tag">
+                    <SelectButton
+                        label={"Tag One"}
+                        selectedOption={form.tagOne}
+                        options={tagOptions}
+                        onSelect={(v) => {
+                            form.tagOne = v;
+                        }}
+
+                    />
+                </div>
+
+                <div class="ebf_tag">
+                    <SelectButton
+                        label={"Tag Two"}
+                        selectedOption={form.tagTwo}
+                        options={tagOptions}
+                        onSelect={(v) => {
+                            form.tagTwo = v;
+                        }}
+                    />
+                </div>
+            </div>
+
+            <div class="ebf_customTagFlex">
+                <div class="ebf_customTag">
                     <TextInput
-                        value={beatCopy.beatTitle}
-                        inputError={formSubmitted && !beatCopy.beatTitle
-                            ? "Please enter a beat title."
-                            : null}
+                        label={"Custom Tag"}
                         onTextChange={(v) => {
-                            beatCopy.beatTitle = v;
+                            form.customTag = v;
                         }}
-                        label="Beat Title"
-                        maxlength={50}
+                        value={form.customTag}
                     />
                 </div>
 
-                <div class="trackDetailsInputFlex">
-                    <div class="wrapbpmJ">
-                        <BpmInput
-                            bpmChanged={(v) => {
-                                beatCopy.bpm = v;
-                            }}
-                            bpm={beatCopy.bpm ? beatCopy.bpm : 0}
-                            inputError={formSubmitted &&
-                            (!beatCopy.bpm ||
-                                beatCopy.bpm <= 0 ||
-                                beatCopy.bpm >= 200)
-                                ? "A number between 1 and 199."
-                                : null}
-                        />
-                    </div>
-                    <div class="wrapkeyJoint">
-                        <SelectButton
-                            onSelect={(v) => {
-                                handleKeySelect(v);
-                            }}
-                            selectedOption={beatCopy.key}
-                            inputError={formSubmitted && !beatCopy.key
-                                ? "Missing"
-                                : null}
-                            options={songKeyOptions}
-                            label={"Key"}
-                        />
-                    </div>
-
-                    <div class="wrapModeJoint">
-                        <SelectButton
-                            onSelect={(v) => {
-                                handleModeSelect(v);
-                            }}
-                            selectedOption={beatCopy.mode}
-                            inputError={formSubmitted && !beatCopy.mode
-                                ? "Missing"
-                                : ""}
-                            options={songModeOptions}
-                            label={"Mode"}
-                        />
-                    </div>
-                </div>
-
-                <div class="singleEditInput">
-                    <ImageUploader
-                        fileName={beatCopy.artworkUrl}
-                        imageUrl={temporaryArtworkUrl}
-                        label={"Album Artwork"}
-                        clearInput={() => {
-                            newArtworkFile = null;
-                            temporaryArtworkUrl = null;
+                <div class="ebf_color">
+                    <ColorSelect
+                        label={"Custom Tag Color"}
+                        onSelect={(v) => {
+                            form.customTagColor = v;
                         }}
-                        fileUploaded={(v) => {
-                            temporaryArtworkUrl = v.imageUrl;
-                            newArtworkFile = v.file;
-                        }}
-                        inputError={formSubmitted && !temporaryArtworkUrl
-                            ? "Please upload an artowrk file."
-                            : null}
-                    />
-                </div>
-
-                <div class="singleEditInput">
-                    <Mp3Uploader
-                        label={"Beat Preview (MP3)"}
-                        mp3Uploaded={(v) => {
-                            newMp3File = v.file;
-                            temporaryMp3PreviewUrl = v.mp3Url;
-                        }}
-                        clearInput={() => {
-                            temporaryMp3PreviewUrl = null;
-                            newMp3File = null;
-                        }}
-                        fileName={temporaryMp3PreviewUrl}
-                        inputError={formSubmitted && !temporaryMp3PreviewUrl
-                            ? "Please upload an audio file."
-                            : null}
+                        selectedOption={form.customTagColor}
+                        {colorOptions}
                     />
                 </div>
             </div>
 
-            <!-- right side -->
-            <div class="halfEdit">
-                <div class="holdHeadings">
-                    <p><b>Tags</b></p>
-                </div>
-                <div class="editInputsFlex">
-                    <div class="goHalfRightEdit">
-                        <TextInput
-                            onTextChange={(v) => {
-                                beatCopy.customTag = v;
-                            }}
-                            label={"Custom Tag"}
-                            value={beatCopy.customTag || ""}
-                            maxlength={35}
-                        />
-                    </div>
-                    <div class="goHalfRightEdit">
-                        <ColorSelect
-                            label={"Custom Tag Color"}
-                            onSelect={(v) => {
-                                beatCopy.customTagColor = v;
-                            }}
-                            selectedOption={beatCopy.customTagColor}
-                            {colorOptions}
-                        />
-                    </div>
+            <div class="ebf_tagFlex">
+                <div class="ebf_tag">
+                    <SelectButton
+                        label={"Mood"}
+                        selectedOption={form.mood}
+                        onSelect={(v) => {
+                            form.mood = v;
+                        }}
+                        options={beatMoodOptions}
+                    />
                 </div>
 
-                <div class="editInputsFlex">
-                    <div class="goHalfRightEdit">
-                        <SelectButton
-                            onSelect={(v) => {
-                                beatCopy.tagOne = v;
-                            }}
-                            selectedOption={beatCopy.tagOne}
-                            options={tagOptions}
-                            label={"Tag One"}
-                        />
-                    </div>
-                    <div class="goHalfRightEdit">
-                        <SelectButton
-                            onSelect={(v) => {
-                                beatCopy.tagTwo = v;
-                            }}
-                            selectedOption={beatCopy.tagTwo}
-                            options={tagOptions}
-                            label={"Tag Two"}
-                        />
-                    </div>
-                </div>
-
-                <div class="editInputsFlex">
-                    <div class="goHalfRightEdit">
-                        <SelectButton
-                            onSelect={(v) => {
-                                beatCopy.mood = v;
-                            }}
-                            options={beatMoodOptions}
-                            label={"Mood"}
-                            selectedOption={beatCopy.mood}
-                        />
-                    </div>
-                    <div class="goHalfRightEdit">
-                        <MultiSelect
-                            label={"Future Destination"}
-                            onChange={(v) => {
-                                beatCopy.futureDestinations = v;
-                            }}
-                            selected={beatCopy.futureDestinations}
-                            options={destinationOptions}
-                        />
-                    </div>
+                <div class="ebf_tag">
+                    <SelectButton
+                        onSelect={(v) => {
+                            form.trackType = v;
+                        }}
+                        label={"Track Type"}
+                        selectedOption={form.trackType}
+                        options={trackTypeOptions}
+                        inputError={(formSubmitted && !form.trackType) ? "Missing Track Type" : null}
+                    />
                 </div>
             </div>
         </div>
 
-        <div
-            class="wrapAddBeatSub"
-            class:padforPlayer={$audioPlayerState !== "Idle"}
-        >
-            <div class="innerSubmitButton">
+        <!-- RIGHT -->
+        <div class="ebf_files">
+            <ImageUploader
+                label="Artwork"
+                imageUrl={artworkUrl}
+                fileName={artworkUrl}
+                fileUploaded={({ imageUrl: newUrl, file }) => {
+                    artworkUrl = newUrl;
+                    newArtworkFile = file;
+                }}
+                clearInput={() => {
+                    artworkUrl = null;
+                    newArtworkFile = null;
+                }}
+                inputError={(!artworkUrl && !newArtworkFile && formSubmitted) ? "Missing Artwork" : null}
+            />
+
+            <Mp3Uploader
+                label="Audio File"
+                mp3Url={mp3Url}
+                fileName={mp3Url}
+                mp3Uploaded={({ mp3Url: newUrl, file }) => {
+                    mp3Url = newUrl;
+                    newMp3File = file;
+                }}
+                clearInput={() => {
+                    mp3Url = null;
+                    newMp3File = null;
+                }}
+                inputError={(!mp3Url && !newMp3File && formSubmitted) ? "Missing Audio File" : null}
+
+            />
+
+            <div class="ebf_submitButton">
+        
+
                 <BoxButton
-                    {shaking}
-                    on:click={updateBeat}
-                    buttonText={"Update"}
+                    buttonText={"Update Beat"}
                     fullWidth={true}
-                ></BoxButton>
+                    on:click={updateBeat}
+                    isDisabled={isUpdatingBeat}
+                    buttonIcon={isUpdatingBeat ? "loading" : null}
+                />
+
+                {#if $editBeatFormError}
+                    <p class="ebf_error" bind:this={errorElement}>
+                        {$editBeatFormError}
+                    </p>
+                {/if}
+
             </div>
         </div>
-    {:else}
-        <!-- if THE Form IS LOADING. -->
-
-        {#if newArtworkFile}
-            <BackendStatusBlock
-                title={"New Artwork Upload Status"}
-                status={artUploadStatus}
-            ></BackendStatusBlock>
-        {/if}
-        {#if newMp3File}
-            <BackendStatusBlock
-                title={"New MP3 Preview Upload Status"}
-                status={mp3UploadStatus}
-            ></BackendStatusBlock>
-        {/if}
-        <div style="margin: auto;">
-            <AudioLoader backgroundColor={"#222222"}></AudioLoader>
-            {#if loadingStatusText}
-                <br />
-                <p style="text-align: center; font-size: 11pt;">
-                    {loadingStatusText}
-                </p>
-            {/if}
-        </div>
-    {/if}
+    </div>
 </div>

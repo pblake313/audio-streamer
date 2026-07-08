@@ -138,7 +138,7 @@
 }
 
 .glass:active:not(:disabled) {
-    transform: scale(0.98);
+    /* transform: scale(0.98); */
 }
 
 /* ---------------------------------------------
@@ -177,7 +177,7 @@
 }
 
 .clear:active:not(:disabled) {
-    transform: scale(0.98);
+    /* transform: scale(0.98); */
 }
 
 /* ---------------------------------------------
@@ -205,6 +205,25 @@
 
 .shake {
     animation: shake 0.3s;
+}
+/* ---------------------------------------------
+   Opacity increase button
+---------------------------------------------- */
+
+.opacityIncrease {
+    color: #f7f7f7;
+    background-color: transparent;
+    border-color: transparent;
+    opacity: 0.55;
+}
+
+.opacityIncrease:hover:not(:disabled) {
+    opacity: 1;
+}
+
+.opacityIncrease:active:not(:disabled) {
+    opacity: 1;
+    /* transform: scale(0.98); */
 }
 
 /* ---------------------------------------------
@@ -263,5 +282,14 @@
     .clear:focus::before,
     .clear:active::before {
         opacity: 0;
+    }
+
+    .opacityIncrease:hover,
+    .opacityIncrease:focus,
+    .opacityIncrease:active {
+        background-color: transparent;
+        border-color: transparent;
+        opacity: 0.55;
+        transform: none;
     }
 }

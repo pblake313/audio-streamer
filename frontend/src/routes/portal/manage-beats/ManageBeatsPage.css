@@ -1,7 +1,9 @@
-.containBeatPage {
-    max-width: 1550px;
+.mbp_container {
+    max-width: 1250px;
     padding: 0 25px;
-    margin: 75px auto 100px auto;
+    margin: auto;
+    margin-top: 75px;
+
 }
 
 .goToAddButton {
@@ -11,28 +13,42 @@
 }
 
 /* Responsive grid – all children same width */
-.adminBeatGrid {
+.mbp_grid {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
     margin-top: 10px;
+    margin-bottom: 25px;
 }
 
 .wrapBeatChild {
     width: 100%;
     max-width: 100%;
 }
+.mbp_fetchMore{
+    margin: auto;
+    width: fit-content;
+    margin-bottom: 50px;
+}
+.mbp_topper{
+    margin: auto;
+    text-align: center;
+    margin-top: 90px;
+    margin-bottom: 50px;
+}
+.mbp_subtitle{
+    margin-top: 15px;
+}
 
 @media(max-width: 780px) {
-    .adminBeatGrid {
-
-        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-        gap: 5px;
+    .mbp_grid {
+        grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+        gap: 15px;
     }
 }
 @media(max-width:575px){
-    .containBeatPage {
+    .mbp_container {
         padding: 0 15px;
     }
 }
