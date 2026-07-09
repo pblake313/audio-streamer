@@ -86,7 +86,7 @@
     {:else}
         <ABTester />
     {/if}
-    <div class="wrapTrackList" class:tracklist_padForPlayer={$showAudioPlayer}>
+    <div class="wrapTrackList">
         <TrackList />
     </div>
 {/if}
@@ -97,9 +97,7 @@
         padding: 25px;
         max-width: 1250px;
     }
-    .tracklist_padForPlayer {
-        padding-bottom: 100px;
-    }
+
     @media (max-width: 575px) {
         .wrapTrackList {
             margin: auto;

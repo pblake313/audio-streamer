@@ -4,7 +4,7 @@ import { selectedBeat, selectNewBeat } from "./selectedBeatStore";
 import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
 
 
-export const showAudioPlayer = writable<boolean>(false)
+export const showAudioPlayer = writable<boolean>(false);
 
 // all beats
 export const beats = writable<Beat[]>([]);
@@ -16,11 +16,20 @@ export const beatFetchError = writable<string | null>(null);
 export const oneBeatFetchSuccessfull = writable<boolean>(false);
 
 
-// Fetch beats from the backend
+let activeBeatFetchPromise: Promise<Beat[]> | null = null;
 
-export async function fetchBeats(pageToFetch?: number) {
-    if (get(isFetchingBeats)) return;
-    if (get(allBeatPagesFetched)) return;
+
+// Fetch beats from the backend
+export async function fetchBeats(pageToFetch?: number): Promise<Beat[]> {
+    if (get(allBeatPagesFetched)) return [];
+
+    /*
+     * If another normal-page request is already running, wait for and
+     * reuse that request instead of firing the same pagination request twice.
+     */
+    if (activeBeatFetchPromise) {
+        return activeBeatFetchPromise;
+    }
 
     const fetchedPages = get(beatPagesFetched);
 
@@ -28,48 +37,62 @@ export async function fetchBeats(pageToFetch?: number) {
         pageToFetch ??
         (fetchedPages.length > 0 ? Math.max(...fetchedPages) + 1 : 1);
 
-    if (fetchedPages.includes(nextPage)) return;
+    if (fetchedPages.includes(nextPage)) return [];
 
     fetchBeatsAttempted.set(true);
     beatFetchError.set(null);
     isFetchingBeats.set(true);
 
-// here i need to separate a more pages beats fetch from the first fetch with booleans.
 
-    try {
-        const result = await authorizedFetch(`/secure/beats/get-live-beats/${nextPage}`, {
-            method: "GET",
-        });
+    activeBeatFetchPromise = (async () => {
+        try {
+            const result = await authorizedFetch(
+                `/secure/beats/get-live-beats/${nextPage}`,
+                {
+                    method: "GET",
+                }
+            );
 
-        oneBeatFetchSuccessfull.set(true);
+            oneBeatFetchSuccessfull.set(true);
 
-        const newBeats: Beat[] = result.beats || [];
+            const newBeats: Beat[] = Array.isArray(result.beats)
+                ? result.beats
+                : [];
 
-        newBeats.forEach((beat) => upsertBeat(beat));
+            newBeats.forEach((beat) => upsertBeat(beat));
 
-        beatPagesFetched.update((pages) => {
-            if (pages.includes(nextPage)) return pages;
-            return [...pages, nextPage].sort((a, b) => a - b);
-        });
+            beatPagesFetched.update((pages) => {
+                if (pages.includes(nextPage)) return pages;
 
-        if (newBeats.length === 0 || result.hasMore === false) {
-            allBeatPagesFetched.set(true);
+                return [...pages, nextPage].sort((a, b) => a - b);
+            });
+
+            if (newBeats.length === 0 || result.hasMore === false) {
+                allBeatPagesFetched.set(true);
+            }
+
+            const currentSelectedBeat = get(selectedBeat);
+
+            if (!currentSelectedBeat && newBeats.length > 0) {
+                selectNewBeat(newBeats[0]);
+            }
+
+            return newBeats;
+        } catch (error: any) {
+            beatFetchError.set(
+                error.message || "An unknown error has occurred."
+            );
+
+            return [];
+        } finally {
+            isFetchingBeats.set(false);
+            activeBeatFetchPromise = null;
         }
+    })();
 
-        const currentSelectedBeat = get(selectedBeat);
 
-        if (!currentSelectedBeat && newBeats.length > 0) {
-            selectNewBeat(newBeats[0]);
-        }
-    } catch (error: any) {
-        beatFetchError.set(error.message || "An unknown error has occurred.");
-    } finally {
-        isFetchingBeats.set(false);
-    }
+    return activeBeatFetchPromise;
 }
-
-
-
 
 
 export function updateBeatRatingInArray(
@@ -96,6 +119,7 @@ export function updateBeatRatingInArray(
         });
     }
 }
+
 
 export function updateBeatCustomTagInArray(
     beatId: string,
@@ -125,6 +149,7 @@ export function updateBeatCustomTagInArray(
     }
 }
 
+
 export function updateBeatNotepadInArray(
     beatId: string,
     notepad: Beat["notepad"]
@@ -149,6 +174,7 @@ export function updateBeatNotepadInArray(
         });
     }
 }
+
 
 export function updateBeatFutureDestinationsInArray(
     beatId: string,
@@ -209,9 +235,13 @@ function getDateCreatedTime(beat: Beat): number {
     return 0;
 }
 
+
 export function upsertBeat(newBeat: Beat) {
     beats.update((currentBeats) => {
-        const idx = currentBeats.findIndex((beat) => beat.id === newBeat.id);
+        const idx = currentBeats.findIndex(
+            (beat) => beat.id === newBeat.id
+        );
+
         let next: Beat[];
 
         if (idx === -1) {
@@ -223,13 +253,15 @@ export function upsertBeat(newBeat: Beat) {
             next[idx] = newBeat;
         }
 
-        // Sort by dateCreated DESC (newest first)
-        next.sort((a, b) => getDateCreatedTime(b) - getDateCreatedTime(a));
+        // Sort by createdAt DESC (newest first)
+        next.sort(
+            (a, b) =>
+                getDateCreatedTime(b) - getDateCreatedTime(a)
+        );
 
         return next;
     });
 }
-
 
 
 export function removeBeatFromArray(beatId: string) {
@@ -238,22 +270,20 @@ export function removeBeatFromArray(beatId: string) {
     );
 }
 
-export function getNextBeatPageToFetch(): number {
-    const fetchedPages = get(beatPagesFetched) as number[];
 
-    // Sort the fetched pages in ascending order
+export function getNextBeatPageToFetch(): number {
+    const fetchedPages = get(beatPagesFetched);
     const sortedPages = [...fetchedPages].sort((a, b) => a - b);
 
-    // Find the first missing page in the sequence
-    for (let i = 1; i <= sortedPages.length + 1; i++) {
-        if (!sortedPages.includes(i)) {
-            return i;
+    for (let page = 1; page <= sortedPages.length + 1; page += 1) {
+        if (!sortedPages.includes(page)) {
+            return page;
         }
     }
 
-    // Default to 1 if no pages have been fetched
     return 1;
 }
+
 
 export function updateBeatInArray(updatedBeat: Beat) {
     beats.update((currentBeats) =>
@@ -264,58 +294,85 @@ export function updateBeatInArray(updatedBeat: Beat) {
 }
 
 
+// =========================
+// Filters
+// =========================
+
 // mood filters
-export const moodFilter = writable<string[]>([])
+export const moodFilter = writable<string[]>([]);
 
 export function toggleMoodFilter(mood: string) {
+    resetFilteredBeatPagination();
+
     moodFilter.update((currentMoods) => {
         if (currentMoods.includes(mood)) {
-            return currentMoods.filter((currentMood) => currentMood !== mood);
+            return currentMoods.filter(
+                (currentMood) => currentMood !== mood
+            );
         }
 
         return [...currentMoods, mood];
     });
 }
+
 export function clearMoodFilter() {
-    moodFilter.set([])
+    resetFilteredBeatPagination();
+    moodFilter.set([]);
 }
+
 
 // custom tag filters
 export const tagFilter = writable<string[]>([]);
 
 export function toggleTagFilter(tag: string) {
+    resetFilteredBeatPagination();
+
     tagFilter.update((currentTags) => {
         if (currentTags.includes(tag)) {
-            return currentTags.filter((currentTag) => currentTag !== tag);
+            return currentTags.filter(
+                (currentTag) => currentTag !== tag
+            );
         }
 
         return [...currentTags, tag];
     });
 }
+
 export function clearTagFilter() {
+    resetFilteredBeatPagination();
     tagFilter.set([]);
 }
+
 
 // artist filters
 export const artistFilter = writable<string[]>([]);
 
 export function toggleArtistFilter(artist: string) {
+    resetFilteredBeatPagination();
+
     artistFilter.update((currentArtists) => {
         if (currentArtists.includes(artist)) {
-            return currentArtists.filter((currentArtist) => currentArtist !== artist);
+            return currentArtists.filter(
+                (currentArtist) => currentArtist !== artist
+            );
         }
 
         return [...currentArtists, artist];
     });
 }
+
 export function clearArtistFilter() {
+    resetFilteredBeatPagination();
     artistFilter.set([]);
 }
+
 
 // beat type filter
 export const beatTypeFilter = writable<string[]>([]);
 
 export function toggleBeatTypeFilter(beatType: string) {
+    resetFilteredBeatPagination();
+
     beatTypeFilter.update((currentBeatTypes) => {
         if (currentBeatTypes.includes(beatType)) {
             return currentBeatTypes.filter(
@@ -326,17 +383,37 @@ export function toggleBeatTypeFilter(beatType: string) {
         return [...currentBeatTypes, beatType];
     });
 }
+
 export function clearBeatTypeFilter() {
+    resetFilteredBeatPagination();
     beatTypeFilter.set([]);
 }
 
+
 // all filters
-export function clearAllFilters(){
-    clearBeatTypeFilter()
-    clearArtistFilter()
-    clearTagFilter()
-    clearMoodFilter()
+export function clearAllFilters() {
+    resetFilteredBeatPagination();
+
+    beatTypeFilter.set([]);
+    artistFilter.set([]);
+    tagFilter.set([]);
+    moodFilter.set([]);
 }
+
+
+export const hasActiveBeatFilters = derived(
+    [moodFilter, tagFilter, artistFilter, beatTypeFilter],
+    ([
+        $moodFilter,
+        $tagFilter,
+        $artistFilter,
+        $beatTypeFilter,
+    ]) =>
+        $moodFilter.length > 0 ||
+        $tagFilter.length > 0 ||
+        $artistFilter.length > 0 ||
+        $beatTypeFilter.length > 0
+);
 
 
 export const filteredBeats = derived(
@@ -360,41 +437,47 @@ export const filteredBeats = derived(
             $artistFilter.length > 0 ||
             $beatTypeFilter.length > 0;
 
-        // No filters selected: show every beat.
+        // No filters selected: show every fetched beat.
         if (!hasActiveFilters) {
             return $beats;
         }
 
         return $beats.filter((beat) => {
+            /*
+             * Each active filter group must match.
+             *
+             * This mirrors the backend query, which ANDs mood, custom tag,
+             * artist and track type groups together. Inside the artist group,
+             * tagOne OR tagTwo may match.
+             */
             const matchesMood =
-                $moodFilter.length > 0 &&
-                beat.mood !== null &&
-                $moodFilter.includes(beat.mood);
+                $moodFilter.length === 0 ||
+                (beat.mood !== null &&
+                    $moodFilter.includes(beat.mood));
 
             const matchesCustomTag =
-                $tagFilter.length > 0 &&
-                beat.customTag !== null &&
-                $tagFilter.includes(beat.customTag);
+                $tagFilter.length === 0 ||
+                (beat.customTag !== null &&
+                    $tagFilter.includes(beat.customTag));
 
-            const beatArtists = [
-                beat.tagOne,
-                beat.tagTwo,
-            ].filter((artist): artist is string => artist !== null);
+            const beatArtists = [beat.tagOne, beat.tagTwo].filter(
+                (artist): artist is string => artist !== null
+            );
 
             const matchesArtist =
-                $artistFilter.length > 0 &&
+                $artistFilter.length === 0 ||
                 beatArtists.some((artist) =>
                     $artistFilter.includes(artist)
                 );
 
             const matchesBeatType =
-                $beatTypeFilter.length > 0 &&
+                $beatTypeFilter.length === 0 ||
                 $beatTypeFilter.includes(beat.trackType);
 
             return (
-                matchesMood ||
-                matchesCustomTag ||
-                matchesArtist ||
+                matchesMood &&
+                matchesCustomTag &&
+                matchesArtist &&
                 matchesBeatType
             );
         });
@@ -402,7 +485,9 @@ export const filteredBeats = derived(
 );
 
 
-// fetching filtered beats
+// =========================
+// Filtered beat pagination
+// =========================
 export const isFetchingFilteredBeats = writable<boolean>(false);
 export const fetchFilteredBeatsError = writable<string | null>(null);
 
@@ -411,8 +496,50 @@ export const allFilteredBeatPagesFetched = writable<boolean>(false);
 
 
 let activeFilteredBeatRequestKey: string | null = null;
+let activeFilteredFetchPromise: Promise<Beat[]> | null = null;
+let activeFilteredFetchPromiseKey: string | null = null;
 
 let filteredBeatsErrorTimeout: ReturnType<typeof setTimeout> | null = null;
+
+
+type CurrentBeatFilters = {
+    artistFilter: string[];
+    beatTypeFilter: string[];
+    tagFilter: string[];
+    moodFilter: string[];
+};
+
+
+function getCurrentBeatFilters(): CurrentBeatFilters {
+    return {
+        artistFilter: get(artistFilter),
+        beatTypeFilter: get(beatTypeFilter),
+        tagFilter: get(tagFilter),
+        moodFilter: get(moodFilter),
+    };
+}
+
+
+function beatFiltersAreActive(filters: CurrentBeatFilters): boolean {
+    return (
+        filters.artistFilter.length > 0 ||
+        filters.beatTypeFilter.length > 0 ||
+        filters.tagFilter.length > 0 ||
+        filters.moodFilter.length > 0
+    );
+}
+
+
+function createFilteredBeatRequestKey(
+    filters: CurrentBeatFilters
+): string {
+    return JSON.stringify({
+        artistFilter: [...filters.artistFilter].sort(),
+        beatTypeFilter: [...filters.beatTypeFilter].sort(),
+        tagFilter: [...filters.tagFilter].sort(),
+        moodFilter: [...filters.moodFilter].sort(),
+    });
+}
 
 
 function setFilteredBeatsError(message: string) {
@@ -420,9 +547,7 @@ function setFilteredBeatsError(message: string) {
         clearTimeout(filteredBeatsErrorTimeout);
     }
 
-
     fetchFilteredBeatsError.set(message);
-
 
     filteredBeatsErrorTimeout = setTimeout(() => {
         fetchFilteredBeatsError.set(null);
@@ -431,16 +556,14 @@ function setFilteredBeatsError(message: string) {
 }
 
 
-function getNextFilteredBeatPageToFetch() {
+export function getNextFilteredBeatPageToFetch(): number {
     const pagesFetched = get(filteredBeatPagesFetched);
 
     let nextPage = 1;
 
-
     while (pagesFetched.includes(nextPage)) {
         nextPage += 1;
     }
-
 
     return nextPage;
 }
@@ -453,50 +576,35 @@ export function resetFilteredBeatPagination() {
     activeFilteredBeatRequestKey = null;
 }
 
-export async function fetchBeatsWithFilters(pageToFetch?: number) {
-    if (get(isFetchingFilteredBeats)) return;
 
+export async function fetchBeatsWithFilters(
+    pageToFetch?: number
+): Promise<Beat[]> {
+    const currentFilters = getCurrentBeatFilters();
 
-    const currentArtistFilters = get(artistFilter);
-    const currentBeatTypeFilters = get(beatTypeFilter);
-    const currentTagFilters = get(tagFilter);
-    const currentMoodFilters = get(moodFilter);
-
-
-    const hasFilters =
-        currentArtistFilters.length > 0 ||
-        currentBeatTypeFilters.length > 0 ||
-        currentTagFilters.length > 0 ||
-        currentMoodFilters.length > 0;
-
-
-    if (!hasFilters) {
+    if (!beatFiltersAreActive(currentFilters)) {
         resetFilteredBeatPagination();
-        return;
+        return [];
     }
 
-
-    const postObj = {
-        artistFilter: currentArtistFilters,
-        beatTypeFilter: currentBeatTypeFilters,
-        tagFilter: currentTagFilters,
-        moodFilter: currentMoodFilters,
-    };
-
+    const requestKey = createFilteredBeatRequestKey(currentFilters);
 
     /*
-        This lets us know when the filters changed.
+     * Reuse an identical in-flight request. If the filters changed while
+     * another filtered request was running, wait for it and then start the
+     * request for the new filter combination.
+     */
+    if (activeFilteredFetchPromise) {
+        const currentPromise = activeFilteredFetchPromise;
+        const currentPromiseKey = activeFilteredFetchPromiseKey;
+        const result = await currentPromise;
 
-        When they change, page 1 needs to be fetched again instead
-        of continuing from the previous filter combination.
-    */
-    const requestKey = JSON.stringify({
-        artistFilter: [...currentArtistFilters].sort(),
-        beatTypeFilter: [...currentBeatTypeFilters].sort(),
-        tagFilter: [...currentTagFilters].sort(),
-        moodFilter: [...currentMoodFilters].sort(),
-    });
+        if (currentPromiseKey !== requestKey) {
+            return fetchBeatsWithFilters(pageToFetch);
+        }
 
+        return result;
+    }
 
     if (requestKey !== activeFilteredBeatRequestKey) {
         filteredBeatPagesFetched.set([]);
@@ -505,66 +613,101 @@ export async function fetchBeatsWithFilters(pageToFetch?: number) {
         activeFilteredBeatRequestKey = requestKey;
     }
 
-
-    if (get(allFilteredBeatPagesFetched)) return;
-
+    if (get(allFilteredBeatPagesFetched)) return [];
 
     const page = pageToFetch ?? getNextFilteredBeatPageToFetch();
-
     const pagesFetched = get(filteredBeatPagesFetched);
 
+    if (pagesFetched.includes(page)) return [];
 
-    if (pagesFetched.includes(page)) return;
+    isFetchingFilteredBeats.set(true);
+    fetchFilteredBeatsError.set(null);
 
-
-    try {
-        isFetchingFilteredBeats.set(true);
-        fetchFilteredBeatsError.set(null);
-
-
-        if (filteredBeatsErrorTimeout) {
-            clearTimeout(filteredBeatsErrorTimeout);
-            filteredBeatsErrorTimeout = null;
-        }
-
-
-        const response = await authorizedFetch(
-            `/secure/beats/get-filtered-beats/${page}`,
-            {
-                method: "POST",
-                body: JSON.stringify(postObj),
-            }
-        );
-
-
-        if (!Array.isArray(response.beats)) {
-            throw new Error("Invalid filtered beats response.");
-        }
-
-
-        response.beats.forEach((beat: Beat) => {
-            upsertBeat(beat);
-        });
-
-
-        filteredBeatPagesFetched.update((currentPages) => {
-            if (currentPages.includes(page)) {
-                return currentPages;
-            }
-
-
-            return [...currentPages, page].sort((a, b) => a - b);
-        });
-
-
-        if (response.hasMore === false) {
-            allFilteredBeatPagesFetched.set(true);
-        }
-    } catch (err: any) {
-        setFilteredBeatsError(
-            err.message || "Failed to fetch filtered beats."
-        );
-    } finally {
-        isFetchingFilteredBeats.set(false);
+    if (filteredBeatsErrorTimeout) {
+        clearTimeout(filteredBeatsErrorTimeout);
+        filteredBeatsErrorTimeout = null;
     }
+
+
+    activeFilteredFetchPromiseKey = requestKey;
+
+    activeFilteredFetchPromise = (async () => {
+        try {
+            const response = await authorizedFetch(
+                `/secure/beats/get-filtered-beats/${page}`,
+                {
+                    method: "POST",
+                    body: JSON.stringify(currentFilters),
+                }
+            );
+
+            if (!Array.isArray(response.beats)) {
+                throw new Error("Invalid filtered beats response.");
+            }
+
+            const newBeats: Beat[] = response.beats;
+
+            newBeats.forEach((beat) => {
+                upsertBeat(beat);
+            });
+
+            /*
+             * Only update this pagination state if the user is still using
+             * the same filter combination that started this request.
+             */
+            const latestRequestKey = createFilteredBeatRequestKey(
+                getCurrentBeatFilters()
+            );
+
+            if (latestRequestKey === requestKey) {
+                filteredBeatPagesFetched.update((currentPages) => {
+                    if (currentPages.includes(page)) {
+                        return currentPages;
+                    }
+
+                    return [...currentPages, page].sort(
+                        (a, b) => a - b
+                    );
+                });
+
+                if (
+                    newBeats.length === 0 ||
+                    response.hasMore === false
+                ) {
+                    allFilteredBeatPagesFetched.set(true);
+                }
+
+                const currentSelectedBeat = get(selectedBeat);
+                const currentFilteredBeats = get(filteredBeats);
+
+                if (
+                    !currentSelectedBeat &&
+                    currentFilteredBeats.length > 0
+                ) {
+                    selectNewBeat(currentFilteredBeats[0]);
+                }
+            }
+
+            return newBeats;
+        } catch (err: any) {
+            const latestRequestKey = createFilteredBeatRequestKey(
+                getCurrentBeatFilters()
+            );
+
+            if (latestRequestKey === requestKey) {
+                setFilteredBeatsError(
+                    err.message || "Failed to fetch filtered beats."
+                );
+            }
+
+            return [];
+        } finally {
+            isFetchingFilteredBeats.set(false);
+            activeFilteredFetchPromise = null;
+            activeFilteredFetchPromiseKey = null;
+        }
+    })();
+
+
+    return activeFilteredFetchPromise;
 }

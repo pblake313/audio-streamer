@@ -33,6 +33,8 @@
 
     let rangeInput: HTMLInputElement;
 
+    let isSeeking = false;
+
     /**
      * Tracks the audio element that currently has listeners attached.
      */
@@ -40,6 +42,11 @@
 
     $: waveformPlayedColor = "#f7f7f7";
     $: waveformBaseColor = "#f7f7f736";
+
+    $: showInitialLoader =
+        $audioPlayerState === "Loading" &&
+        duration <= 0 &&
+        !isSeeking;
 
     function updateAudioState() {
         if (!connectedAudio) {
@@ -49,18 +56,58 @@
             return;
         }
 
-        currentTime = Number.isFinite(connectedAudio.currentTime)
-            ? Math.floor(connectedAudio.currentTime)
-            : 0;
+        /*
+         * Do not allow timeupdate to fight the range input
+         * while the user is dragging.
+         */
+        if (!isSeeking) {
+            currentTime = Number.isFinite(
+                connectedAudio.currentTime,
+            )
+                ? connectedAudio.currentTime
+                : 0;
+        }
 
-        duration = Number.isFinite(connectedAudio.duration)
-            ? Math.floor(connectedAudio.duration)
-            : 0;
+        /*
+         * Do not wipe out a valid duration during a seek.
+         */
+        if (
+            Number.isFinite(connectedAudio.duration) &&
+            connectedAudio.duration > 0
+        ) {
+            duration = connectedAudio.duration;
+        }
 
         waveformUrl =
             connectedAudio.currentSrc ||
             connectedAudio.src ||
             "";
+    }
+
+    function handleLoadStart() {
+        if (!connectedAudio) return;
+
+        waveformUrl =
+            connectedAudio.currentSrc ||
+            connectedAudio.src ||
+            "";
+
+        /*
+         * A genuine new track load should reset the range.
+         * Seeking an existing track should not.
+         */
+        if (!isSeeking) {
+            currentTime = 0;
+            duration = 0;
+        }
+    }
+
+    function handleEmptied() {
+        if (isSeeking) return;
+
+        currentTime = 0;
+        duration = 0;
+        waveformUrl = "";
     }
 
     function disconnectAudio() {
@@ -83,12 +130,12 @@
 
         connectedAudio.removeEventListener(
             "loadstart",
-            updateAudioState,
+            handleLoadStart,
         );
 
         connectedAudio.removeEventListener(
             "emptied",
-            updateAudioState,
+            handleEmptied,
         );
 
         connectedAudio = null;
@@ -127,12 +174,12 @@
 
         connectedAudio.addEventListener(
             "loadstart",
-            updateAudioState,
+            handleLoadStart,
         );
 
         connectedAudio.addEventListener(
             "emptied",
-            updateAudioState,
+            handleEmptied,
         );
 
         updateAudioState();
@@ -144,16 +191,52 @@
      */
     $: connectAudio(audio);
 
-    function seek(event: Event) {
+    function startSeeking(event: PointerEvent) {
+        if (!connectedAudio || duration <= 0) return;
+
+        isSeeking = true;
+
         resetTrackTimer();
 
         const input = event.currentTarget as HTMLInputElement;
+
+        try {
+            input.setPointerCapture(event.pointerId);
+        } catch {
+            /*
+             * Pointer capture may already be handled by the browser.
+             */
+        }
+    }
+
+    function seek(event: Event) {
+        const input = event.currentTarget as HTMLInputElement;
         const nextTime = Number(input.value);
 
-        if (!audio || !Number.isFinite(nextTime)) return;
+        if (
+            !connectedAudio ||
+            !Number.isFinite(nextTime)
+        ) {
+            return;
+        }
 
-        audio.currentTime = nextTime;
-        currentTime = Math.floor(nextTime);
+        /*
+         * Move the thumb immediately.
+         */
+        currentTime = nextTime;
+
+        /*
+         * Move the actual audio position.
+         */
+        connectedAudio.currentTime = nextTime;
+    }
+
+    function finishSeeking() {
+        if (!isSeeking) return;
+
+        isSeeking = false;
+
+        updateAudioState();
     }
 
     $: {
@@ -186,6 +269,11 @@
     });
 </script>
 
+<svelte:window
+    on:pointerup={finishSeeking}
+    on:pointercancel={finishSeeking}
+/>
+
 {#if useWaveForm}
     {#if showTrackTime}
         <div class="timeFlex">
@@ -207,11 +295,14 @@
         class="wrapEntireRange"
         class:smallRange={!showTrackTime}
     >
-        {#if $audioPlayerState !== "Loading"}
+        <div class="contentWrapper">
+            <!--
+                This never gets removed from the DOM.
+                That is what keeps dragging functional.
+            -->
             <div
-                in:fade={{ duration: 150 }}
-                out:fade={{ duration: 150 }}
-                class="contentWrapper"
+                class="rangeContent"
+                class:rangeContentHidden={showInitialLoader}
             >
                 <div class="rangeWrapper">
                     <input
@@ -220,9 +311,12 @@
                         type="range"
                         min="0"
                         max={duration}
-                        step="1"
+                        step="0.01"
                         bind:value={currentTime}
+                        on:pointerdown={startSeeking}
                         on:input={seek}
+                        on:change={finishSeeking}
+                        on:blur={finishSeeking}
                         disabled={!audio || duration <= 0}
                     />
                 </div>
@@ -234,20 +328,22 @@
                     </div>
                 {/if}
             </div>
-        {:else}
-            <div
-                in:fade={{ duration: 150 }}
-                out:fade={{ duration: 150 }}
-                class="contentWrapper"
-            >
-                <div class="wrapLoaderJ">
-                    <AudioLoader
-                        height="7px"
-                        backgroundColor="transparent"
-                    />
+
+            {#if showInitialLoader}
+                <div
+                    in:fade={{ duration: 150 }}
+                    out:fade={{ duration: 150 }}
+                    class="loaderOverlay"
+                >
+                    <div class="wrapLoaderJ">
+                        <AudioLoader
+                            height="7px"
+                            backgroundColor="transparent"
+                        />
+                    </div>
                 </div>
-            </div>
-        {/if}
+            {/if}
+        </div>
     </div>
 {:else}
     <div
@@ -294,6 +390,30 @@
 
         width: 100%;
         height: 100%;
+    }
+
+    .rangeContent {
+        width: 100%;
+        height: 100%;
+    }
+
+    /*
+     * Hide it visually while loading, but do not destroy it.
+     */
+    .rangeContentHidden {
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .loaderOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        pointer-events: none;
     }
 
     .rangeWrapper {

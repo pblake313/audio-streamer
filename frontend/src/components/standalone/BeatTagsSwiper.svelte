@@ -7,6 +7,7 @@
     import {
         artistFilter,
         beatTypeFilter,
+        isFetchingFilteredBeats,
         moodFilter,
         tagFilter,
         toggleArtistFilter,
@@ -289,6 +290,7 @@
                 )}
                 padding={tagPadding}
                 fontSize={tagFontSize}
+                isDisabled={$isFetchingFilteredBeats}
             />
         {/if}
 
@@ -306,6 +308,8 @@
                 )}
                 padding={tagPadding}
                 fontSize={tagFontSize}
+                isDisabled={$isFetchingFilteredBeats}
+
             />
         {/if}
 
@@ -323,6 +327,8 @@
                 )}
                 padding={tagPadding}
                 fontSize={tagFontSize}
+                isDisabled={$isFetchingFilteredBeats}
+
             />
         {/if}
 
@@ -340,6 +346,8 @@
                 )}
                 padding={tagPadding}
                 fontSize={tagFontSize}
+                isDisabled={$isFetchingFilteredBeats}
+
             />
         {/if}
 

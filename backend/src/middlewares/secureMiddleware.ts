@@ -7,8 +7,6 @@ import { ForceLogoutError } from "../errors/ForceLogoutError";
 
 const secureMiddleWare = async (req: Request, res: Response, next: NextFunction) => {
 
-    console.log('hitting secure middleware.')
-
     const authHeader = req.header("Authorization");
     const bearerToken = authHeader?.startsWith("Bearer ")
         ? authHeader.split(" ")[1]

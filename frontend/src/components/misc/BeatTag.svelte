@@ -11,6 +11,8 @@
     export let padding: string = "3px 6px 2px 6px";
     export let mobilePadding: string | null = null;
 
+    export let isDisabled: boolean = false
+
     $: hasCustomTagColor = tagColor !== "#353535";
 </script>
 
@@ -19,6 +21,8 @@
     class="beatTagWrapper"
     class:beatTag_active={isActive}
     class:beatTag_customColor={hasCustomTagColor}
+    disabled={isDisabled}
+    
     style="
         --tag-color: {tagColor};
         --tag-text-color: {tagTextColor};

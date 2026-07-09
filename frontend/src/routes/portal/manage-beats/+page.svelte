@@ -42,53 +42,48 @@
     <title>Manage Tracks</title>
 </svelte:head>
 
-{#if !$fetchBeatsAttempted || ($isFetchingBeats && $beats.length <= 0)}
-    <Loader loaderStyle={"loader_full"} />
-{:else if $beatFetchError}
-    <PageHeading
-        title={"Fetch Beats Error"}
-        subtitle={$beatFetchError}
-        buttonText={"Retry"}
-        onButtonClick={() => {
-            fetchBeats();
-        }}
-    />
-{:else if $beats.length >= 1}
-
-
-    <div class="mbp_container">
-        <div class="mbp_topper">
-            <h2>Manage Tracks</h2>
-            <p class="mbp_subtitle">Edit your track items.</p>
-        </div>
-            
-        <div class="mbp_grid">
-            {#each $beats as beat, i}
-                <div class="wrapBeatChild">
-                    <ManageBeatListItem
-                        {beat}
-                    />
-                </div>
-            {/each}
-        </div>
-    </div>
-
-
-{#if !$allBeatPagesFetched}
-    <div class="mbp_fetchMore">
-
-        <BoxButton 
-            tightPad={true} 
-            buttonText={$isFetchingBeats ? null : 'Fetch More'} 
-            buttonIcon={$isFetchingBeats ? 'loading' : null}
-            isDisabled={$isFetchingBeats} 
-            on:click={() => {fetchBeats()}} 
+<div style="margin-bottom: 125px;">
+    {#if !$fetchBeatsAttempted || ($isFetchingBeats && $beats.length <= 0)}
+        <Loader loaderStyle={"loader_full"} />
+    {:else if $beatFetchError}
+        <PageHeading
+            title={"Fetch Beats Error"}
+            subtitle={$beatFetchError}
+            buttonText={"Retry"}
+            onButtonClick={() => {
+                fetchBeats();
+            }}
         />
+    {:else if $beats.length >= 1}
+        <div class="mbp_container">
+            <div class="mbp_topper">
+                <h2>Manage Tracks</h2>
+                <p class="mbp_subtitle">Edit your track items.</p>
+            </div>
 
-    </div>
-{/if}
+            <div class="mbp_grid">
+                {#each $beats as beat, i}
+                    <div class="wrapBeatChild">
+                        <ManageBeatListItem {beat} />
+                    </div>
+                {/each}
+            </div>
+        </div>
 
-
-{:else}
-    <AddTrackPointer />
-{/if}
+        {#if !$allBeatPagesFetched}
+            <div class="mbp_fetchMore">
+                <BoxButton
+                    tightPad={true}
+                    buttonText={$isFetchingBeats ? null : "Fetch More"}
+                    buttonIcon={$isFetchingBeats ? "loading" : null}
+                    isDisabled={$isFetchingBeats}
+                    on:click={() => {
+                        fetchBeats();
+                    }}
+                />
+            </div>
+        {/if}
+    {:else}
+        <AddTrackPointer />
+    {/if}
+</div>

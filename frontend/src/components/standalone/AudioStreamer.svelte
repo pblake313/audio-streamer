@@ -101,8 +101,8 @@
 
             <div class="streamInfoFlex">
                 <div class="trackInfoStream">
-                    <p>{$selectedBeat.beatTitle}</p>
-                    <p style="opacity: .5; font-size: 9pt">
+                    <p class="as_title">{$selectedBeat.beatTitle}</p>
+                    <p class="as_subtitle">
                         {$selectedBeat.bpm} BPM - {$selectedBeat.key} {$selectedBeat.mode}
                     </p>
                 </div>

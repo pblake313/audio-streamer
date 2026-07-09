@@ -3,8 +3,8 @@ import { accessToken } from "../../stores/tokenStore"
 import { user } from "../../stores/UserStore"
 import { authorizedFetch } from "../Fetchers/authorizedFetch"
 import { publicFetch } from "../Fetchers/publicFetch"
-import { stopTrack } from "../../stores/AudioPlayerStore"
-import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted } from "../../stores/AudioPlayer/BeatsStore"
+import { audioMode, stopTrack } from "../../stores/AudioPlayerStore"
+import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted, oneBeatFetchSuccessfull } from "../../stores/AudioPlayer/BeatsStore"
 import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore"
 import { goto } from "$app/navigation"
 
@@ -68,6 +68,10 @@ export async function logout() {
         fetchBeatsAttempted.set(false);
         beats.set([]);
         selectedBeat.set(null);
+        oneBeatFetchSuccessfull.set(false)
+
+        audioMode.set('streamer')
+
 
         await goto("/login", {
             replaceState: true,

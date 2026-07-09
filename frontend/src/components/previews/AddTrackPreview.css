@@ -129,3 +129,8 @@
     }
 
 }
+@media (max-width: 600px) {
+    .addTrackPreview_container{
+        padding: 0px 15px;
+    }
+}

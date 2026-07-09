@@ -140,7 +140,7 @@ export async function getFilteredBeatsByPage(
 
                     return {
                         ...beat,
-                        mp3Url: signedMp3Url,
+                        mp3Url: signedMp3Url, 
                     };
                 })
         );

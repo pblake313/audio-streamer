@@ -20,15 +20,19 @@
     import BpmInput from "../form-inputs/BpmInput.svelte";
     import ImageUploader from "../form-inputs/file-uploaders/ImageUploader.svelte";
     import Mp3Uploader from "../form-inputs/file-uploaders/Mp3Uploader.svelte";
-    import { createValidEditBeatFormObject, editBeatFormError, setEditBeatFormError } from "../../stores/EditBeatStore";
+    import {
+        createValidEditBeatFormObject,
+        editBeatFormError,
+        setEditBeatFormError,
+    } from "../../stores/EditBeatStore";
     import { upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import { goto } from "$app/navigation";
     import { pushNotification } from "../../stores/NotificationStore";
 
     export let beat: Beat;
 
-    let isUpdatingBeat: boolean = false
-    let formSubmitted: boolean = false
+    let isUpdatingBeat: boolean = false;
+    let formSubmitted: boolean = false;
 
     // files
     let newArtworkFile: File | null;
@@ -77,18 +81,14 @@
 
         const rect = errorElement.getBoundingClientRect();
 
-        const isOnScreen =
-            rect.bottom > 0 &&
-            rect.top < window.innerHeight;
+        const isOnScreen = rect.bottom > 0 && rect.top < window.innerHeight;
 
         if (isOnScreen) return;
 
         window.scrollTo({
             top: Math.max(
                 0,
-                window.scrollY +
-                    rect.top -
-                    window.innerHeight * 0.5,
+                window.scrollY + rect.top - window.innerHeight * 0.5,
             ),
             behavior: "smooth",
         });
@@ -96,18 +96,18 @@
 
     async function updateBeat() {
         try {
-            formSubmitted = true
+            formSubmitted = true;
 
-            if (isUpdatingBeat) return
+            if (isUpdatingBeat) return;
 
             // validate beat obj.
 
-            const validObj: FormData = createValidEditBeatFormObject(form)
+            const validObj: FormData = createValidEditBeatFormObject(form);
 
-            console.log(validObj)
+            console.log(validObj);
 
-            if (!artworkUrl && !newArtworkFile){
-                throw new Error('Please select an artwork file.')
+            if (!artworkUrl && !newArtworkFile) {
+                throw new Error("Please select an artwork file.");
             }
             if (newArtworkFile) {
                 validObj.append("newArtwork", newArtworkFile);
@@ -121,27 +121,34 @@
                 validObj.append("newMp3File", newMp3File);
             }
 
+            editBeatFormError.set(null);
+            isUpdatingBeat = true;
 
-            editBeatFormError.set(null)
-            isUpdatingBeat = true
+            const response = await authorizedFetch(
+                `/secure/beats/update-beat/${beat.id}`,
+                {
+                    method: "POST",
+                    body: validObj,
+                },
+            );
 
-            const response = await authorizedFetch(`/secure/beats/update-beat/${beat.id}`, {
-                method: "POST",
-                body: validObj,
-            });
-
-            upsertBeat(response.updatedBeat)
-            pushNotification('Beat updated successfully.', 'Success', false, 1700, "Updated!")
-            goto('/portal/manage-beats')
-
+            upsertBeat(response.updatedBeat);
+            pushNotification(
+                "Beat updated successfully.",
+                "Success",
+                false,
+                1700,
+                "Updated!",
+            );
+            goto("/portal/manage-beats");
         } catch (err: any) {
             console.log(err);
 
-            const errorMessage = err.message || 'An unknown error has occurred.'
-            setEditBeatFormError(errorMessage)
-
+            const errorMessage =
+                err.message || "An unknown error has occurred.";
+            setEditBeatFormError(errorMessage);
         } finally {
-            isUpdatingBeat = false
+            isUpdatingBeat = false;
         }
     }
 </script>
@@ -171,7 +178,9 @@
                         form.title = v;
                     }}
                     value={form.title}
-                    inputError={(formSubmitted && !form.title) ? "Missing Track Title" : null}
+                    inputError={formSubmitted && !form.title
+                        ? "Missing Track Title"
+                        : null}
                 />
             </div>
 
@@ -182,7 +191,9 @@
                             form.bpm = v;
                         }}
                         bpm={form.bpm}
-                        inputError={(formSubmitted && form.bpm <= 0) ? "Invalid BPM" : null}
+                        inputError={formSubmitted && form.bpm <= 0
+                            ? "Invalid BPM"
+                            : null}
                     />
                 </div>
 
@@ -194,8 +205,9 @@
                         selectedOption={form.mode}
                         label={"Mode"}
                         options={songModeOptions}
-                        inputError={(formSubmitted && !form.mode) ? "Missing Mode" : null}
-
+                        inputError={formSubmitted && !form.mode
+                            ? "Missing Mode"
+                            : null}
                     />
                 </div>
 
@@ -207,8 +219,9 @@
                         }}
                         options={songKeyOptions}
                         selectedOption={form.key}
-                        inputError={(formSubmitted && !form.key) ? "Missing Key" : null}
-
+                        inputError={formSubmitted && !form.key
+                            ? "Missing Key"
+                            : null}
                     />
                 </div>
             </div>
@@ -222,7 +235,6 @@
                         onSelect={(v) => {
                             form.tagOne = v;
                         }}
-
                     />
                 </div>
 
@@ -281,7 +293,9 @@
                         label={"Track Type"}
                         selectedOption={form.trackType}
                         options={trackTypeOptions}
-                        inputError={(formSubmitted && !form.trackType) ? "Missing Track Type" : null}
+                        inputError={formSubmitted && !form.trackType
+                            ? "Missing Track Type"
+                            : null}
                     />
                 </div>
             </div>
@@ -289,40 +303,45 @@
 
         <!-- RIGHT -->
         <div class="ebf_files">
-            <ImageUploader
-                label="Artwork"
-                imageUrl={artworkUrl}
-                fileName={artworkUrl}
-                fileUploaded={({ imageUrl: newUrl, file }) => {
-                    artworkUrl = newUrl;
-                    newArtworkFile = file;
-                }}
-                clearInput={() => {
-                    artworkUrl = null;
-                    newArtworkFile = null;
-                }}
-                inputError={(!artworkUrl && !newArtworkFile && formSubmitted) ? "Missing Artwork" : null}
-            />
+            <div class="ebf_uploder">
+                <ImageUploader
+                    label="Artwork"
+                    imageUrl={artworkUrl}
+                    fileName={artworkUrl}
+                    fileUploaded={({ imageUrl: newUrl, file }) => {
+                        artworkUrl = newUrl;
+                        newArtworkFile = file;
+                    }}
+                    clearInput={() => {
+                        artworkUrl = null;
+                        newArtworkFile = null;
+                    }}
+                    inputError={!artworkUrl && !newArtworkFile && formSubmitted
+                        ? "Missing Artwork"
+                        : null}
+                />
+            </div>
 
-            <Mp3Uploader
-                label="Audio File"
-                mp3Url={mp3Url}
-                fileName={mp3Url}
-                mp3Uploaded={({ mp3Url: newUrl, file }) => {
-                    mp3Url = newUrl;
-                    newMp3File = file;
-                }}
-                clearInput={() => {
-                    mp3Url = null;
-                    newMp3File = null;
-                }}
-                inputError={(!mp3Url && !newMp3File && formSubmitted) ? "Missing Audio File" : null}
-
-            />
+            <div class="ebf_uploder">
+                <Mp3Uploader
+                    label="Audio File"
+                    {mp3Url}
+                    fileName={mp3Url}
+                    mp3Uploaded={({ mp3Url: newUrl, file }) => {
+                        mp3Url = newUrl;
+                        newMp3File = file;
+                    }}
+                    clearInput={() => {
+                        mp3Url = null;
+                        newMp3File = null;
+                    }}
+                    inputError={!mp3Url && !newMp3File && formSubmitted
+                        ? "Missing Audio File"
+                        : null}
+                />
+            </div>
 
             <div class="ebf_submitButton">
-        
-
                 <BoxButton
                     buttonText={"Update Beat"}
                     fullWidth={true}
@@ -336,7 +355,6 @@
                         {$editBeatFormError}
                     </p>
                 {/if}
-
             </div>
         </div>
     </div>

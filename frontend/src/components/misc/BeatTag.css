@@ -298,7 +298,9 @@
 /* ========================================= */
 /* RESPONSIVE                                */
 /* ========================================= */
-
+.beatTagWrapper:disabled {
+    opacity: .5;
+}
 @media (max-width: 600px) {
     .tagText {
         padding: var(--tag-mobile-padding);
