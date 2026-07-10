@@ -1,6 +1,12 @@
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
+    import {
+        onDestroy,
+        onMount,
+        tick,
+    } from "svelte";
+
     import type { Beat } from "../../lib/types/Beats";
+
     import BeatTag from "../misc/BeatTag.svelte";
     import "./BeatTagsSwiper.css";
 
@@ -18,194 +24,224 @@
 
     export let beat: Beat;
 
-    export let tagPadding: string = "3px 6px 2px 6px";
-    export let tagFontSize: string = "10pt";
+    export let tagPadding = "3px 6px 2px 6px";
+    export let tagFontSize = "10pt";
 
-    type TagType = "mood" | "tag" | "custom" | 'beatType';
-    type GestureDirection = "horizontal" | "vertical" | null;
+    type TagType =
+        | "mood"
+        | "tag"
+        | "custom"
+        | "beatType";
 
     let scrollEl: HTMLDivElement;
-
-    let isDragging = false;
-    let isBlockingClicks = false;
+    let contentEl: HTMLDivElement;
 
     let canScrollLeft = false;
     let canScrollRight = false;
 
-    let activePointerId: number | null = null;
-    let activePointerType: string | null = null;
+    /*
+     * Mouse-only drag state.
+     *
+     * Touch input is intentionally left to the browser so Safari
+     * can use native horizontal scrolling and momentum.
+     */
+    let mouseIsDown = false;
+    let isDragging = false;
+    let isBlockingClicks = false;
 
-    let gestureDirection: GestureDirection = null;
+    let mouseStartX = 0;
+    let mouseStartScrollLeft = 0;
 
-    let startX = 0;
-    let startY = 0;
-    let startScrollLeft = 0;
+    let clickBlockTimeout: number | null = null;
+    let scrollAnimationFrame: number | null = null;
 
-    let clickBlockTimeout: ReturnType<typeof setTimeout>;
     let resizeObserver: ResizeObserver | null = null;
 
-    const DIRECTION_THRESHOLD = 6;
+    const MOUSE_DRAG_THRESHOLD = 5;
     const SCROLL_EDGE_TOLERANCE = 2;
+    const CLICK_BLOCK_DURATION = 140;
 
-    function updateScrollFades() {
-        if (!scrollEl) return;
+    function clearClickBlockTimeout() {
+        if (clickBlockTimeout === null) {
+            return;
+        }
 
-        const maxScrollLeft =
-            scrollEl.scrollWidth - scrollEl.clientWidth;
-
-        canScrollLeft =
-            scrollEl.scrollLeft > SCROLL_EDGE_TOLERANCE;
-
-        canScrollRight =
-            maxScrollLeft > SCROLL_EDGE_TOLERANCE &&
-            scrollEl.scrollLeft <
-                maxScrollLeft - SCROLL_EDGE_TOLERANCE;
+        window.clearTimeout(clickBlockTimeout);
+        clickBlockTimeout = null;
     }
 
-    function handlePointerDown(event: PointerEvent) {
+    function updateScrollFades() {
+        if (!scrollEl) {
+            return;
+        }
+
+        const maxScrollLeft = Math.max(
+            0,
+            scrollEl.scrollWidth -
+                scrollEl.clientWidth,
+        );
+
+        canScrollLeft =
+            scrollEl.scrollLeft >
+            SCROLL_EDGE_TOLERANCE;
+
+        canScrollRight =
+            maxScrollLeft >
+                SCROLL_EDGE_TOLERANCE &&
+            scrollEl.scrollLeft <
+                maxScrollLeft -
+                    SCROLL_EDGE_TOLERANCE;
+    }
+
+    /*
+     * Scroll events fire rapidly on touch devices.
+     *
+     * Throttle the reactive fade updates to one per animation
+     * frame instead of updating Svelte state on every event.
+     */
+    function scheduleScrollFadeUpdate() {
+        if (scrollAnimationFrame !== null) {
+            return;
+        }
+
+        scrollAnimationFrame =
+            window.requestAnimationFrame(() => {
+                scrollAnimationFrame = null;
+                updateScrollFades();
+            });
+    }
+
+    function handleMouseDown(event: MouseEvent) {
+        if (event.button !== 0) {
+            return;
+        }
+
+        clearClickBlockTimeout();
+
+        mouseIsDown = true;
+        isDragging = false;
+        isBlockingClicks = false;
+
+        mouseStartX = event.clientX;
+        mouseStartScrollLeft =
+            scrollEl.scrollLeft;
+
+        window.addEventListener(
+            "mousemove",
+            handleMouseMove,
+            {
+                passive: false,
+            },
+        );
+
+        window.addEventListener(
+            "mouseup",
+            handleMouseUp,
+            {
+                once: true,
+            },
+        );
+    }
+
+    function handleMouseMove(event: MouseEvent) {
+        if (!mouseIsDown) {
+            return;
+        }
+
+        /*
+         * Recover if mouseup occurred outside the browser window.
+         */
+        if ((event.buttons & 1) !== 1) {
+            finishMouseDrag();
+            return;
+        }
+
+        const distanceX =
+            event.clientX - mouseStartX;
+
         if (
-            event.pointerType === "mouse" &&
-            event.button !== 0
+            !isDragging &&
+            Math.abs(distanceX) <
+                MOUSE_DRAG_THRESHOLD
         ) {
             return;
         }
 
-        clearTimeout(clickBlockTimeout);
-
-        activePointerId = event.pointerId;
-        activePointerType = event.pointerType;
-
-        gestureDirection = null;
-
-        startX = event.clientX;
-        startY = event.clientY;
-        startScrollLeft = scrollEl.scrollLeft;
-
-        isDragging = false;
-        isBlockingClicks = false;
-
-        /*
-         * Do not capture the pointer here.
-         *
-         * Capturing immediately steals normal clicks from the BeatTag
-         * buttons. The pointer will only be captured after a horizontal
-         * drag has actually been detected.
-         */
-    }
-
-    function handlePointerMove(event: PointerEvent) {
-        if (event.pointerId !== activePointerId) {
-            return;
-        }
-
-        const distanceX = event.clientX - startX;
-        const distanceY = event.clientY - startY;
-
-        const absoluteX = Math.abs(distanceX);
-        const absoluteY = Math.abs(distanceY);
-
-        if (!gestureDirection) {
-            const hasPassedThreshold =
-                absoluteX > DIRECTION_THRESHOLD ||
-                absoluteY > DIRECTION_THRESHOLD;
-
-            if (!hasPassedThreshold) {
-                return;
-            }
-
-            gestureDirection =
-                absoluteX > absoluteY
-                    ? "horizontal"
-                    : "vertical";
-
-            /*
-             * Leave vertical gestures completely alone so the page can
-             * continue scrolling normally.
-             */
-            if (gestureDirection === "vertical") {
-                isDragging = false;
-                return;
-            }
-
+        if (!isDragging) {
             isDragging = true;
             isBlockingClicks = true;
-
-            /*
-             * Only capture after we know this is a real horizontal mouse
-             * drag. Normal button clicks never reach this point.
-             */
-            if (
-                activePointerType === "mouse" &&
-                !scrollEl.hasPointerCapture(event.pointerId)
-            ) {
-                scrollEl.setPointerCapture(event.pointerId);
-            }
         }
 
-        if (gestureDirection === "vertical") {
-            return;
-        }
-
-        isDragging = true;
-        isBlockingClicks = true;
-
-        if (event.cancelable) {
-            event.preventDefault();
-        }
-
-        event.stopPropagation();
+        event.preventDefault();
 
         scrollEl.scrollLeft =
-            startScrollLeft - distanceX;
+            mouseStartScrollLeft - distanceX;
 
-        updateScrollFades();
+        scheduleScrollFadeUpdate();
     }
 
-    function handlePointerEnd(event: PointerEvent) {
-        if (event.pointerId !== activePointerId) {
-            return;
-        }
+    function handleMouseUp() {
+        finishMouseDrag();
+    }
 
-        if (scrollEl.hasPointerCapture(event.pointerId)) {
-            scrollEl.releasePointerCapture(event.pointerId);
-        }
+    function finishMouseDrag() {
+        const userDragged = isDragging;
 
-        const shouldKeepBlockingClick =
-            gestureDirection === "horizontal" &&
-            isBlockingClicks;
+        window.removeEventListener(
+            "mousemove",
+            handleMouseMove,
+        );
 
+        window.removeEventListener(
+            "mouseup",
+            handleMouseUp,
+        );
+
+        mouseIsDown = false;
         isDragging = false;
 
-        activePointerId = null;
-        activePointerType = null;
-        gestureDirection = null;
+        clearClickBlockTimeout();
 
-        clearTimeout(clickBlockTimeout);
-
-        if (shouldKeepBlockingClick) {
+        if (userDragged) {
             /*
-             * Keep blocking briefly because browsers often fire a click
-             * immediately after pointerup.
+             * A click is commonly fired immediately after mouseup.
+             * Keep blocking briefly to prevent accidental filters.
              */
-            clickBlockTimeout = setTimeout(() => {
-                isBlockingClicks = false;
-            }, 180);
+            clickBlockTimeout = window.setTimeout(
+                () => {
+                    isBlockingClicks = false;
+                    clickBlockTimeout = null;
+                },
+                CLICK_BLOCK_DURATION,
+            );
         } else {
             isBlockingClicks = false;
         }
 
-        updateScrollFades();
+        scheduleScrollFadeUpdate();
+    }
+
+    function handleDragStart(event: DragEvent) {
+        /*
+         * Prevent images or text inside a BeatTag from starting
+         * the browser's native desktop drag operation.
+         */
+        event.preventDefault();
     }
 
     function handleTagClick(
-        event: MouseEvent,
+        event: Event,
         tag: string | null | undefined,
         tagType: TagType,
     ) {
         event.preventDefault();
         event.stopPropagation();
 
-        if (isBlockingClicks || !tag) {
+        if (
+            isBlockingClicks ||
+            !tag ||
+            $isFetchingFilteredBeats
+        ) {
             return;
         }
 
@@ -216,45 +252,76 @@
         tag: string,
         tagType: TagType,
     ) {
-        if (tagType === "mood") {
-            toggleMoodFilter(tag);
-            return;
-        }
+        switch (tagType) {
+            case "mood":
+                toggleMoodFilter(tag);
+                break;
 
-        if (tagType === "tag") {
-            toggleArtistFilter(tag);
-            return;
-        }
+            case "tag":
+                toggleArtistFilter(tag);
+                break;
 
-        if (tagType === 'beatType'){
-            toggleBeatTypeFilter(tag)
-            return
-        }
+            case "beatType":
+                toggleBeatTypeFilter(tag);
+                break;
 
-        toggleTagFilter(tag);
+            case "custom":
+                toggleTagFilter(tag);
+                break;
+        }
     }
 
-    onMount(() => {
+    onMount(async () => {
+        await tick();
+
         updateScrollFades();
 
+        /*
+         * Observe the visible scroll container and one inner
+         * content element instead of every individual BeatTag.
+         */
         resizeObserver = new ResizeObserver(() => {
-            updateScrollFades();
+            scheduleScrollFadeUpdate();
         });
 
         resizeObserver.observe(scrollEl);
+        resizeObserver.observe(contentEl);
 
-        for (const child of Array.from(scrollEl.children)) {
-            resizeObserver.observe(child);
-        }
+        /*
+         * Custom fonts can change the total content width after
+         * the component initially renders.
+         */
+        document.fonts?.ready
+            .then(() => {
+                scheduleScrollFadeUpdate();
+            })
+            .catch(() => {
+                // Font readiness is non-critical.
+            });
 
-        requestAnimationFrame(() => {
-            updateScrollFades();
-        });
+        scheduleScrollFadeUpdate();
     });
 
     onDestroy(() => {
-        clearTimeout(clickBlockTimeout);
+        window.removeEventListener(
+            "mousemove",
+            handleMouseMove,
+        );
+
+        window.removeEventListener(
+            "mouseup",
+            handleMouseUp,
+        );
+
+        clearClickBlockTimeout();
+
         resizeObserver?.disconnect();
+
+        if (scrollAnimationFrame !== null) {
+            window.cancelAnimationFrame(
+                scrollAnimationFrame,
+            );
+        }
     });
 </script>
 
@@ -268,105 +335,109 @@
         class="bts_container"
         class:isDragging
         class:isBlockingClicks
-        on:scroll={updateScrollFades}
-        on:pointerdown={handlePointerDown}
-        on:pointermove={handlePointerMove}
-        on:pointerup={handlePointerEnd}
-        on:pointercancel={handlePointerEnd}
+        role="group"
+        aria-label="Track filters"
+        on:scroll|passive={scheduleScrollFadeUpdate}
+        on:mousedown={handleMouseDown}
+        on:dragstart={handleDragStart}
     >
-        {#if beat.customTag}
-            <BeatTag
-                tagColor={`#${beat.customTagColor || "f7f7f7"}`}
-                tagText={beat.customTag}
-                tagTextColor="#222222"
-                on:click={(event) =>
-                    handleTagClick(
-                        event,
+        <div
+            bind:this={contentEl}
+            class="bts_content"
+        >
+            {#if beat.customTag}
+                <BeatTag
+                    tagColor={`#${beat.customTagColor || "f7f7f7"}`}
+                    tagText={beat.customTag}
+                    tagTextColor="#222222"
+                    isActive={$tagFilter.includes(
                         beat.customTag,
-                        "custom",
                     )}
-                isActive={$tagFilter.includes(
-                    beat.customTag,
-                )}
-                padding={tagPadding}
-                fontSize={tagFontSize}
-                isDisabled={$isFetchingFilteredBeats}
-            />
-        {/if}
+                    padding={tagPadding}
+                    fontSize={tagFontSize}
+                    isDisabled={$isFetchingFilteredBeats}
+                    on:click={(event) =>
+                        handleTagClick(
+                            event,
+                            beat.customTag,
+                            "custom",
+                        )}
+                />
+            {/if}
 
-        {#if beat.tagOne}
-            <BeatTag
-                tagText={beat.tagOne}
-                on:click={(event) =>
-                    handleTagClick(
-                        event,
+            {#if beat.tagOne}
+                <BeatTag
+                    tagText={beat.tagOne}
+                    isActive={$artistFilter.includes(
                         beat.tagOne,
-                        "tag",
                     )}
-                isActive={$artistFilter.includes(
-                    beat.tagOne,
-                )}
-                padding={tagPadding}
-                fontSize={tagFontSize}
-                isDisabled={$isFetchingFilteredBeats}
+                    padding={tagPadding}
+                    fontSize={tagFontSize}
+                    isDisabled={$isFetchingFilteredBeats}
+                    on:click={(event) =>
+                        handleTagClick(
+                            event,
+                            beat.tagOne,
+                            "tag",
+                        )}
+                />
+            {/if}
 
-            />
-        {/if}
-
-        {#if beat.tagTwo}
-            <BeatTag
-                tagText={beat.tagTwo}
-                on:click={(event) =>
-                    handleTagClick(
-                        event,
+            {#if beat.tagTwo}
+                <BeatTag
+                    tagText={beat.tagTwo}
+                    isActive={$artistFilter.includes(
                         beat.tagTwo,
-                        "tag",
                     )}
-                isActive={$artistFilter.includes(
-                    beat.tagTwo,
-                )}
-                padding={tagPadding}
-                fontSize={tagFontSize}
-                isDisabled={$isFetchingFilteredBeats}
+                    padding={tagPadding}
+                    fontSize={tagFontSize}
+                    isDisabled={$isFetchingFilteredBeats}
+                    on:click={(event) =>
+                        handleTagClick(
+                            event,
+                            beat.tagTwo,
+                            "tag",
+                        )}
+                />
+            {/if}
 
-            />
-        {/if}
-
-        {#if beat.mood}
-            <BeatTag
-                tagText={beat.mood}
-                on:click={(event) =>
-                    handleTagClick(
-                        event,
+            {#if beat.mood}
+                <BeatTag
+                    tagText={beat.mood}
+                    isActive={$moodFilter.includes(
                         beat.mood,
-                        "mood",
                     )}
-                isActive={$moodFilter.includes(
-                    beat.mood,
-                )}
-                padding={tagPadding}
-                fontSize={tagFontSize}
-                isDisabled={$isFetchingFilteredBeats}
+                    padding={tagPadding}
+                    fontSize={tagFontSize}
+                    isDisabled={$isFetchingFilteredBeats}
+                    on:click={(event) =>
+                        handleTagClick(
+                            event,
+                            beat.mood,
+                            "mood",
+                        )}
+                />
+            {/if}
 
-            />
-        {/if}
-
-        {#if beat.trackType === "Reference"}
-            <BeatTag
-                tagColor="#4abdff"
-                tagText="Reference"
-                tagTextColor="#222222"
-                padding={tagPadding}
-                fontSize={tagFontSize}
-                isActive={$beatTypeFilter.includes(beat.trackType)}
-                on:click={(event) => {
-                    handleTagClick(
-                        event,
+            {#if beat.trackType === "Reference"}
+                <BeatTag
+                    tagColor="#4abdff"
+                    tagText="Reference"
+                    tagTextColor="#222222"
+                    isActive={$beatTypeFilter.includes(
                         beat.trackType,
-                        'beatType'
-                    )
-                }}
-            />
-        {/if}
+                    )}
+                    padding={tagPadding}
+                    fontSize={tagFontSize}
+                    isDisabled={$isFetchingFilteredBeats}
+                    on:click={(event) =>
+                        handleTagClick(
+                            event,
+                            beat.trackType,
+                            "beatType",
+                        )}
+                />
+            {/if}
+        </div>
     </div>
 </div>

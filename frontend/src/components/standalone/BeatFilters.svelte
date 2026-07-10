@@ -14,19 +14,12 @@
         clearMoodFilter,
         clearTagFilter,
         fetchBeatsWithFilters,
-        fetchFilteredBeatsError,
-        filteredBeats,
         moodFilter,
         tagFilter,
     } from "../../stores/AudioPlayer/BeatsStore";
 
     import CloseIcon from "../Icons/svg/CloseIcon.svelte";
     import "./BeatFilters.css";
-
-    type GestureDirection =
-        | "horizontal"
-        | "vertical"
-        | null;
 
     let scrollEl: HTMLDivElement;
 
@@ -37,18 +30,16 @@
     let canScrollRight = false;
 
     let activePointerId: number | null = null;
-    let activePointerType: string | null = null;
-
-    let gestureDirection: GestureDirection = null;
 
     let startX = 0;
-    let startY = 0;
     let startScrollLeft = 0;
 
-    let clickBlockTimeout: ReturnType<typeof setTimeout>;
+    let clickBlockTimeout: number | null = null;
+    let fadeAnimationFrame: number | null = null;
+
     let resizeObserver: ResizeObserver | null = null;
 
-    const DIRECTION_THRESHOLD = 6;
+    const DRAG_THRESHOLD = 5;
     const SCROLL_EDGE_TOLERANCE = 2;
 
     $: activeFilterCount = [
@@ -58,8 +49,22 @@
         $beatTypeFilter.length > 0,
     ].filter(Boolean).length;
 
+    /*
+     * Fetch whenever at least one filter is active.
+     */
+    $: if (
+        $moodFilter.length >= 1 ||
+        $tagFilter.length >= 1 ||
+        $artistFilter.length >= 1 ||
+        $beatTypeFilter.length >= 1
+    ) {
+        fetchBeatsWithFilters();
+    }
+
     function updateScrollFades() {
-        if (!scrollEl) return;
+        if (!scrollEl) {
+            return;
+        }
 
         const maxScrollLeft =
             scrollEl.scrollWidth - scrollEl.clientWidth;
@@ -73,87 +78,75 @@
                 maxScrollLeft - SCROLL_EDGE_TOLERANCE;
     }
 
+    /*
+     * Prevent the scroll event from causing multiple
+     * Svelte updates during the same animation frame.
+     */
+    function scheduleScrollFadeUpdate() {
+        if (fadeAnimationFrame !== null) {
+            return;
+        }
+
+        fadeAnimationFrame = requestAnimationFrame(() => {
+            fadeAnimationFrame = null;
+            updateScrollFades();
+        });
+    }
+
+    /*
+     * Touch devices use native browser scrolling.
+     * Custom dragging is only enabled for a mouse.
+     */
     function handlePointerDown(event: PointerEvent) {
         if (
-            event.pointerType === "mouse" &&
+            event.pointerType !== "mouse" ||
             event.button !== 0
         ) {
             return;
         }
 
-        clearTimeout(clickBlockTimeout);
+        if (clickBlockTimeout !== null) {
+            window.clearTimeout(clickBlockTimeout);
+            clickBlockTimeout = null;
+        }
 
         activePointerId = event.pointerId;
-        activePointerType = event.pointerType;
-
-        gestureDirection = null;
 
         startX = event.clientX;
-        startY = event.clientY;
         startScrollLeft = scrollEl.scrollLeft;
 
         isDragging = false;
         isBlockingClicks = false;
+
+        scrollEl.setPointerCapture(event.pointerId);
     }
 
     function handlePointerMove(event: PointerEvent) {
-        if (event.pointerId !== activePointerId) {
+        if (
+            event.pointerType !== "mouse" ||
+            event.pointerId !== activePointerId
+        ) {
             return;
         }
 
         const distanceX = event.clientX - startX;
-        const distanceY = event.clientY - startY;
 
-        const absoluteX = Math.abs(distanceX);
-        const absoluteY = Math.abs(distanceY);
-
-        if (!gestureDirection) {
-            const hasPassedThreshold =
-                absoluteX > DIRECTION_THRESHOLD ||
-                absoluteY > DIRECTION_THRESHOLD;
-
-            if (!hasPassedThreshold) {
-                return;
-            }
-
-            gestureDirection =
-                absoluteX > absoluteY
-                    ? "horizontal"
-                    : "vertical";
-
-            if (gestureDirection === "vertical") {
-                isDragging = false;
-                return;
-            }
-
-            isDragging = true;
-            isBlockingClicks = true;
-
-            if (
-                activePointerType === "mouse" &&
-                !scrollEl.hasPointerCapture(event.pointerId)
-            ) {
-                scrollEl.setPointerCapture(event.pointerId);
-            }
-        }
-
-        if (gestureDirection === "vertical") {
+        if (
+            !isDragging &&
+            Math.abs(distanceX) < DRAG_THRESHOLD
+        ) {
             return;
         }
 
         isDragging = true;
         isBlockingClicks = true;
 
-        if (event.cancelable) {
-            event.preventDefault();
-        }
-
-        event.stopPropagation();
+        event.preventDefault();
 
         scrollEl.scrollLeft =
             startScrollLeft - distanceX;
 
-        updateScrollFades();
+        scheduleScrollFadeUpdate();
     }
 
     function handlePointerEnd(event: PointerEvent) {
@@ -161,74 +154,70 @@
             return;
         }
 
+        const dragged = isDragging;
+
         if (scrollEl.hasPointerCapture(event.pointerId)) {
             scrollEl.releasePointerCapture(event.pointerId);
         }
 
-        const shouldKeepBlockingClick =
-            gestureDirection === "horizontal" &&
-            isBlockingClicks;
-
+        activePointerId = null;
         isDragging = false;
 
-        activePointerId = null;
-        activePointerType = null;
-        gestureDirection = null;
-
-        clearTimeout(clickBlockTimeout);
-
-        if (shouldKeepBlockingClick) {
-            clickBlockTimeout = setTimeout(() => {
-                isBlockingClicks = false;
-            }, 180);
-        } else {
-            isBlockingClicks = false;
+        if (clickBlockTimeout !== null) {
+            window.clearTimeout(clickBlockTimeout);
         }
 
-        updateScrollFades();
+        if (dragged) {
+            clickBlockTimeout = window.setTimeout(() => {
+                isBlockingClicks = false;
+                clickBlockTimeout = null;
+            }, 100);
+        } else {
+            isBlockingClicks = false;
+            clickBlockTimeout = null;
+        }
+
+        scheduleScrollFadeUpdate();
     }
 
     function handleFilterClick(
         event: MouseEvent,
         clearFilter: () => void,
     ) {
-        event.preventDefault();
-        event.stopPropagation();
-
         if (isBlockingClicks) {
+            event.preventDefault();
+            event.stopPropagation();
             return;
         }
 
         clearFilter();
     }
 
-
-    $: if ($moodFilter.length >= 1 || $tagFilter.length >= 1 || $artistFilter.length >= 1 || $beatTypeFilter.length >= 1) {
-        fetchBeatsWithFilters()
-    }
-
     onMount(() => {
         updateScrollFades();
 
         resizeObserver = new ResizeObserver(() => {
-            updateScrollFades();
+            scheduleScrollFadeUpdate();
         });
 
         resizeObserver.observe(scrollEl);
 
-        requestAnimationFrame(() => {
-            updateScrollFades();
-        });
+        scheduleScrollFadeUpdate();
     });
 
     afterUpdate(() => {
-        requestAnimationFrame(() => {
-            updateScrollFades();
-        });
+        scheduleScrollFadeUpdate();
     });
 
     onDestroy(() => {
-        clearTimeout(clickBlockTimeout);
+        if (clickBlockTimeout !== null) {
+            window.clearTimeout(clickBlockTimeout);
+        }
+
+        if (fadeAnimationFrame !== null) {
+            cancelAnimationFrame(fadeAnimationFrame);
+        }
+
         resizeObserver?.disconnect();
     });
 </script>
@@ -238,12 +227,15 @@
     class:canScrollLeft
     class:canScrollRight
 >
+    <!--
+        svelte-ignore a11y_no_static_element_interactions
+    -->
     <div
         bind:this={scrollEl}
         class="beatFilters_flex"
         class:isDragging
         class:isBlockingClicks
-        on:scroll={updateScrollFades}
+        on:scroll={scheduleScrollFadeUpdate}
         on:pointerdown={handlePointerDown}
         on:pointermove={handlePointerMove}
         on:pointerup={handlePointerEnd}
@@ -259,15 +251,15 @@
                         clearMoodFilter,
                     )}
             >
-                <div class="beatFilter_iconContainer">
-                    <div class="beatFilter_icon">
+                <span class="beatFilter_iconContainer">
+                    <span class="beatFilter_icon">
                         <CloseIcon height="16px" />
-                    </div>
-                </div>
+                    </span>
+                </span>
 
-                <p class="beatFilter_text">
+                <span class="beatFilter_text">
                     {$moodFilter.join(", ")}
-                </p>
+                </span>
             </button>
         {/if}
 
@@ -281,15 +273,15 @@
                         clearTagFilter,
                     )}
             >
-                <div class="beatFilter_iconContainer">
-                    <div class="beatFilter_icon">
+                <span class="beatFilter_iconContainer">
+                    <span class="beatFilter_icon">
                         <CloseIcon height="16px" />
-                    </div>
-                </div>
+                    </span>
+                </span>
 
-                <p class="beatFilter_text">
+                <span class="beatFilter_text">
                     {$tagFilter.join(", ")}
-                </p>
+                </span>
             </button>
         {/if}
 
@@ -303,15 +295,15 @@
                         clearArtistFilter,
                     )}
             >
-                <div class="beatFilter_iconContainer">
-                    <div class="beatFilter_icon">
+                <span class="beatFilter_iconContainer">
+                    <span class="beatFilter_icon">
                         <CloseIcon height="16px" />
-                    </div>
-                </div>
+                    </span>
+                </span>
 
-                <p class="beatFilter_text">
+                <span class="beatFilter_text">
                     {$artistFilter.join(", ")}
-                </p>
+                </span>
             </button>
         {/if}
 
@@ -325,39 +317,41 @@
                         clearBeatTypeFilter,
                     )}
             >
-                <div class="beatFilter_iconContainer">
-                    <div class="beatFilter_icon">
+                <span class="beatFilter_iconContainer">
+                    <span class="beatFilter_icon">
                         <CloseIcon height="16px" />
-                    </div>
-                </div>
+                    </span>
+                </span>
 
-                <p class="beatFilter_text">
+                <span class="beatFilter_text">
                     {$beatTypeFilter.join(", ")}
-                </p>
+                </span>
             </button>
         {/if}
 
         {#if activeFilterCount >= 2}
             <button
                 type="button"
-                class="beatFilters_button beatFilters_lastButton"
+                class="
+                    beatFilters_button
+                    beatFilters_lastButton
+                "
                 on:click={(event) =>
                     handleFilterClick(
                         event,
                         clearAllFilters,
                     )}
             >
-                <div class="beatFilter_iconContainer">
-                    <div class="beatFilter_icon">
+                <span class="beatFilter_iconContainer">
+                    <span class="beatFilter_icon">
                         <CloseIcon height="16px" />
-                    </div>
-                </div>
+                    </span>
+                </span>
 
-                <p class="beatFilter_text">
+                <span class="beatFilter_text">
                     Clear All Filters
-                </p>
+                </span>
             </button>
         {/if}
     </div>
 </div>
-
