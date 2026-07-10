@@ -6,7 +6,7 @@
     const year = new Date().getFullYear();
 </script>
 
-<div class="footer_container" class:footer_padForPlayer={$showAudioPlayer}>
+<div class="footer_container" >
     <div class="footer_insideContainer">
         <p class="footer_eyebrow">A project by</p>
         <a href="https://www.pattsway.com" class="footer_containLogo">
@@ -16,6 +16,8 @@
     </div>
 </div>
 
-<p style="text-align: center; opacity: .3; font-size: 10pt; padding-bottom: 5px;">
+<p style="text-align: center; opacity: .3; font-size: 10pt; padding-bottom: 5px;" >
     All Rights Reserved | Copyright © {year} PATTSWAY
 </p>
+
+<div class:footer_padForPlayer={$showAudioPlayer}></div>

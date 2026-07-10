@@ -5,7 +5,7 @@
     import "./ProjectDetails.css";
 
 
-    let slideType: "mobile" | "desktop" = "desktop";
+    let slideType: "mobile" | "desktop" = "mobile";
 </script>
 
 
