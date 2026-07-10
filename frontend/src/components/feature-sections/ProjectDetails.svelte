@@ -5,7 +5,7 @@
     import "./ProjectDetails.css";
 
 
-    let slideType: "mobile" | "desktop" = "mobile";
+    let slideType: "mobile" | "desktop" = "desktop";
 </script>
 
 
@@ -51,14 +51,17 @@
             />
         </div>
 
-        <div class="projectDetails_swiperSection">
+ 
+    </div>
+
+           <div class="projectDetails_swiperSection">
             {#if slideType === "desktop"}
                 <DesktopScreenshotSwiper />
             {:else}
                 <MobileScreenshotSwiper />
             {/if}
         </div>
-    </div>
+
 
     <!-- features -->
     <div class="projectDetails_section" id="features">

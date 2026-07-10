@@ -1,15 +1,18 @@
 .mobileScreenshotMegaContainer {
-    padding: 0 25px;
     margin-top: 15px;
-}
-
-.mobileScreenshotWrapper {
-    width: 100%;
-    max-width: 1250px;
-    margin: auto;
     overflow: hidden;
 }
 
+.mobileScreenshotWrapper {
+    max-width: 1250px;
+    margin: auto;
+    overflow: hidden;
+    padding: 0px 25px;
+}
+
+.mobileScreenshotMegaWrap{
+    overflow-x: hidden;
+}
 /* THUMBNAIL PICKER */
 
 .mobileScreenshotPicker {
@@ -174,6 +177,12 @@
     .mobileScreenshotWrapper {
         padding: 0 25px;
     }
+    .mobileScreenshotWrapper{
+        overflow: visible;
+    }
+    .mobileScreenshotMegaWrap{
+        overflow: visible;
+    }
 }
 
 @media (max-width: 800px) {
@@ -185,6 +194,7 @@
 @media (max-width: 600px) {
     .mobileScreenshotWrapper {
         padding: 0 15px;
+        width: calc(100% - 30px);
     }
 
     .mobileScreenshotLocation {

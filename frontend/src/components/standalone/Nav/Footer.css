@@ -40,6 +40,11 @@
 .footer_padForPlayer{
     padding-bottom: 100px;
 }
+@media (max-width: 600px) {
+    .footer_insideContainer{
+        padding: 0px 15px;
+    }
+}
 @media (pointer: coarse) {
     .footer_containLogo{
         opacity: 1;

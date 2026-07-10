@@ -4,6 +4,7 @@
         padding: 0px 25px;
         margin: auto;
         padding-top: 100px;
+
     }
     .projectDetails_swiperMegaContainer{
         padding-top: 100px;
@@ -85,6 +86,9 @@ a.projectDetails_li_starter {
     .projectDetails_section{
         padding: 0px 15px;
         padding-top: 75px;
+    }
+    .projectDetails_photoFlex {
+        padding: 0px 15px;
     }
     
 }

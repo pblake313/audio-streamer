@@ -66,12 +66,12 @@
                     slidesPerView: 5,
                 },
 
-                1200: {
+                1300: {
                     slidesPerView: 5,
                 },
 
                 900: {
-                    slidesPerView: 5,
+                    slidesPerView: 4.5,
                 },
 
                 600: {
@@ -83,7 +83,7 @@
                 },
 
                 0: {
-                    slidesPerView: 1.5,
+                    slidesPerView: 1.4,
                 },
             },
 

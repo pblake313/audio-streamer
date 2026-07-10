@@ -1,6 +1,7 @@
 .dss_megaContainer {
     padding: 0 25px;
     margin-top: 15px;
+    overflow: hidden;
 }
 
 .dss_container {
@@ -167,13 +168,15 @@
 /* RESPONSIVE */
 
 @media (max-width: 1300px) {
-    .dss_megaContainer {
-        padding: 0;
+    .dss_container{
+        padding: 0px 25px;
+        width: calc(100% - 50px);
+    }
+    .dss_megaContainer{
+        padding: 0px;
     }
 
-    .dss_container {
-        padding: 0 25px;
-    }
+
 }
 
 @media (max-width: 800px) {
