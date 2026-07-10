@@ -40,6 +40,7 @@
         color: var(--font-color-heading);
 
     }
+    
 </style>
 
 <div class="gitHubLinkWrapper" class:stickyLink={stickyLink}>

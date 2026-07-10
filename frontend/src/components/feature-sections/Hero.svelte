@@ -5,9 +5,8 @@
 
     import BoxButton from "../buttons/BoxButton.svelte";
     import GitHubLink from "../links/GitHubLink.svelte";
-    import "./Hero.css";
-    import GlassSurface from "../UI/GlassSurface.svelte";
     import { user } from "../../stores/UserStore";
+    import "./Hero.css";
 
     let showVideo = false;
 
@@ -22,12 +21,10 @@
             class="hero_insideContainer"
             in:fade={{ duration: 700, delay: 150 }}
         >
-            <h1>Secure audio streaming for unreleased music.</h1>
+            <h1 class="hero_title">Your music. In one private workspace.</h1>
 
             <p class="hero_subtext">
-                A private SvelteKit and Node.js audio vault built for protected
-                playback, token-secured streaming, and locked-down access to
-                unreleased tracks.
+                A secure music streaming platform that allows producers and musicians to organize, review, compare, and test their mixes from anywhere.
             </p>
 
             <div class="hero_buttonContainer">

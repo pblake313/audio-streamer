@@ -166,7 +166,7 @@
             class="pinHelpWrap"
             aria-hidden={isLoading || !!pinErrorMessage}
         >
-            <a href="/" class="pinForm_idk">Where is my code?</a>
+            <a href="/#wheres-my-pin" class="pinForm_idk">Where is my code?</a>
         </div>
     </div>
 </div>

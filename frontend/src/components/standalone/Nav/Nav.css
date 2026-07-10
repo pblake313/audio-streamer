@@ -38,7 +38,9 @@
     background-color: #222;
     border-bottom: var(--border-light);
 }
-
+.nav_scrolledMobileNav{
+    border-bottom: 1px solid #222;
+}
 .nav_mobileToggle {
     display: none;
 }

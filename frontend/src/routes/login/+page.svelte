@@ -25,7 +25,7 @@
         
     {#if showVideo}
         
-        <div class="loginPage_glass" in:fade={{duration: 500, delay: 350}}>
+        <div class="loginPage_glass" >
             <GlassSurface>
                 <div class="loginPage_wrapForm">
                     <h2 style="margin-bottom: 25px;">Login</h2>

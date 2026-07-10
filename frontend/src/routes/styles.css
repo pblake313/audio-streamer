@@ -24,6 +24,7 @@ html {
     padding: 0px;
     margin: 0px;
     color: rgba(255, 255, 255, 0.11);
+    scroll-behavior: smooth;
 }
 
 body {
@@ -110,15 +111,19 @@ button {
 
     /* Removes highlight on mobile */
 }
-
+ul {
+    margin: 0px;
+    margin-left: 10px;
+    padding: 0px;
+    display: block;
+}
 li {
-    color: #323232;
+    color: var(--font-color-light);
     font-family: var(--font-sans);
     line-height: 1.7em;
     padding: 0px;
     margin: 0px;
-    font-size: 11pt;
-    opacity: .8;
+    font-weight: 450;
 }
 
 .inBagButton {
@@ -154,6 +159,7 @@ li {
     display: flex;
     justify-content: space-between;
 }
+
 
 @keyframes golefthard {
     0% {
