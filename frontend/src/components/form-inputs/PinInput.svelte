@@ -119,7 +119,6 @@
 
         color: #fff;
         text-align: center;
-        font-family: inherit;
         font-size: clamp(1.2rem, 4vw, 1.8rem);
         font-weight: 600;
         line-height: 1;
@@ -133,6 +132,9 @@
         transition:
             border-color 0.2s ease,
             box-shadow 0.2s ease;
+
+    font-family: var(--font-sans);
+
     }
 
     .pin-box:hover {

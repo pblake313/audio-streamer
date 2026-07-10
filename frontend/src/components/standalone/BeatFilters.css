@@ -6,25 +6,38 @@
     --beat-filters-fade-color: #222222;
 
     position: relative;
+    isolation: isolate;
 
     width: 100%;
     max-width: 100%;
     min-width: 0;
 
     overflow: hidden;
-    isolation: isolate;
 }
 
-/* Left fade */
-.beatFilters_wrapper::before {
+/* ========================================= */
+/* EDGE FADES                                */
+/* ========================================= */
+
+.beatFilters_wrapper::before,
+.beatFilters_wrapper::after {
     content: "";
 
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 0;
 
     width: 35px;
+
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+
+    transition: opacity 0.2s ease;
+}
+
+.beatFilters_wrapper::before {
+    left: 0;
 
     background: linear-gradient(
         to right,
@@ -36,24 +49,10 @@
         ) 40%,
         transparent 100%
     );
-
-    opacity: 0;
-    pointer-events: none;
-    z-index: 5;
-
-    transition: opacity 0.2s ease;
 }
 
-/* Right fade */
 .beatFilters_wrapper::after {
-    content: "";
-
-    position: absolute;
-    top: 0;
     right: 0;
-    bottom: 0;
-
-    width: 35px;
 
     background: linear-gradient(
         to left,
@@ -65,12 +64,6 @@
         ) 40%,
         transparent 100%
     );
-
-    opacity: 0;
-    pointer-events: none;
-    z-index: 5;
-
-    transition: opacity 0.2s ease;
 }
 
 .beatFilters_wrapper.canScrollLeft::before {
@@ -100,30 +93,30 @@
     padding-right: 2px;
 
     scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    /*
+     * Let mobile browsers handle scrolling,
+     * momentum and gesture direction natively.
+     */
+    touch-action: auto;
     -webkit-overflow-scrolling: touch;
+
     overscroll-behavior-x: contain;
+    scroll-behavior: auto;
 
     cursor: grab;
 
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
-
-    /*
-     * Vertical page scrolling remains available.
-     * Horizontal movement is handled by the pointer logic.
-     */
-    touch-action: pan-y;
 }
 
 .beatFilters_flex::-webkit-scrollbar {
     display: none;
 }
 
-.beatFilters_flex.isDragging {
-    cursor: grabbing;
-}
-
+.beatFilters_flex.isDragging,
 .beatFilters_flex.isBlockingClicks {
     cursor: grabbing;
 }
@@ -153,7 +146,7 @@
     padding: 3px 10px 3px 6px;
 
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50px;
+    border-radius: 999px;
     outline: none;
 
     background: color-mix(
@@ -166,17 +159,21 @@
     cursor: pointer;
 
     backdrop-filter: blur(12px) saturate(115%);
-    -webkit-backdrop-filter: blur(12px) saturate(115%);
+    -webkit-backdrop-filter:
+        blur(12px)
+        saturate(115%);
 
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.05),
         0 5px 12px rgba(0, 0, 0, 0.12);
 
     transition:
-        background-color 0.3s,
-        border-color 0.3s,
-        color 0.3s,
-        transform 0.15s;
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+
+    touch-action: manipulation;
 
     user-select: none;
     -webkit-user-select: none;
@@ -208,13 +205,13 @@
     white-space: nowrap;
 
     pointer-events: none;
-
-    transition: color 0.3s;
 }
 
 .beatFilter_iconContainer {
     position: relative;
     z-index: 1;
+
+    display: block;
 
     width: 20px;
     height: 20px;
@@ -238,8 +235,6 @@
 
     color: inherit;
     pointer-events: none;
-
-    transition: color 0.3s;
 }
 
 .beatFilters_lastButton {
@@ -247,15 +242,25 @@
 }
 
 /* ========================================= */
-/* DESKTOP HOVER                             */
+/* DESKTOP                                   */
 /* ========================================= */
 
 @media (hover: hover) and (pointer: fine) {
     .beatFilters_button:hover,
     .beatFilters_button:focus-visible {
-        background: #f7f7f7;
-        border-color: #f7f7f7;
-        color: #222222;
+        background: color-mix(
+            in srgb,
+            #353535 92%,
+            white
+        );
+
+        border-color: rgba(255, 255, 255, 0.14);
+        color: #f7f7f7;
+    }
+
+    .beatFilters_lastButton:hover,
+    .beatFilters_lastButton:focus-visible {
+        background: rgba(255, 255, 255, 0.045);
     }
 
     .beatFilters_button:active {
@@ -268,16 +273,32 @@
 /* ========================================= */
 
 @media (hover: none), (pointer: coarse) {
+    .beatFilters_flex {
+        cursor: default;
+    }
+
+    /*
+     * Backdrop blur is expensive during movement,
+     * especially on mobile Safari.
+     */
+    .beatFilters_button {
+        background: rgba(53, 53, 53, 0.96);
+
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.04),
+            0 3px 8px rgba(0, 0, 0, 0.1);
+
+        transition: none;
+    }
+
     .beatFilters_button:hover,
     .beatFilters_button:focus,
     .beatFilters_button:focus-visible,
     .beatFilters_button:active {
-        background: color-mix(
-            in srgb,
-            #353535 82%,
-            transparent
-        );
-
+        background: rgba(53, 53, 53, 0.96);
         border-color: rgba(255, 255, 255, 0.08);
         color: #f7f7f7;
 
@@ -285,6 +306,7 @@
         transform: none;
     }
 
+    .beatFilters_lastButton,
     .beatFilters_lastButton:hover,
     .beatFilters_lastButton:focus,
     .beatFilters_lastButton:focus-visible,

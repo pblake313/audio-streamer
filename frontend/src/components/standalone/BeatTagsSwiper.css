@@ -3,6 +3,7 @@
 
     width: fit-content;
     max-width: 100%;
+    min-width: 0;
 
     overflow: hidden;
 
@@ -71,53 +72,101 @@
 }
 
 .bts_container {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
 
     overflow-x: auto;
     overflow-y: hidden;
 
-    white-space: nowrap;
-
+    /*
+     * This enables Safari's native momentum scrolling.
+     */
     -webkit-overflow-scrolling: touch;
+
+    /*
+     * Do not use pan-y here.
+     *
+     * pan-y tells the browser it may only natively pan this
+     * element vertically, which disables native horizontal
+     * scrolling on Safari and other touch browsers.
+     */
+    touch-action: auto;
+
     overscroll-behavior-x: contain;
 
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+
     scrollbar-width: none;
-
-    cursor: grab;
-
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
-
-    touch-action: pan-y;
-}
-
-.bts_container.isDragging,
-.bts_container.isBlockingClicks {
-    cursor: grabbing;
+    -ms-overflow-style: none;
 }
 
 .bts_container::-webkit-scrollbar {
     display: none;
+
+    width: 0;
+    height: 0;
 }
 
-.bts_container :global(*) {
+.bts_content {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    width: max-content;
+    min-width: max-content;
+
+    gap: 8px;
+
+    white-space: nowrap;
+}
+
+/*
+ * This is an imported global CSS file, so Svelte's :global()
+ * syntax should not be used here.
+ */
+.bts_content > * {
     flex: 0 0 auto;
-
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
 }
 
-@media (hover: none) and (pointer: coarse) {
+/*
+ * Desktop mouse behavior only.
+ *
+ * Touch devices should keep their native cursor and native
+ * touch scrolling behavior.
+ */
+@media (hover: hover) and (pointer: fine) {
+    .bts_container {
+        cursor: grab;
+    }
+
+    .bts_container.isDragging,
+    .bts_container.isBlockingClicks {
+        cursor: grabbing;
+    }
+
+    .bts_container.isDragging,
+    .bts_container.isDragging *,
+    .bts_container.isBlockingClicks,
+    .bts_container.isBlockingClicks * {
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
+    }
+}
+
+@media (hover: none), (pointer: coarse) {
     .bts_container,
     .bts_container.isDragging,
     .bts_container.isBlockingClicks {
         cursor: default;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bts_wrapper::before,
+    .bts_wrapper::after {
+        transition: none;
     }
 }

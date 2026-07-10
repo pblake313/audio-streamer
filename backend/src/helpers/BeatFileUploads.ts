@@ -14,6 +14,8 @@ type UploadBeatParams = {
 async function validateArtworkFile(
     file: Express.Multer.File,
 ): Promise<void> {
+
+
     if (!file?.buffer?.length) {
         throw new Error("Artwork file is missing or empty.");
     }
@@ -51,6 +53,8 @@ async function validateArtworkFile(
 async function validateMp3File(
     file: Express.Multer.File,
 ): Promise<void> {
+    console.log(file)
+
     if (!file?.buffer?.length) {
         throw new Error("MP3 file is missing or empty.");
     }
@@ -86,7 +90,8 @@ async function validateMp3File(
         if (!isMp3) {
             throw new Error("Not a valid MP3.");
         }
-    } catch {
+    } catch (err) {
+        console.log(err)
         throw new Error(
             "Audio file must be a valid MP3 file.",
         );
@@ -226,6 +231,7 @@ export async function uploadBeatMp3({
         });
 
         blobStream.on("error", (error) => {
+
             reject(
                 new Error(
                     error.message ||
