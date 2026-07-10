@@ -1,11 +1,15 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import BoxButton from "../buttons/BoxButton.svelte";
+    import { onMount } from "svelte";
     import Toggler from "../buttons/Toggler.svelte";
-    import GitHubLink from "../links/GitHubLink.svelte";
     import DesktopScreenshotSwiper from "../swipers/DesktopScreenshotSwiper.svelte";
     import MobileScreenshotSwiper from "../swipers/MobileScreenshotSwiper.svelte";
     import "./ProjectDetails.css";
+
+    onMount(() => {
+        if (window.innerWidth < 800) {
+            slideType = "mobile";
+        }
+    });
 
     let slideType: "mobile" | "desktop" = "desktop";
 </script>

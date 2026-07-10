@@ -1,9 +1,7 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
-    import './HighlightedTrack.css'
-    import {
-        selectedBeat,
-    } from "../../stores/AudioPlayer/selectedBeatStore";
+    import "./HighlightedTrack.css";
+    import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore";
     import {
         audioPlayerState,
         audioStore,
@@ -18,7 +16,6 @@
     import AudioPlayerState from "./AudioPlayerState.svelte";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
 
-
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
 
@@ -29,7 +26,6 @@
     ) {
         playOrPauseIcon = $audioPlayerState === "Playing" ? "pause" : "play";
     }
-
 
     function handlePlayPauseClick() {
         resetTrackTimer();
@@ -47,8 +43,6 @@
             playTrack();
         }
     }
-
-
 
     function handleArtworkClick() {
         // Same behavior as the main play/pause button
@@ -74,6 +68,7 @@
         <div class="ht_insideContainer">
             <div class="ht_artworkContainer">
                 <!-- ARTWORK CLICK = user gesture play/pause -->
+
                 <button class="ht_artworkButton" on:click={handleArtworkClick}>
                     {#key $selectedBeat}
                         <AlbumArtwork
@@ -82,31 +77,45 @@
                         />
                     {/key}
 
+                    <!-- do not show on touch devices. -->
                     <div class="ht_albumOverlay">
                         <div class="ht_largePP">
-                            <PlayPauseButton height={"85px"} playIconHeight={"50px"} pauseIconHeight={"55px"} playOrPause={playOrPauseIcon} color={"#f7f7f7"}/>
+                            <PlayPauseButton
+                                height={"85px"}
+                                playIconHeight={"50px"}
+                                pauseIconHeight={"55px"}
+                                playOrPause={playOrPauseIcon}
+                                color={"#f7f7f7"}
+                            />
                         </div>
-
                     </div>
-
                 </button>
             </div>
 
             <div class="ht_trackInfo">
-
                 <div class="ht_details">
                     <div class="ht_stateAndKey">
                         <AudioPlayerState />
-                        
-                        <p class="ht_keyAndMode">{$selectedBeat.key} {$selectedBeat.mode} - {$selectedBeat.bpm} BPM</p>
+
+                        <p class="ht_keyAndMode">
+                            {$selectedBeat.key}
+                            {$selectedBeat.mode} - {$selectedBeat.bpm} BPM
+                        </p>
                     </div>
                     <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
                 </div>
 
-
                 <!-- <BeatTagsSwiper beat={$selectedBeat}/> -->
 
                 <div class="ht_rangeControls">
+
+                    <div class="ht_mobileRange">
+                        <AudioRange
+                            audio={$audioStore ?? undefined}
+                            useWaveForm={false}
+                            
+                        />
+                    </div>
 
                     <AudioControlBox {playOrPauseIcon}></AudioControlBox>
 
@@ -114,21 +123,12 @@
                         <AudioRange
                             waveHeight={50}
                             useWaveForm={true}
-        audio={$audioStore ?? undefined}
-
+                            audio={$audioStore ?? undefined}
                         />
                     </div>
 
-<div class="ht_mobileRange">
-    <AudioRange
-        audio={$audioStore ?? undefined}
-        waveHeight={25}
-        useWaveForm={true}
-    />
-</div>
-
+           
                 </div>
-
             </div>
         </div>
     </div>

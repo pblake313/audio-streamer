@@ -1,18 +1,25 @@
+.dss_megaContainer {
+    padding: 0 25px;
+    margin-top: 15px;
+}
+
 .dss_container {
+    width: 100%;
     max-width: 1250px;
     margin: auto;
     overflow: hidden;
 }
 
 /* THUMBNAIL PICKER */
+
 .dss_slidePicker {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(9, 1fr);
+    grid-template-columns: repeat(10, 1fr);
     align-items: center;
     gap: 10px;
-    margin-bottom: 25px;
     margin-top: 10px;
+    margin-bottom: 25px;
 }
 
 .dss_slidePickerButton {
@@ -50,6 +57,7 @@
 }
 
 /* MAIN SWIPER */
+
 .dss_megaSwipeWrap {
     width: 100%;
 }
@@ -65,13 +73,15 @@
 }
 
 .dss_singleSwiperSlide {
+    display: flex;
+    overflow: hidden;
+
     font-size: 18px;
     cursor: grab;
     user-select: none;
+
     border-radius: 10px;
     border: 1px solid rgba(92, 92, 92, 0.5);
-    display: flex;
-    overflow: hidden;
 }
 
 .dss_singleSwiperSlide:active {
@@ -87,38 +97,65 @@
 .dss_imageContainer img {
     width: 100%;
     height: 100%;
+    display: block;
+
     object-fit: cover;
     object-position: center;
-    display: block;
+
+    pointer-events: none;
 }
 
-/* BOTTOM NAV */
+/* BOTTOM DOT NAVIGATION */
+
 .dss_swiperLocation {
+    width: 100%;
+    min-height: 42px;
+    margin-top: 15px;
+
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
 }
 
 .dss_innerLocationGrid {
     width: fit-content;
+    max-width: 100%;
+
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 5px;
 }
 
 .dss_swiperNavButton {
+    flex: 0 0 auto;
+
+    width: 18px;
     height: 6px;
-    width: 20px;
+    padding: 0;
+
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.4);
     border: none;
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.35);
     opacity: 0.7;
-    transition: 0.3s;
+
+    transition:
+        width 0.25s ease,
+        background-color 0.25s ease,
+        opacity 0.25s ease,
+        transform 0.25s ease;
 }
 
 .dss_swiperNavButton:hover {
     opacity: 1;
+    transform: scaleY(1.15);
 }
 
 .dss_swiperNavButton.dss_active {
+    width: 28px;
     background: #ffffff;
     opacity: 1;
 }
@@ -127,32 +164,78 @@
     opacity: 1;
 }
 
-.dss_photosButtonsFlex {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+/* RESPONSIVE */
+
+@media (max-width: 1300px) {
+    .dss_megaContainer {
+        padding: 0;
+    }
+
+    .dss_container {
+        padding: 0 25px;
+    }
 }
 
-.dss_swiperButtons {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    width: fit-content;
-    margin-top: 15px;
+@media (max-width: 800px) {
+    .dss_slidePicker {
+        display: none;
+    }
 }
 
-.dss_swiperButtonPrev {
-    transform: rotate(180deg);
-    padding-top: 3px;
+@media (max-width: 600px) {
+    .dss_container {
+        padding: 0 15px;
+    }
+
+    .dss_swiperLocation {
+        min-height: 36px;
+        margin-top: 12px;
+    }
+
+    .dss_innerLocationGrid {
+        gap: 4px;
+    }
+
+    .dss_swiperNavButton {
+        width: 14px;
+        height: 5px;
+    }
+
+    .dss_swiperNavButton.dss_active {
+        width: 24px;
+    }
 }
 
-.dss_lastNavButton {
-    display: none;
-    background-color: blue;
+@media (max-width: 400px) {
+    .dss_innerLocationGrid {
+        gap: 3px;
+    }
+
+    .dss_swiperNavButton {
+        width: 12px;
+    }
+
+    .dss_swiperNavButton.dss_active {
+        width: 20px;
+    }
 }
 
-.dss_nonDots {
-    display: none;
+@media (hover: none) {
+    .dss_slidePickerButton:hover {
+        opacity: 0.65;
+        transform: none;
+    }
+
+    .dss_slidePickerButtonActive:hover {
+        opacity: 1;
+    }
+
+    .dss_swiperNavButton:hover {
+        opacity: 0.7;
+        transform: none;
+    }
+
+    .dss_swiperNavButton.dss_active:hover {
+        opacity: 1;
+    }
 }

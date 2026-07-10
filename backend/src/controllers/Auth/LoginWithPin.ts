@@ -49,23 +49,21 @@ export async function loginWithPin(req: Request, res: Response, next: NextFuncti
             // delete all wrong pin docs for this ip.
             await deleteWrongPinDocByIP(ip)
 
-
-            // got here...
-
 			// Refresh token – long lived, stored in cookie
-			const refreshToken = sign(
-				{ ip }, // normalized
-				process.env.REFRESH_SECRET || "",
-				{ expiresIn: "30d" }
-			);
+            const refreshToken = sign(
+                { ip },
+                process.env.REFRESH_SECRET || "",
+                { expiresIn: "48h" }
+            );
 
-			res.cookie("refresh_token", refreshToken, {
-				httpOnly: true,
-				secure: true,
-				maxAge: 30 * 24 * 60 * 60 * 1000,
-				sameSite: "none"
-			});
+            res.cookie("refresh_token", refreshToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: 48 * 60 * 60 * 1000, // 48 hours
+                sameSite: "none"
+            });
 
+            
 			// Access token – short lived, returned in body
 			const accessToken = sign(
 				{ ip }, // same normalized IP

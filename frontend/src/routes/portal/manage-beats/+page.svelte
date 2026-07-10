@@ -30,12 +30,6 @@
         }
     });
 
-    async function retryBeatsFetch() {
-        try {
-            fetchBeatsAttempted.set(false);
-            await fetchBeats();
-        } catch {}
-    }
 </script>
 
 <svelte:head>
@@ -77,6 +71,7 @@
                     buttonText={$isFetchingBeats ? null : "Fetch More"}
                     buttonIcon={$isFetchingBeats ? "loading" : null}
                     isDisabled={$isFetchingBeats}
+                    buttonStyle={"glass"}
                     on:click={() => {
                         fetchBeats();
                     }}

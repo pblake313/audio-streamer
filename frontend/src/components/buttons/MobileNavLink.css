@@ -1,0 +1,21 @@
+.mnl_link{
+    width: 100%;
+    display: block;
+    text-align: right;
+    font-size: 36pt;
+    font-weight: 500;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    color: var(--font-color-light);
+}
+.mnl_active{
+    color: var(--font-color-heading);
+}
+@media (max-width: 600px) {
+    .mnl_link{
+        font-size: 30pt;
+    }
+    
+}

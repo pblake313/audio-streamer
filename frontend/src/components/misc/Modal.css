@@ -1,7 +1,7 @@
 .modalWrap {
     position: fixed;
     inset: 0;
-    z-index: 997;
+    z-index: 45;
     border: none;
 
     display: flex;
@@ -59,9 +59,7 @@
     overflow: visible;
 }
 
-.padForTheAudio {
-    padding-bottom: 75px;
-}
+
 
 @media (max-width: 600px) {
     .modalWrap {
@@ -81,6 +79,9 @@
 
     .wrapTheSlot {
         height: fit-content;
+    }
+    .padForTheAudio {
+        padding-bottom: 85px;
     }
 }
 

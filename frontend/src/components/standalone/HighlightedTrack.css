@@ -178,6 +178,7 @@
         display: none;
     }
     .ht_mobileRange{
+        margin-top: 25px;
         display: block;
     }
     .ht_trackInfo{
@@ -188,6 +189,12 @@
 @media (max-width: 600px) {
     .ht_insideContainer {
         padding: 0px 15px;
+    }
+    
+}
+@media (pointer: coarse) {
+    .ht_albumOverlay{
+        display: none;
     }
     
 }

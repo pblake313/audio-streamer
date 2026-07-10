@@ -37,13 +37,16 @@
         left: 50%;
         transform: translate(-50%, -50%);
         height: fit-content;
-        padding-top: 3px;
+        padding-top: 6px;
+
     }
     .roto{
         transform: translate(-50%, -50%) rotate(180deg);
+        padding-top: 4px;
     }
     .slideNavButton:disabled {
         opacity: .2;
+        cursor: auto;
     }
     @media(pointer: coarse){
         .slideNavButton:hover {

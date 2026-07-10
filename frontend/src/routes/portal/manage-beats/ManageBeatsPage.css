@@ -2,7 +2,7 @@
     max-width: 1250px;
     padding: 0 25px;
     margin: auto;
-    margin-top: 75px;
+    padding-top: 25px;
 
 }
 
@@ -34,11 +34,11 @@
 .mbp_topper{
     margin: auto;
     text-align: center;
-    margin-top: 90px;
-    margin-bottom: 50px;
+    padding-top: 90px;
+    padding-bottom: 50px;
 }
 .mbp_subtitle{
-    margin-top: 15px;
+    padding-top: 15px;
 }
 
 @media(max-width: 780px) {

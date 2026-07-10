@@ -12,6 +12,9 @@
     import MobileMenuToggler from "../../UI/MobileMenuToggler.svelte";
     import MobileNav from "./MobileNav.svelte";
     import { authorizedFetch } from "../../../helpers/Fetchers/authorizedFetch";
+    import Logo from "../../Icons/Logos/Logo.svelte";
+    import { fade, slide } from "svelte/transition";
+    import { pushNotification } from "../../../stores/NotificationStore";
 
     let isScrolled = false;
 
@@ -34,21 +37,6 @@
 
     let isLoading: boolean = false
 
-    async function test() {
-        try{
-            isLoading = true
-
-            const response = await authorizedFetch('/secure/test')
-
-            console.log('Successful Response: ', response)
-        } catch (err){
-            console.log(err)
-        } finally {
-            isLoading = false
-        }
-        
-    }
-
 </script>
 
 <!-- have a user. -->
@@ -57,9 +45,10 @@
     <div class="nav_inside">
         {#if $user}
             <div class="nav_userFlex">
-                <div class="nav_githubFlex">
-                    <GitHubLink gitText={"@pblake313"} />
-                    <!-- <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/> -->
+                <div class="nav_logoFlex">
+                    <a href="/">
+                        <Logo color={'#f7f7f7'} width="120px"/>
+                    </a>
                 </div>
                 <div class="nav_rightFlex">
                              <NavigationLink
@@ -89,7 +78,6 @@
             <div class="nav_noUserFlex">
                 <div class="nav_githubFlex">
                     <GitHubLink gitText={"@pblake313"} />
-                     <BoxButton on:click={test} buttonIcon={isLoading ? 'loading' : null} buttonText={isLoading ? null : 'Test'} tightPad={true}/>
                 </div>
 
                 <div class="nav_rightFlex">
@@ -116,5 +104,5 @@
 </div>
 
 {#if $mobileNavOpen}
-    <MobileNav />
+        <MobileNav />
 {/if}

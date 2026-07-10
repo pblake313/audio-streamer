@@ -1,69 +1,91 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
     import SwiperCore from "swiper";
     import { Navigation } from "swiper/modules";
+    import { fade } from "svelte/transition";
+
     // @ts-ignore: CSS side-effect import for Swiper
     import "swiper/css";
     // @ts-ignore: CSS side-effect import for Swiper navigation
     import "swiper/css/navigation";
+
     import "./DesktopScreenshotSwiper.css";
-    import SlideNavButton from "../buttons/SlideNavButton.svelte";
-    import { fade } from "svelte/transition";
 
     export let images: string[] = [
-        "/Images/ScreenShots/Desktop/desk0.png",
-        "/Images/ScreenShots/Desktop/desk2.png",
-        "/Images/ScreenShots/Desktop/desk3.png",
-        "/Images/ScreenShots/Desktop/desk5.png",
-        "/Images/ScreenShots/Desktop/desk1.png",
-        "/Images/ScreenShots/Desktop/desk6.png",
-        "/Images/ScreenShots/Desktop/desk4.png",
-        "/Images/ScreenShots/Desktop/desk7.png",
-        "/Images/ScreenShots/Desktop/desk8.png",
+        "/Images/ScreenShots/Desktop/desk1.webp",
+        "/Images/ScreenShots/Desktop/desk2.webp",
+        "/Images/ScreenShots/Desktop/desk3.webp",
+        "/Images/ScreenShots/Desktop/desk4.webp",
+        "/Images/ScreenShots/Desktop/desk5.webp",
+        "/Images/ScreenShots/Desktop/desk6.webp",
+        "/Images/ScreenShots/Desktop/desk7.webp",
+        "/Images/ScreenShots/Desktop/desk8.webp",
+        "/Images/ScreenShots/Desktop/desk9.webp",
+        "/Images/ScreenShots/Desktop/desk10.webp",
     ];
 
     let swiperContainer: HTMLDivElement;
     let swiper: SwiperCore | null = null;
+
+    /*
+        activeIndex controls the thumbnail picker.
+
+        activeDot controls the bottom navigation dots because Swiper
+        can have fewer snap points than images when slidesPerView
+        is greater than 1.
+    */
     let activeIndex = 0;
+    let activeDot = 0;
+    let dotCount = 0;
 
-    function goNext() {
-        swiper?.slideNext();
-    }
-
-    function goPrev() {
-        swiper?.slidePrev();
+    function updateNavigationState(sw: SwiperCore) {
+        activeIndex = sw.realIndex;
+        activeDot = sw.snapIndex;
+        dotCount = sw.snapGrid.length;
     }
 
     function goToSlide(index: number) {
-        activeIndex = index;
-        swiper?.slideTo(index);
+        if (!swiper) return;
+
+        swiper.slideTo(index);
+    }
+
+    function goToDot(index: number) {
+        if (!swiper) return;
+
+        swiper.slideTo(index);
     }
 
     onMount(() => {
         swiper = new SwiperCore(swiperContainer, {
             modules: [Navigation],
 
-            slidesPerView: 2.3,
+            slidesPerView: 1,
+            slidesPerGroup: 1,
             spaceBetween: 15,
             loop: false,
             speed: 300,
-            roundLengths: false,
             centeredSlides: false,
             centeredSlidesBounds: false,
+            roundLengths: true,
 
             breakpoints: {
                 1600: {
                     slidesPerView: 1,
                 },
+
                 1200: {
-                    slidesPerView: 1.4,
+                    slidesPerView: 1,
                 },
+
                 900: {
                     slidesPerView: 1.2,
                 },
+
                 650: {
                     slidesPerView: 1.1,
                 },
+
                 0: {
                     slidesPerView: 1.1,
                     spaceBetween: 15,
@@ -73,10 +95,35 @@
 
             on: {
                 init(sw) {
-                    activeIndex = sw.realIndex;
+                    updateNavigationState(sw);
                 },
+
                 slideChange(sw) {
-                    activeIndex = sw.realIndex;
+                    updateNavigationState(sw);
+                },
+
+                reachBeginning(sw) {
+                    updateNavigationState(sw);
+                },
+
+                reachEnd(sw) {
+                    updateNavigationState(sw);
+                },
+
+                fromEdge(sw) {
+                    updateNavigationState(sw);
+                },
+
+                resize(sw) {
+                    updateNavigationState(sw);
+                },
+
+                breakpoint(sw) {
+                    updateNavigationState(sw);
+                },
+
+                update(sw) {
+                    updateNavigationState(sw);
                 },
             },
         });
@@ -86,75 +133,74 @@
             swiper = null;
         };
     });
-
-    onDestroy(() => {
-        swiper?.destroy(true, true);
-        swiper = null;
-    });
 </script>
 
-<div
-    class="dss_container"
-    in:fade={{ delay: 500, duration: 500 }}
-    out:fade={{ duration: 500 }}
->
-    <div class="dss_slidePicker" aria-label="Screenshot picker">
-        {#each images as img, index}
-            <button
-                type="button"
-                class="dss_slidePickerButton {index === activeIndex ? 'dss_slidePickerButtonActive' : ''}"
-                on:click={() => goToSlide(index)}
-                aria-label={`View screenshot ${index + 1}`}
-                aria-pressed={index === activeIndex}
-            >
-                <img
-                    src={img}
-                    alt={`Screenshot thumbnail ${index + 1}`}
-                    loading="lazy"
-                />
-            </button>
-        {/each}
-    </div>
-
-    <div class="dss_megaSwipeWrap">
-        <div class="swiper dss_swiper" bind:this={swiperContainer}>
-            <div class="swiper-wrapper dss_swiperWrapper">
-                {#each images as img, index}
-                    <div class="swiper-slide dss_singleSwiperSlide">
-                        <div class="dss_imageContainer">
-                            <img
-                                src={img}
-                                alt={`Screenshot ${index + 1}`}
-                                loading="lazy"
-                            />
-                        </div>
-                    </div>
-                {/each}
-            </div>
-        </div>
-    </div>
-
-    <div class="dss_swiperLocation">
-        <div class="dss_innerLocationGrid">
-            {#each images as _, i}
+<div class="dss_megaContainer">
+    <div
+        class="dss_container"
+        in:fade={{ delay: 500, duration: 500 }}
+        out:fade={{ duration: 500 }}
+    >
+        <div
+            class="dss_slidePicker"
+            aria-label="Screenshot picker"
+        >
+            {#each images as img, index}
                 <button
                     type="button"
-                    class="dss_swiperNavButton {i === activeIndex ? 'dss_active' : ''}"
-                    on:click={() => goToSlide(i)}
-                    aria-label={`Go to screenshot ${i + 1}`}
-                    aria-pressed={i === activeIndex}
-                />
+                    class="dss_slidePickerButton {index === activeIndex
+                        ? 'dss_slidePickerButtonActive'
+                        : ''}"
+                    on:click={() => goToSlide(index)}
+                    aria-label={`View screenshot ${index + 1}`}
+                    aria-pressed={index === activeIndex}
+                >
+                    <img
+                        src={img}
+                        alt={`Screenshot thumbnail ${index + 1}`}
+                        loading="lazy"
+                    />
+                </button>
             {/each}
         </div>
 
-        <div class="dss_nonDots"></div>
-
-        <div class="dss_swiperButtons">
-            <div class="dss_swiperButtonPrev">
-                <SlideNavButton on:click={goPrev} />
+        <div class="dss_megaSwipeWrap">
+            <div
+                class="swiper dss_swiper"
+                bind:this={swiperContainer}
+            >
+                <div class="swiper-wrapper dss_swiperWrapper">
+                    {#each images as img, index}
+                        <div class="swiper-slide dss_singleSwiperSlide">
+                            <div class="dss_imageContainer">
+                                <img
+                                    src={img}
+                                    alt={`Screenshot ${index + 1}`}
+                                    loading="lazy"
+                                />
+                            </div>
+                        </div>
+                    {/each}
+                </div>
             </div>
+        </div>
 
-            <SlideNavButton on:click={goNext} />
+        <div class="dss_swiperLocation">
+            <div
+                class="dss_innerLocationGrid"
+                aria-label="Screenshot navigation"
+            >
+                {#each Array(dotCount) as _, index}
+                    <button
+                        type="button"
+                        class:dss_active={index === activeDot}
+                        class="dss_swiperNavButton"
+                        on:click={() => goToDot(index)}
+                        aria-label={`Go to screenshot position ${index + 1}`}
+                        aria-pressed={index === activeDot}
+                    />
+                {/each}
+            </div>
         </div>
     </div>
 </div>

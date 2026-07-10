@@ -54,7 +54,12 @@
     align-items: center;
     gap: 25px;
 }
-
+.nav_logoFlex {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding-top: 4px;
+}
 /* mobile nav */
 @media (max-width: 750px) {
     .nav_rightFlex {

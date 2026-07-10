@@ -3,6 +3,7 @@ import { get } from "svelte/store";
 import { accessToken } from "../../stores/tokenStore";
 import { logout } from "../Auth/authFunctions";
 import { pushNotification } from "../../stores/NotificationStore";
+import { user } from "../../stores/UserStore";
 
 const backendLink = import.meta.env.VITE_BACKEND_URL;
 
@@ -71,33 +72,44 @@ export async function authorizedFetch<T = any>(
         body = null;
     }
 
-    if (!res.ok) {
-        const isForceLogout =
-            res.status === 440 || body?.forceLogout === true;
 
-        const message =
+
+    if (!res.ok) {
+
+
+        const rawMessage =
             body?.message ||
             body?.error ||
             `Request failed with status ${res.status}`;
+
+
+        // if we have a specific message we want to change... this is for the refresh token, when the refresh token expires after 48 hours.
+        const message =
+            rawMessage === "jwt expired"
+                ? "Session expired."
+                : rawMessage;
+                
+
 
         const error = {
             status: body?.status || res.status,
             message,
             data: body?.data ?? body ?? null,
-            forceLogout: isForceLogout,
         } satisfies AuthorizedFetchError;
 
-        if (isForceLogout) {
-            accessToken.set(null);
-            logout();
 
-            pushNotification(
-                message || "An unknown logout reason occurred.",
-                "Error",
-                false,
-                5000,
-                "Logout Forced"
-            );
+        const haveUser = get(user)
+
+        if (error.data.forceLogout) {
+
+            accessToken.set(null);
+
+            if (haveUser){
+                logout();
+                pushNotification( message || "An unknown logout reason occurred.", "Error", false, 5000, "Logout Forced");
+            } else {
+                // console.log('dont have a user, no logout notification to push.')
+            }
 
             throw error;
         }
