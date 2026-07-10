@@ -214,6 +214,12 @@ export const tagOptions = [
     'Yung Pinch'
 ];
 
+export const trackTypeOptions = [
+    'Beat',
+    'Reference'
+]
+
+
 export const kitDescriptionOptions = [
     'Drum Kit',
     'Loop & Drum Kit',
@@ -257,10 +263,6 @@ export let colorOptions: {
     color: string;
     colorName: string;
 }[] = [
-    // --------------------
-    // WHITE
-    // --------------------
-    { color: "ffffff", colorName: "White" },
 
     // --------------------
     // REDS & PINKS (OG + Vibrant)

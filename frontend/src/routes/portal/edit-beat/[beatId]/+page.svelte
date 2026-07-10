@@ -1,11 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
-    import EditBeatForm from '../../../../forms/EditBeatForm/EditBeatForm.svelte';
     import type { Beat } from '../../../../lib/types/Beats';
-    import { beatToEdit, fetchSingleBeat, isFetchingBeatToEdit } from '../../../../stores/EditBeatStore';
+    import { beatToEdit, fetchSingleBeat, fetchSingleBeatError, isFetchingBeatToEdit } from '../../../../stores/EditBeatStore';
     import DashboardLoader from '../../../../components/loaders/PageLoaders/DashboardLoader.svelte';
     import { goto } from '$app/navigation';
+    import EditBeatForm from '../../../../components/forms/EditBeatForm.svelte';
+    import Loader from '../../../../components/loaders/Loader.svelte';
+    import PageHeading from '../../../../components/page-components/PageHeading.svelte';
 
 
     // Get the beatId from the page store
@@ -13,36 +15,37 @@
 
     let beatCopy: Beat | null = null
   
-    // Check if the beatId exists in the adminBeats array on mount
     onMount(async () => {
-        await fetchSingleBeat(beatId)
+        const id = beatId;
 
-        if ($beatToEdit){
-            beatCopy = $beatToEdit
-        } else {
-            console.log('no beat to edit... need to do something...')
-            goto('/portal/manage-beats')
+        if (!id) {
+            console.log("No beat ID");
+            await goto("/portal/manage-beats");
+            return;
         }
-  
-    });
 
+        await fetchSingleBeat(id);
+    });
 
 </script>
 
 
-<svelte:head>
-    <title>Edit Track - {beatCopy?.beatTitle || 'PATTSWAY'}</title>
-</svelte:head>
-
 
 {#if $isFetchingBeatToEdit}
-    <DashboardLoader />
+    <Loader loaderStyle={"loader_full"} text={"Fetching latest beat data."}/>
+{:else if $fetchSingleBeatError}
+    <PageHeading 
+        title={"Fetch Beat Error"} 
+        subtitle={$fetchSingleBeatError} 
+        onButtonClick={() => {
+            fetchSingleBeat(beatId || null)
+        }}
+        buttonText={"Retry"}
+    />
+{:else if $beatToEdit}
+    <EditBeatForm beat={$beatToEdit}/>
 {:else}
-    {#if beatCopy}   
-        <EditBeatForm beatCopy={beatCopy}></EditBeatForm>
-    {:else}
-        <p>No Beat To edit... gotta return...</p>
-    {/if}
+    <p>No beat to edit.</p>
 {/if}
 
 

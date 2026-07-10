@@ -1,31 +1,46 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import HighlightedTrack from '../../components/standalone/HighlightedTrack.svelte';
-    import { fetchBeats, fetchBeatsAttempted } from '../../stores/AudioPlayer/beatArrayStore';
-    import { selectedBeat } from '../../stores/AudioPlayer/selectedBeatStore';
-    import { pauseTrack, playTrack, smartNextTrack, smartPreviousTrack } from '../../stores/AudioPlayerStore';
-    import { navStyle } from '../../stores/navstore';
-    import { get } from 'svelte/store';
-    import { pushNotification } from '../../stores/NotificationStore';
-    import SpinLoader from '../../components/loaders/SpinLoader.svelte';
-    import TrackList from '../../components/lists/TrackList/TrackList.svelte';
-
-
-    let fetchBeatsErrorOccurred: boolean = false
+    import { onMount } from "svelte";
+    import HighlightedTrack from "../../components/standalone/HighlightedTrack.svelte";
+    import {
+        beatFetchError,
+        beats,
+        fetchBeats,
+        isFetchingBeats,
+        oneBeatFetchSuccessfull,
+        showAudioPlayer,
+    } from "../../stores/AudioPlayer/BeatsStore";
+    import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore";
+    import {
+        audioMode,
+        pauseTrack,
+        playTrack,
+        smartNextTrack,
+        smartPreviousTrack,
+    } from "../../stores/AudioPlayerStore";
+    import TrackList from "../../components/lists/TrackList/TrackList.svelte";
+    import Loader from "../../components/loaders/Loader.svelte";
+    import PageHeading from "../../components/page-components/PageHeading.svelte";
+    import ABTester from "../../components/standalone/ABTester.svelte";
 
     // This reactive block runs every time $selectedBeat changes.
-    $: if (typeof navigator !== 'undefined' && navigator.mediaSession && $selectedBeat) {
+    $: if (
+        typeof navigator !== "undefined" &&
+        navigator.mediaSession &&
+        $selectedBeat
+    ) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: $selectedBeat.beatTitle,
             artist: "PATTSWAY",
-            album: `${$selectedBeat.bpm} BPM - ${$selectedBeat.key} ${$selectedBeat.mode}` || "Unknown Album",
+            album:
+                `${$selectedBeat.bpm} BPM - ${$selectedBeat.key} ${$selectedBeat.mode}` ||
+                "Unknown Album",
             artwork: [
-            {
-                src: $selectedBeat.artworkUrl,
-                sizes: '512x512', // optional, specify if known
-                type: 'image/png'  // optional, specify the MIME type
-            }
-            ]
+                {
+                    src: $selectedBeat.artworkUrl,
+                    sizes: "512x512", // optional, specify if known
+                    type: "image/png", // optional, specify the MIME type
+                },
+            ],
         });
 
         // Set action handlers for lock screen and media keys.
@@ -43,65 +58,51 @@
         });
     }
 
-
-    onMount( async()=> {
-        navStyle.set({style:'standard', capWidth: true, addLine: false})
-
-        try {
-
-            const beatFetchAttemtpted = get(fetchBeatsAttempted)
-
-            if (!beatFetchAttemtpted){
-                await fetchBeats()
-            }
-
-        } catch {
-            fetchBeatsErrorOccurred = true
-            pushNotification("There was an error that occurred when fetching beats.", 'Error', false, 6000, 'Fetch Beats Error')
-        } finally {
-
+    onMount(async () => {
+        if (!$oneBeatFetchSuccessfull) {
+            await fetchBeats();
         }
-
-    })
-
-
+    });
 </script>
 
 <svelte:head>
-    <title>{$selectedBeat?.beatTitle || 'Listen'}</title>
+    <title>{$selectedBeat?.beatTitle || "Listen"}</title>
 </svelte:head>
 
+{#if $isFetchingBeats && !$oneBeatFetchSuccessfull}
+    <Loader loaderStyle={"loader_full"} />
+{:else if $beatFetchError}
+    <PageHeading
+        title={"Fetch Beats Error"}
+        subtitle={$beatFetchError}
+        buttonText={"Retry"}
+        onButtonClick={() => {
+            fetchBeats();
+        }}
+    />
+{:else}
+    {#if $audioMode === "streamer"}
+        <HighlightedTrack />
+    {:else}
+        <ABTester />
+    {/if}
+    <div class="wrapTrackList">
+        <TrackList />
+    </div>
+{/if}
 
 <style>
     .wrapTrackList {
         margin: auto;
         padding: 25px;
-        max-width: 1550px;
+        max-width: 1250px;
     }
-    @media (max-width:575px){
-            .wrapTrackList {
+
+    @media (max-width: 575px) {
+        .wrapTrackList {
             margin: auto;
-            padding: 15px;
-            max-width: 1550px;
+            max-width: 1250px;
+            padding: 0px 15px;
         }
     }
 </style>
-
-
-{#if !$fetchBeatsAttempted}
-    <SpinLoader></SpinLoader>
-{:else}
-    {#if !fetchBeatsErrorOccurred}
-        <HighlightedTrack></HighlightedTrack>
-        <div class="wrapTrackList">
-            <TrackList></TrackList>
-        </div>
-        <div style="height: 100px;"></div>
-    {:else}
-        <p>There was an error while fetching beats</p>
-    {/if}
-
-
-{/if}
-
-

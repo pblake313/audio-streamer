@@ -27,19 +27,18 @@
     import CloseButton from "../buttons/CloseButton.svelte";
     import { goto } from "$app/navigation";
     import Modal from "../misc/Modal.svelte";
+    import AlbumArtwork from "../UI/AlbumArtwork.svelte";
+    import { showAudioPlayer } from "../../stores/AudioPlayer/BeatsStore";
 
-    // 👇 Track last URL we've applied to the audio element
     let lastUrl: string | null = null;
 
-    // Ensure audio.src is updated when beat changes
     $: if ($audioPlayerUrl && $audioPlayerUrl !== lastUrl) {
         const audio = get(audioStore);
+
         if (audio) {
-            // Only run when URL actually changes
             audio.src = $audioPlayerUrl;
             lastUrl = $audioPlayerUrl;
 
-            // Only autoplay on a fresh URL change AND when requested
             if ($useAutoPlay) {
                 autoPlayTrack();
                 useAutoPlay.set(false);
@@ -47,28 +46,20 @@
         }
     }
 
-    // Function that checks if the page has scrolled 500 pixels or more
     function checkScrollPosition() {
-        if (window.scrollY >= 250) {
-            scrolledTwoFifty.set(true);
-        } else {
-            scrolledTwoFifty.set(false);
-        }
+        scrolledTwoFifty.set(window.scrollY >= 250);
     }
 
-        // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
 
-    // when NOT loading, sync icon to player state
     $: if ($audioPlayerState !== "Loading" && $audioPlayerState !== "Buffering") {
         playOrPauseIcon = $audioPlayerState === "Playing" ? "pause" : "play";
     }
 
-    // Attach the scroll event listener on mount
     onMount(() => {
         window.addEventListener("scroll", checkScrollPosition);
-        // Run it once immediately to set the initial state
         checkScrollPosition();
+
         return () => {
             window.removeEventListener("scroll", checkScrollPosition);
         };
@@ -76,40 +67,46 @@
 
     $: isOnBeatsRoute = $page.url.pathname === "/portal";
 
-    $: hideStreamPlayer = (!$scrolledTwoFifty && isOnBeatsRoute) || $audioPlayerState === "Idle";
+    $: hideStreamPlayer =
+        (!$scrolledTwoFifty && isOnBeatsRoute) ||
+        $audioPlayerState === "Idle";
+
+    // true = audio player is showing
+    $: showAudioPlayer.set(
+        Boolean($selectedBeat) && !hideStreamPlayer && !$inTimeout
+    );
 </script>
 
 {#if $selectedBeat}
     <div
-        class="audioStreamWrapper"
+        class="as_wrapper"
         class:hideStreamPlayer={hideStreamPlayer || $inTimeout}
     >
         <AudioRange
             roundedEdges={false}
             showTrackTime={false}
-            imageUrl={$selectedBeat.artworkUrl || null}
+            audio={$audioStore ?? undefined}
+
         />
 
         <div class="innerAudio">
-            <!-- fade help -->
-            <button class="bottomArt" on:click={() => { goto("/portal"); }}>
-                <img
-                    class="miniArt"
-                    src="{$selectedBeat.artworkUrl}"
-                    alt="{$selectedBeat.beatTitle}"
-                />
+            <button
+                class="as_albumArtwork"
+                on:click={() => {
+                    goto("/portal");
+                }}
+            >
+                <AlbumArtwork width={"100%"} imageUrl={$selectedBeat.artworkUrl} />
             </button>
 
             <div class="streamInfoFlex">
-                <!-- fade help -->
                 <div class="trackInfoStream">
-                    <p>{$selectedBeat.beatTitle}</p>
-                    <p style="opacity: .5; font-size: 9pt">
+                    <p class="as_title">{$selectedBeat.beatTitle}</p>
+                    <p class="as_subtitle">
                         {$selectedBeat.bpm} BPM - {$selectedBeat.key} {$selectedBeat.mode}
                     </p>
                 </div>
 
-                <!-- fade help -->
                 <div class="streamTrackControls">
                     <div class="wrapSeeka">
                         <SeekButton
@@ -121,6 +118,7 @@
                             rewindOrForward={"rewind"}
                         />
                     </div>
+
                     <PlayPauseButton
                         playOrPause={playOrPauseIcon}
                         isDisabled={
@@ -129,6 +127,7 @@
                         }
                         on:togglePlayPause={() => {
                             resetTrackTimer();
+
                             $audioPlayerState === "Playing"
                                 ? pauseTrack()
                                 : playTrack();
@@ -138,6 +137,7 @@
                         pauseIconHeight={"20px"}
                         height={"50px"}
                     />
+
                     <div class="wrapSeeka">
                         <SeekButton
                             iconHeight={"12px"}
@@ -167,13 +167,14 @@
             <br />
             <p>Are you still there?</p>
             <br />
+
             <div style="display: flex; justify-content: space-between;">
                 <div></div>
+
                 <BoxButton
-                    buttonStyle={"stayWhite"}
                     fullWidth={true}
                     buttonText={"Yes"}
-                    on:click={(e) => {
+                    on:click={() => {
                         resetTrackTimer();
                         playTrack();
                     }}

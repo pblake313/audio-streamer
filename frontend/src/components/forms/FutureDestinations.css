@@ -1,0 +1,116 @@
+.fd_button {
+    background-color: transparent;
+    height: 30px;
+    width: fit-content;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 0px;
+    transition: .3s;
+    border: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.fd_button:focus,
+.fd_button:focus-visible,
+.fd_button:active {
+    outline: none;
+    box-shadow: none;
+}
+
+.fd_loadWrap {
+    height: 30px;
+    aspect-ratio: 1 / 1;
+}
+
+.fd_buttonFlex {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fd_pattsway {
+    padding-top: 6px;
+}
+
+.fd_nonActive {
+    filter: grayscale(1);
+    transition: .3s;
+}
+
+.fd_nonActivePattsway {
+    filter: grayscale(1);
+    opacity: .3;
+    transition: .3s;
+}
+
+.fd_nonActiveSoundcloud {
+    opacity: .6;
+    filter: grayscale(1);
+    transition: .3s;
+}
+
+.fd_appLogo {
+    display: none;
+}
+
+/* Only apply hover effects on mouse/trackpad devices */
+@media (hover: hover) and (pointer: fine) {
+    .fd_nonActive:hover {
+        filter: grayscale(.3);
+    }
+
+    .fd_nonActivePattsway:hover {
+        opacity: .8;
+    }
+
+    .fd_nonActiveSoundcloud:hover {
+        opacity: 1;
+        filter: grayscale(.3);
+    }
+}
+
+/* Touch screens stay strictly active/inactive */
+@media (hover: none), (pointer: coarse) {
+    .fd_button:hover,
+    .fd_button:focus,
+    .fd_button:focus-visible,
+    .fd_button:active {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .fd_nonActive:hover,
+    .fd_nonActive:focus,
+    .fd_nonActive:active {
+        filter: grayscale(1);
+    }
+
+    .fd_nonActivePattsway:hover,
+    .fd_nonActivePattsway:focus,
+    .fd_nonActivePattsway:active {
+        filter: grayscale(1);
+        opacity: .3;
+    }
+
+    .fd_nonActiveSoundcloud:hover,
+    .fd_nonActiveSoundcloud:focus,
+    .fd_nonActiveSoundcloud:active {
+        opacity: .6;
+        filter: grayscale(1);
+    }
+}
+
+@media (max-width: 600px) {
+    .fd_largeLogo {
+        display: none;
+    }
+
+    .fd_appLogo {
+        display: block;
+    }
+
+    .fd_pattsway {
+        padding-top: 0;
+    }
+}

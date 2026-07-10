@@ -1,0 +1,88 @@
+.abToggler_main {
+    position: relative;
+
+    display: block;
+    flex: 0 0 auto;
+
+    padding: 0;
+    margin: 0 5px;
+
+    border: none;
+    border-radius: 50%;
+
+    background-color: transparent;
+    color: #2222227e;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0);
+
+    transition:
+        background-color 0.4s ease,
+        box-shadow 0.4s ease,
+        opacity 0.4s ease,
+        transform 0.15s ease;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+.abToggler_iconWrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transform: translate(-50%, -50%);
+}
+
+.abToggler_iconWrap :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.abToggler_main:hover {
+    background-color: rgba(100, 100, 100, 0.199);
+}
+
+.abToggler_main.abToggler_active {
+    background-color: rgba(255, 255, 255, 0.559);
+    transform: scale(0.94);
+}
+
+.abToggler_main.abToggler_active:hover {
+    background-color: rgba(255, 255, 255, 0.199);
+}
+
+.abToggler_showRing {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.abToggler_main:disabled {
+    opacity: 0.2;
+    cursor: default;
+}
+
+.abToggler_main:focus {
+    outline: none;
+}
+
+.abToggler_main:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.55);
+    outline-offset: 3px;
+}
+
+@media (hover: none), (pointer: coarse) {
+    .abToggler_main:hover {
+        background-color: transparent;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0);
+    }
+
+    .abToggler_main.abToggler_active,
+    .abToggler_main.abToggler_active:hover {
+        background-color: rgba(255, 255, 255, 0.559);
+    }
+}

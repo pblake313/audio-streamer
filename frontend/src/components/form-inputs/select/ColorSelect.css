@@ -1,85 +1,143 @@
-/* container & label */
-
 .colorSelectContainer {
     position: relative;
 }
 
 .colorSelectZTop {
-    z-index: 5;
-}
-
-.colorSelectSpacer {
-    height: 44px;
+    position: relative;
 }
 
 .colorSelectLabel {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     display: block;
     position: relative;
-    top: 0;
-    left: 0;
+    margin: 0px;
+    margin-bottom: 8px;
+    padding: 0px;
     font-size: 11pt;
-    opacity: 1;
-    padding: 0;
+    line-height: 1em;
     color: #b3b3b3;
 }
 
-.colorSelectHasError .colorSelectLabel {
-    color: #f94040;
+.colorSelectAnchor {
+    position: relative;
+    height: 46px;
 }
 
-/* button */
+.colorSelectWrap {
+    position: absolute;
+    width: calc(100% - 2px);
+
+    border: 1px solid #81818149;
+    border-radius: 8px;
+
+    background-color: #222222;
+
+    display: flex;
+    flex-direction: column;
+
+    max-height: 46px;
+    overflow: hidden;
+
+    transition:
+        max-height 220ms ease,
+        box-shadow 200ms ease,
+        border-color 200ms ease;
+}
+
+.colorSelectWrap.colorSelectOpenUp {
+    bottom: 0;
+    flex-direction: column-reverse;
+}
+
+.colorSelectWrap.colorSelectOpen {
+    max-height: calc(46px + 30vh);
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+    border-color: #81818149;
+}
+
+.colorSelectWrap.colorSelectHasError {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
+
+.colorSelectWrap.colorSelectHasError.colorSelectOpen {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
 
 .colorSelectButton {
     display: block;
-    background-color: #222222;
-    border: 1px solid #81818149;
-    border-radius: 4px;
-    position: absolute;
     width: 100%;
-    transition: 0.3s;
-    padding: 0;
-    margin: 0;
-    bottom: 0;
+    height: 46px;
+
+    border: none;
+    outline: none;
+
+    background-color: #222222;
+    color: #6e7075;
+
+    font-size: 11pt;
+    text-align: left;
+    line-height: 1em;
+
+    padding: 14px;
+    padding-right: 42px;
+
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 0 0 1px transparent;
+
+    position: relative;
+    flex-shrink: 0;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 }
 
-.colorSelectButton.colorSelectOpen {
-    box-shadow: 0 0 0 1px #b8b8b8;
+.colorSelectButton:hover {
+    background-color: #292929;
 }
 
-/* selected text */
+.colorSelectButton.colorSelectHasSelection {
+    color: #d1d1d1;
+}
+
+.colorSelectButton:focus-visible {
+    box-shadow: inset 0px 0px 0px 1px #b8b8b8;
+}
+
+.colorSelectPlaceholder {
+    display: block;
+    width: 100%;
+
+    color: #6e7075;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
 
 .colorSelectText {
-    margin: 0;
-    text-align: left;
-    margin-bottom: 0;
-    padding: 14px 40px 14px 14px;
-    color: #6e7075;
-    font-size: 11pt;
-    border-radius: 4px;
-    line-height: 1em;
-    transition: color 0.3s ease;
-}
+    display: block;
+    width: 100%;
 
-.colorSelectHasSelection {
-    color: #f7f7f7;
-}
+    color: #d1d1d1;
 
-.colorSelectTextOpen {
-    border-radius: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
-
-/* arrow */
 
 .colorSelectArrowWrapper {
     position: absolute;
     height: 20px;
     width: 20px;
-    top: 12px;
+    top: 13px;
     right: 10px;
-    transition: 0.3s;
+    transition: 0.2s;
+    pointer-events: none;
 }
 
 .colorSelectArrowContainer {
@@ -88,123 +146,152 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) rotate(90deg);
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .colorSelectArrowRotated {
     transform: translate(-50%, -50%) rotate(270deg);
 }
 
-/* dropdown / scroll */
-
 .colorSelectOptions {
-    max-height: 30vh;
+    width: calc(100% - 2px);
+    margin: 0 auto;
+
+    background-color: #292929;
+
+    max-height: 0;
+    opacity: 0;
+    pointer-events: none;
+
     overflow-y: auto;
+    overflow-x: hidden;
+
     -webkit-overflow-scrolling: touch;
+
+    transform: translateY(-4px);
+
+    transition:
+        max-height 220ms ease,
+        opacity 160ms ease,
+        transform 160ms ease;
+
+    border-top: 1px solid #75757523;
+
     scrollbar-width: thin;
     scrollbar-color: rgba(248, 248, 248, 0.25) transparent;
-    position: absolute;
-    width: calc(100% - 2px);
-    background-color: #292929;
-    border-radius: 4px;
-    box-shadow: none;
-    transition: box-shadow 0.2s ease;
-    top: calc(100% + 8px); /* default: open DOWN */
-    bottom: auto;
-}
-
-.colorSelectOptions.colorSelectOpenUp {
-    top: auto;
-    bottom: calc(100% + 8px);
 }
 
 .colorSelectOptions.colorSelectOptionsOpen {
-    box-shadow: 0 0 0 1px #b8b8b8;
+    max-height: 30vh;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
 }
 
-/* scrollbars */
+.colorSelectOptions.colorSelectOptionsOpenUp {
+    border-top: none;
+    border-bottom: 1px solid #75757523;
+    transform: translateY(4px);
+}
+
+.colorSelectOptions.colorSelectOptionsOpen.colorSelectOptionsOpenUp {
+    transform: translateY(0);
+}
 
 .colorSelectOptions::-webkit-scrollbar {
     width: 6px;
 }
 
 .colorSelectOptions::-webkit-scrollbar-thumb {
-    background-color: rgba(216, 19, 19, 0.877);
+    background-color: rgba(175, 175, 175, 0.35);
     border-radius: 10px;
     transition: background-color 0.3s ease;
 }
 
 .colorSelectOptions:hover::-webkit-scrollbar-thumb,
 .colorSelectOptions:active::-webkit-scrollbar-thumb {
-    background-color: rgba(71, 172, 4, 0.25);
-}
-
-.colorSelectOptions {
-    scrollbar-width: thin;
+    background-color: rgba(175, 175, 175, 0.568);
 }
 
 .colorSelectOptions:hover {
     scrollbar-color: rgba(175, 175, 175, 0.568) transparent;
 }
 
-/* option buttons */
-
 .colorSelectOptionButton {
-    padding: 10px 20px;
-    background-color: #222222;
     display: block;
-    border: none;
     width: 100%;
-    text-align: left;
+
+    padding: 10px 20px;
+
+    background-color: #222222;
+    border: none;
     border-bottom: 1px solid #75757523;
+
+    text-align: left;
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition: background-color 0.2s ease;
 }
 
 .colorSelectOptionButton:hover {
-    cursor: pointer;
     background-color: #292929;
+}
+
+.colorSelectOptionButton:last-child {
+    border-bottom: none;
 }
 
 .colorSelectOptionPicked {
     background-color: rgba(97, 97, 97, 0.596);
 }
 
-.colorSelectOptionPicked p {
-    color: white;
-}
-
 .colorSelectOptionPicked:hover {
-           background-color: rgba(97, 97, 97, 0.596);
-
-
+    background-color: rgba(97, 97, 97, 0.596);
 }
 
-.colorSelectLabel p {
+.colorSelectOptionPicked p {
+    color: #ffffff;
+}
+
+.colorSelectOptionLabel {
+    margin: 0px;
+    padding: 0px;
+
     color: #b3b3b3;
-}
+    font-size: 11pt;
+    line-height: 1.2em;
 
-/* color row */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
 
 .colorSelectRow {
     display: flex;
     align-items: center;
     gap: 10px;
-    justify-content: space-between;
+    width: 100%;
 }
 
 .colorSelectDot {
     width: 14px;
+    min-width: 14px;
     height: 14px;
     border-radius: 50%;
     border: 1px solid #555;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .colorSelectTextWrapper {
-    width: calc(100% - 30px);
+    width: calc(100% - 24px);
+    min-width: 0;
     overflow: hidden;
 }
 
-.colorSelectTextWrapper p {
+.colorSelectTextWrapper p,
+.colorSelectTextWrapper span {
     display: block;
     width: 100%;
     white-space: nowrap;
@@ -212,12 +299,6 @@
     text-overflow: ellipsis;
 }
 
-.selectedColorRow{
-    padding-left: 18px;
-}
-
-.colorSelectHasSelection {
-    padding-left: 0px;
-    margin-left: 0px;
-    color: #d1d1d1;
+.colorSelectError {
+    margin-top: 8px;
 }

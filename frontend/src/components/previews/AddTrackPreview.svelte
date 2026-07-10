@@ -1,12 +1,17 @@
 <script lang="ts">
+    import type { Beat } from "../../lib/types/Beats";
+    import DeleteTrackForm from "../forms/DeleteTrackForm.svelte";
     import Logo from "../Icons/Logos/Logo.svelte";
     import SoundcloudLogo from "../Icons/Logos/SoundcloudLogo.svelte";
     import YoutubeLogo from "../Icons/Logos/YoutubeLogo.svelte";
     import BeatTag from "../misc/BeatTag.svelte";
+    import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import "./AddTrackPreview.css";
 
+    export let deleteBeat: Beat | null = null
+
     export let title: string | null = null;
-    export let bpm: number | null;
+    export let bpm: number | null = null;
     export let tagOne: string | null = null;
     export let tagTwo: string | null = null;
     export let albumUrl: string | null = null;
@@ -15,117 +20,66 @@
     export let mood: string | null = null;
     export let customTag: string | null = null;
     export let customTagColor: string | null = null;
-    export let heading: string = "Enter `heading`";
     export let futureDestinations: string[] = [];
 </script>
 
-<div class="trackPreviewWrapper">
+<div class="addTrackPreview_wrapper">
     {#if albumUrl}
-        <img class="backgroundPreviewArt" src={albumUrl} alt="ALBUM ART" />
+        <img
+            class="addTrackPreview_backgroundImage"
+            src={albumUrl}
+            alt="ALBUM ART"
+        />
     {/if}
 
-    <div class="insidePreview">
-        <p><b>{heading}</b></p>
-        <br />
+    <div class="addTrackPreview_container">
 
-        <div class="trackPreviewDetails">
-            <div class="previewArtwork">
-                {#if !albumUrl}
-                    <p class="missingArt">No Artwork Uploaded</p>
-                {:else}
-                    <img class="previewAlbum" src={albumUrl} alt="ALBUM ART" />
-                {/if}
-            </div>
-
-            <div class="trackInfoDetails">
-                <p class="keyJoint">
-                    {key ? key : "KEY"}
-                    {mode ? mode : "MODE"} - {bpm ? bpm : "0"} BPM
-                </p>
-
-                <h3>{title ? title : "Track Title"}</h3>
-
-                <div class="deskVersion">
-                    <div class="previewTags">
-                        {#if customTag || tagOne || tagTwo || mood}
-                            {#if customTag}
-                                <BeatTag
-                                    tagText={customTag}
-                                    tagColor={customTagColor
-                                        ? `#${customTagColor}`
-                                        : "#353535"}
-                                    tagTextColor={customTag && customTagColor
-                                        ? "#222222"
-                                        : "#a8a8a8"}
-                                ></BeatTag>
-                            {/if}
-                            {#if tagOne}
-                                <BeatTag tagText={tagOne}></BeatTag>
-                            {/if}
-                            {#if tagTwo}
-                                <BeatTag tagText={tagTwo}></BeatTag>
-                            {/if}
-                            {#if mood}
-                                <BeatTag tagText={mood}></BeatTag>
-                            {/if}
-                        {:else}
-                            <br />
-                        {/if}
-                    </div>
-                    {#if futureDestinations.length >= 1}
-                        <div class="futureDestinations">
-                            {#if futureDestinations.includes("Youtube")}
-                                <div class="wrapFDLogo">
-                                    <YoutubeLogo height={"20px"}></YoutubeLogo>
-                                </div>
-                            {/if}
-                            {#if futureDestinations.includes("SoundCloud")}
-                                <div class="wrapFDLogo">
-                                    <SoundcloudLogo height={"20px"}
-                                    ></SoundcloudLogo>
-                                </div>
-                            {/if}
-                            {#if futureDestinations.includes("Pattsway")}
-                                <div class="wrapFDLogo">
-                                    <Logo width={"80px"} color={"#f7f7f7"}
-                                    ></Logo>
-                                </div>
-                            {/if}
-                        </div>
-                    {/if}
-                </div>
-            </div>
+        <div class="addTrackPreview_artwork">
+            <AlbumArtwork width={'100%'} imageUrl={albumUrl} />
         </div>
 
-        <div class="mobileVers">
-            <div class="previewTags">
-                {#if customTag || tagOne || tagTwo || mood}
-                    {#if customTag}
-                        <BeatTag
-                            tagText={customTag}
-                            tagColor={customTagColor
-                                ? `#${customTagColor}`
-                                : "#353535"}
-                            tagTextColor={customTag && customTagColor
-                                ? "#222222"
-                                : "#a8a8a8"}
-                        ></BeatTag>
-                    {/if}
-                    {#if tagOne}
-                        <BeatTag tagText={tagOne}></BeatTag>
-                    {/if}
-                    {#if tagTwo}
-                        <BeatTag tagText={tagTwo}></BeatTag>
-                    {/if}
-                    {#if mood}
-                        <BeatTag tagText={mood}></BeatTag>
-                    {/if}
-                {:else}
-                    <br />
+        <div class="addTrackPreview_trackDetails">
+            <p class="addTrackPreview_keyBpm">
+                {key ? key : "KEY"}
+                {mode ? mode : "MODE"} <span style="opacity: .3;">|</span> {bpm ? bpm : "0"} BPM
+            </p>
+
+            <h2 class="addTrackPreview_title">{title ? title : "Track Title"}</h2>
+
+            <div class="addTrackPreview_tags">
+                {#if customTag}
+                    <BeatTag
+                        tagText={customTag}
+                        tagColor={customTagColor
+                            ? `#${customTagColor}`
+                            : "#353535"}
+                        tagTextColor={customTag && customTagColor
+                            ? "#222222"
+                            : "#f7f7f7"}
+                    ></BeatTag>
                 {/if}
+                {#if tagOne}
+                    <BeatTag tagText={tagOne}></BeatTag>
+                {/if}
+                {#if tagTwo}
+                    <BeatTag tagText={tagTwo}></BeatTag>
+                {/if}
+                {#if mood}
+                    <BeatTag tagText={mood}></BeatTag>
+                {/if}
+
             </div>
+
+            {#if deleteBeat}
+                <div class="addTrackPreview_wrapDeleteBeat">
+                    <DeleteTrackForm beat={deleteBeat}/>
+                </div>
+            {/if}
+
+
+
             {#if futureDestinations.length >= 1}
-                <div class="futureDestinations">
+                <div class="addTrackPreview_destinations">
                     {#if futureDestinations.includes("Youtube")}
                         <div class="wrapFDLogo">
                             <YoutubeLogo height={"20px"}></YoutubeLogo>
@@ -133,7 +87,8 @@
                     {/if}
                     {#if futureDestinations.includes("SoundCloud")}
                         <div class="wrapFDLogo">
-                            <SoundcloudLogo height={"20px"}></SoundcloudLogo>
+                            <SoundcloudLogo height={"20px"}
+                            ></SoundcloudLogo>
                         </div>
                     {/if}
                     {#if futureDestinations.includes("Pattsway")}
@@ -143,6 +98,7 @@
                     {/if}
                 </div>
             {/if}
+
         </div>
     </div>
 

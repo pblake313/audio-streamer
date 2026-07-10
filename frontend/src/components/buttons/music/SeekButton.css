@@ -5,19 +5,20 @@
     border: none;
     cursor: pointer;
     transition: 0.4s;
-    -webkit-tap-highlight-color: transparent; /* Removes highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* ========================================= */
 /* HOVER (only if NOT disabled)              */
+/* Matches play/pause hover                  */
 /* ========================================= */
 .seekerButton:not(:disabled):hover {
     opacity: 1;
-    background-color: rgba(255, 255, 255, 0.176);
+    background-color: rgba(100, 100, 100, 0.199);
 }
 
 .seekerButton:not(:disabled).activeSeeker:hover {
-    background-color: rgba(255, 255, 255, 0.559);
+    background-color: rgba(255, 255, 255, 0.199);
 }
 
 /* Flash state from JS */
@@ -41,11 +42,10 @@
 
 /* ========================================= */
 /* DISABLED STATE                            */
-/* (delay kept EXACTLY as you had it)        */
 /* ========================================= */
 .seekerButton:disabled {
     opacity: 0.2;
-    transition: opacity 0.4s ease 1s; /* kept */
+    transition: opacity 0.4s ease 1s;
 }
 
 /* ========================================= */
@@ -71,6 +71,7 @@
 /* ========================================= */
 @media (pointer: coarse) {
     .seekerButton:not(:disabled):hover {
+        background-color: transparent;
         opacity: 1;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0);
     }
@@ -82,18 +83,15 @@
 
 /* ========================================= */
 /* TOUCH DEVICES WITH NO HOVER               */
-/* (Safari + iOS sticky-hover fix)           */
+/* Safari + iOS sticky-hover fix             */
 /* ========================================= */
 @media (hover: none) and (pointer: coarse) {
-
-    /* Don't let hover stick after tap */
     .seekerButton:not(:disabled):hover {
         background-color: transparent;
         opacity: 1;
         box-shadow: none;
     }
 
-    /* No focus highlight */
     .seekerButton:focus {
         background-color: transparent;
         outline: none;
@@ -105,6 +103,4 @@
         outline: none;
         box-shadow: none;
     }
-
-    /* DO NOT touch activeSeeker or :active */
 }

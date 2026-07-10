@@ -1,6 +1,6 @@
 <script lang="ts">
   import AddIcon from "../../Icons/svg/AddIcon.svelte";
-import SpinLoader from "../../loaders/SpinLoader.svelte";
+import SpinLoader from "../../loaders/Loader.svelte";
 import CartIcon from "../../svg/Icons/CartIcon.svelte";
   import PauseIcon from "../../Icons/svg/PauseIcon.svelte";
 import PlayIcon from "../../svg/Icons/PlayIcon.svelte";

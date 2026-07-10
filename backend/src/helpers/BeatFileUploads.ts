@@ -1,97 +1,261 @@
-import admin from 'firebase-admin';
-import sharp from 'sharp';
-import type { Server } from 'socket.io';
+import admin from "firebase-admin";
+import sharp from "sharp";
+import { parseBuffer } from "music-metadata";
 
 type UploadBeatParams = {
-  file: Express.Multer.File;
-  socketId: string;
-  beatId: string;
-  io: Server;
+    file: Express.Multer.File;
+    beatId: string;
 };
 
+/* ---------------------------------------------
+   Validation
+---------------------------------------------- */
 
-export async function uploadBeatArtwork({
-  file,
-  socketId,
-  beatId,
-  io
-}: UploadBeatParams): Promise<string> {
-  const bucket = admin.storage().bucket();
-  const fileName = `Beats/${beatId}/Artwork/${beatId}`;
-  io.to(socketId).emit('uploadStarted', 'artwork');
-
-  // convert to webp if image
-  let fileBuffer = file.buffer;
-  if (file.mimetype.startsWith('image/')) {
-    try {
-      fileBuffer = await sharp(file.buffer).webp().toBuffer();
-    } catch (error) {
-      console.error(error);
-      throw new Error('Error converting image to WebP format.');
+async function validateArtworkFile(
+    file: Express.Multer.File,
+): Promise<void> {
+    if (!file?.buffer?.length) {
+        throw new Error("Artwork file is missing or empty.");
     }
-  }
 
-  const fileUpload = bucket.file(fileName);
+    try {
+        const metadata = await sharp(file.buffer).metadata();
 
-  return new Promise((resolve, reject) => {
-    const blobStream = fileUpload.createWriteStream({
-      metadata: {
-        contentType: file.mimetype.startsWith('image/')
-          ? 'image/webp'
-          : file.mimetype,
-      },
-    });
+        if (
+            !metadata.format ||
+            !metadata.width ||
+            !metadata.height
+        ) {
+            throw new Error("Invalid image metadata.");
+        }
 
-    blobStream.on('error', (error) => {
-      return reject({
-        message: 'Unable to upload file, something went wrong.',
-        fileName: file.originalname,
-      });
-    });
+        if (metadata.format === "svg") {
+            throw new Error(
+                "SVG artwork files are not supported.",
+            );
+        }
+    } catch (error: any) {
+        if (
+            error?.message ===
+            "SVG artwork files are not supported."
+        ) {
+            throw error;
+        }
 
-    blobStream.on('finish', () => {
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
-      io.to(socketId).emit('uploadComplete', 'artwork');
-      resolve(publicUrl);
-    });
-
-    blobStream.end(fileBuffer);
-  });
+        throw new Error(
+            "Artwork must be a valid JPG, JPEG, PNG, WebP, GIF, TIFF, AVIF, HEIF, or another supported raster image.",
+        );
+    }
 }
 
-export async function uploadBeatMp3({
-  file,
-  socketId,
-  beatId,
-  io
+async function validateMp3File(
+    file: Express.Multer.File,
+): Promise<void> {
+    if (!file?.buffer?.length) {
+        throw new Error("MP3 file is missing or empty.");
+    }
+
+    try {
+        const metadata = await parseBuffer(
+            file.buffer,
+            {
+                mimeType: "audio/mpeg",
+                size: file.size,
+                path: file.originalname,
+            },
+            {
+                duration: false,
+                skipCovers: true,
+            },
+        );
+
+        const container =
+            metadata.format.container?.toLowerCase() ?? "";
+
+        const codec =
+            metadata.format.codec?.toLowerCase() ?? "";
+
+        const isMp3 =
+            container.includes("mpeg") &&
+            (
+                codec.includes("layer 3") ||
+                codec.includes("layer iii") ||
+                codec.includes("mp3")
+            );
+
+        if (!isMp3) {
+            throw new Error("Not a valid MP3.");
+        }
+    } catch {
+        throw new Error(
+            "Audio file must be a valid MP3 file.",
+        );
+    }
+}
+
+/* ---------------------------------------------
+   Storage URL
+---------------------------------------------- */
+
+function createStorageUrl(
+    bucketName: string,
+    fileName: string,
+): string {
+    const encodedFileName = fileName
+        .split("/")
+        .map(encodeURIComponent)
+        .join("/");
+
+    return (
+        `https://storage.googleapis.com/` +
+        `${bucketName}/${encodedFileName}`
+    );
+}
+
+/* ---------------------------------------------
+   Upload artwork
+---------------------------------------------- */
+
+export async function uploadBeatArtwork({
+    file,
+    beatId,
 }: UploadBeatParams): Promise<string> {
-  const bucket = admin.storage().bucket();
-  const fileName = `Beats/${beatId}/MP3Preview/${beatId}`;
-  io.to(socketId).emit('uploadStarted', 'mp3');
+    await validateArtworkFile(file);
 
-  const fileBuffer = file.buffer;
-  const fileUpload = bucket.file(fileName);
+    const bucket = admin.storage().bucket();
 
-  return new Promise((resolve, reject) => {
-    const blobStream = fileUpload.createWriteStream({
-      metadata: {
-        contentType: file.mimetype,
-      },
+    // The object is overwritten, but the returned URL is
+    // versioned so the browser does not reuse the old image.
+    const fileName =
+        `Beats/${beatId}/Artwork/${beatId}.webp`;
+
+    let fileBuffer: Buffer;
+
+    try {
+        fileBuffer = await sharp(file.buffer)
+            .rotate()
+            .webp({
+                quality: 85,
+            })
+            .toBuffer();
+    } catch (error: any) {
+        throw new Error(
+            error?.message ||
+                "Error converting artwork to WebP format.",
+        );
+    }
+
+    const fileUpload = bucket.file(fileName);
+
+    return new Promise((resolve, reject) => {
+        const blobStream = fileUpload.createWriteStream({
+            resumable: false,
+            metadata: {
+                contentType: "image/webp",
+                cacheControl:
+                    "public, max-age=31536000, immutable",
+            },
+        });
+
+        blobStream.on("error", (error) => {
+            reject(
+                new Error(
+                    error.message ||
+                        "Unable to upload artwork file.",
+                ),
+            );
+        });
+
+        blobStream.on("finish", async () => {
+            try {
+                await fileUpload.makePublic();
+
+                const publicUrl = createStorageUrl(
+                    bucket.name,
+                    fileUpload.name,
+                );
+
+                const versionedUrl =
+                    `${publicUrl}?v=${Date.now()}`;
+
+                resolve(versionedUrl);
+            } catch (error: any) {
+                reject(
+                    new Error(
+                        error?.message ||
+                            "Artwork uploaded, but failed to make it public.",
+                    ),
+                );
+            }
+        });
+
+        blobStream.end(fileBuffer);
     });
+}
 
-    blobStream.on('error', (error) => {
-      return reject({
-        message: 'Unable to upload file, something went wrong.',
-        fileName: file.originalname,
-      });
+/* ---------------------------------------------
+   Upload MP3
+---------------------------------------------- */
+
+export async function uploadBeatMp3({
+    file,
+    beatId,
+}: UploadBeatParams): Promise<string> {
+    await validateMp3File(file);
+
+    const bucket = admin.storage().bucket();
+    const uploadVersion = Date.now();
+
+    // Use a new object name for each upload so the raw private
+    // URL genuinely changes and the audio element cannot reuse
+    // the previous MP3.
+    const fileName =
+        `Beats/${beatId}/MP3Preview/` +
+        `${beatId}-${uploadVersion}.mp3`;
+
+    const fileUpload = bucket.file(fileName);
+
+    return new Promise((resolve, reject) => {
+        const blobStream = fileUpload.createWriteStream({
+            resumable: false,
+            metadata: {
+                contentType: "audio/mpeg",
+                cacheControl:
+                    "private, no-store, max-age=0, no-transform",
+            },
+        });
+
+        blobStream.on("error", (error) => {
+            reject(
+                new Error(
+                    error.message ||
+                        "Unable to upload MP3 file.",
+                ),
+            );
+        });
+
+        blobStream.on("finish", async () => {
+            try {
+                await fileUpload.makePrivate({
+                    strict: false,
+                });
+
+                const privateUrl = createStorageUrl(
+                    bucket.name,
+                    fileUpload.name,
+                );
+
+                resolve(privateUrl);
+            } catch (error: any) {
+                reject(
+                    new Error(
+                        error?.message ||
+                            "MP3 uploaded, but failed to keep it private.",
+                    ),
+                );
+            }
+        });
+
+        blobStream.end(file.buffer);
     });
-
-    blobStream.on('finish', () => {
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
-      io.to(socketId).emit('uploadComplete', 'mp3');
-      resolve(publicUrl);
-    });
-
-    blobStream.end(fileBuffer);
-  });
 }

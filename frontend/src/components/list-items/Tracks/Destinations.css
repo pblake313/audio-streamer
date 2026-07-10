@@ -1,0 +1,18 @@
+.destinations_flex{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.destinations_mobile{
+    display: none;
+}
+@media (max-width: 1050px) {
+    .destinations_mobile{
+        display: block;
+        padding-top: 2px;
+    }
+    .destinations_desk{
+        display: none;
+    }
+    
+}

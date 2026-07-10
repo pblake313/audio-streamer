@@ -2,20 +2,17 @@
     import "./BoxButton.css";
     import CloseIcon from "../Icons/svg/CloseIcon.svelte";
     import MoreIcon from "../Icons/svg/MoreIcon.svelte";
-    import SpinLoader from "../loaders/SpinLoader.svelte";
+    import SpinLoader from "../loaders/Loader.svelte";
     import AddIcon from "../Icons/svg/AddIcon.svelte";
     import TrashIcon from "../Icons/svg/TrashIcon.svelte";
 
-    export let buttonText: string = "Enter Button Text";
+    export let buttonText: string | null = "Enter Button Text";
     export let buttonStyle:
         | "stockButton"
-        | "ghostButton"
-        | "lightHouse"
-        | "whiteButton"
-        | "stayWhite"
+        | "secondary"
         | "opacityIncrease"
-        | "whiteLightning"
-        | "danger" = "stockButton";
+        | "clear"
+        | "glass" = "stockButton";
     export let buttonIcon:
         | "add"
         | "close"
@@ -29,7 +26,6 @@
     export let fullWidth: boolean = false;
     export let isDisabled: boolean = false;
     export let noPad: boolean = false;
-    export let fontSize: string = "11pt";
     export let iconColor: string = "ffffff";
 </script>
 
@@ -44,7 +40,7 @@
 >
     <div class="innaFlex">
         {#if buttonIcon}
-            <div class:wrapTheIcon={buttonText.trim() !== ""}>
+            <div class:wrapTheIcon={buttonText?.trim() !== ""}>
                 {#if buttonIcon === "add"}
                     <div style="margin-top: 4px;">
                         <AddIcon height={"18px"} color={iconColor}></AddIcon>
@@ -66,29 +62,24 @@
                 {#if buttonIcon === "more"}
                     <div style="margin-top: 3px;">
                         <MoreIcon
-                            height={buttonText.trim() !== "" ? "16px" : "19px"}
+                            height={buttonText?.trim() !== "" ? "16px" : "19px"}
                         ></MoreIcon>
                     </div>
                 {/if}
 
                 {#if buttonIcon === "loading"}
                     <SpinLoader
-                        height={"24px"}
+                        height={"20px"}
                         color={buttonStyle === "stockButton"
-                            ? "#ffffff"
-                            : "#000000"}
+                            ? "#222222"
+                            : "#f7f7f7"}
                     ></SpinLoader>
                 {/if}
             </div>
         {/if}
 
-        {#if buttonIcon !== "loading"}
-            <p
-                class="fixa"
-                style="white-space: nowrap; font-size: {fontSize}; "
-            >
-                {buttonText}
-            </p>
+        {#if buttonText}
+            {buttonText}
         {/if}
     </div>
 </button>

@@ -2,6 +2,7 @@
     import { audioPlayerState, pauseTrack, playTrack, resetTrackTimer, smartNextTrack, smartPreviousTrack, userTapped } from "../../stores/AudioPlayerStore";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import SeekButton from "../buttons/music/SeekButton.svelte";
+    import './AudioPlayerControls.css'
 
 
     function handlePlayPauseClick() {
@@ -25,9 +26,9 @@
 
 </script>
 
-<div class="highlightedTrackControls">
+<div class="apc_container">
     <SeekButton
-        iconHeight={"12px"}
+        iconHeight={"18px"}
         isDisabled={["Buffering", "Loading"].includes($audioPlayerState) &&
             $userTapped}
         on:seek={() => {
@@ -35,6 +36,7 @@
             smartPreviousTrack();
         }}
         rewindOrForward={"rewind"}
+        height={'55px'}
     />
 
     <div class="wPlayPlauser">
@@ -44,19 +46,22 @@
                 $userTapped}
             on:togglePlayPause={handlePlayPauseClick}
             color={"#f7f7f7"}
-            playIconHeight={"22px"}
-            pauseIconHeight={"20px"}
-            height={"50px"}
+
+            playIconHeight={"30px"}
+            pauseIconHeight={"30px"}
+            height={"65px"}
         />
     </div>
 
     <SeekButton
-        iconHeight={"12px"}
+        iconHeight={"18px"}
         isDisabled={["Buffering", "Loading"].includes($audioPlayerState) &&
             $userTapped}
         on:seek={() => {
             resetTrackTimer();
             smartNextTrack();
         }}
+        height={'55px'}
+
     />
 </div>

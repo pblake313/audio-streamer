@@ -1,6 +1,68 @@
-
 .wrapOnlyButton {
     width: fit-content;
     margin: auto;
-    padding: 25px 0px;
+    padding: 25px 0;
+}
+
+.trackList_filtersModeFlex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.trackList_filters {
+    flex: 1 1 auto;
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.trackList_filters :global(.beatFilters_flex) {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.trackList_modeToggler {
+    display: flex;
+    flex: 0 0 auto;
+    min-height: 30px;
+    align-items: center;
+}
+
+.trackList_modeToggleButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    background-color: transparent;
+
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+    padding-right: 12px;
+}
+
+.trackList_modeToggleButton:hover {
+    opacity: 1;
+}
+.trackList_megaWrap{
+    margin-bottom: 100px;
 }

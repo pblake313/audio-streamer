@@ -1,125 +1,190 @@
-.imageUploadLabel {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    display: block;
-    position: relative;
-    top: 0px;
-    left: 0px;
-    font-size: 11pt;
-    opacity: 1;
-    padding: 0px;
-}
-.imageUploadLabel p {
-    color: #b3b3b3;
-
-}
-
-    /* Minimal, non-invasive: tune sizes in your project */
-.dropZone {
-  border: 1px dashed #81818149;
-
-  border-radius: 4px;
-  padding: 14px;            /* adjust to your spacing scale */
-  background: #222;
-  cursor: pointer;
-  transition: .3s;
-  user-select: none;
-}
-
-.dropZone p {
-  margin: 0 0 6px 0;        /* keep tight like your current <p> spacing */
-}
-.dropZone small {
-  opacity: .7;
-}
-.dropZone.dragActive {
-    box-shadow: 0px 0px 0px 1px #b8b8b8; 
-    border: 1px solid #32323249;
-}
-.dropZone:focus {
-  outline: none;
-
-}
-.flexImageLabel{
+.mp3Up-labelRow {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    margin-bottom: 8px;
 }
-.maxLabelText{
-  font-size: 8pt;
-  opacity: 0.3;
-}
-.selectedImageFilename{
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+
+.mp3Up-label {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 11pt;
-}
-.dropZone:focus {
-  outline: none;
-  box-shadow: none; /* ← this is the gray ring you see */
-
-}
-.hasFileSelected{
-    box-shadow: none; 
-    border: 1px solid #81818149;
-}
-.hasFileSelected.dropZone.dragActive {
-        box-shadow: 0px 0px 0px 1px #b8b8b8; 
-    border: 1px solid #81818149;
+    line-height: 1em;
+    color: #b3b3b3;
 }
 
-.containNoFileZone p {
+.mp3Up-maxSize {
     margin: 0px;
+    padding: 0px;
+    font-size: 9pt;
+    line-height: 1em;
+    color: #b3b3b3;
+    opacity: 0.35;
+}
+
+.mp3Up-dropZone {
+    border: 1px dashed #81818149;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #222222;
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mp3Up-dropZone:hover {
+    border-color: #81818180;
+    background-color: #252525;
+}
+
+.mp3Up-dropZone.mp3Up-dragActive {
+    border: 1px solid #b8b8b8;
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+    background-color: #292929;
+}
+
+.mp3Up-dropZone:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.mp3Up-dropZone:focus-visible {
+    border: 1px solid #b8b8b8;
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+}
+
+.mp3Up-hasFile {
+    border: 1px solid #81818149;
+}
+
+.mp3Up-hasFile.mp3Up-dragActive {
+    border: 1px solid #b8b8b8;
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+}
+
+.mp3Up-error {
+    border-color: #c30d0d;
+    box-shadow: 0px 0px 0px 1px #c30d0d;
+}
+
+.mp3Up-errorText {
+    margin-top: 8px;
+}
+
+/* ---------------------------------------------
+   Empty state
+---------------------------------------------- */
+
+.mp3Up-emptyState {
+    padding: 14px 0px;
     text-align: center;
 }
-.acceptedFileTypeText{
-    font-size: 9pt;
-    opacity: .6;
-}
-.dndTop{
-    font-size: 10pt;
-    opacity: .9;
-}
-.containNoFileZone{
-    padding: 10px 0px;
-}
-.hasSelectedFileFlex{
-    display: flex;
-    justify-content: space-between;
-}
-.containRemovalButton{
-    width: 40px;
-}
-.containSelectedjoint{
-    width: calc(100% - 50px);
 
-    padding-top: 5px;
-
-}
-.selectedImageFilename {
+.mp3Up-emptyState p {
     margin: 0px;
-}
-.errorInput{
-    border: 1px solid #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d; 
-}
-.imgUp-emptyState {
-  padding: 10px 0;
-  text-align: center;
+    padding: 0px;
 }
 
-.imgUp-emptyTitle {
-  font-size: 10pt;
-  opacity: 0.9;
-  color: #d1d1d1;
+.mp3Up-emptyTitle {
+    font-size: 12pt;
+    line-height: 1.2em;
+    color: #d1d1d1;
+    margin-bottom: 8px !important;
 }
 
-.imgUp-fileTypes {
-  font-size: 9pt;
-  opacity: 0.6;
-  color: #d1d1d1;
+.mp3Up-fileTypes {
+    font-size: 11pt;
+    line-height: 1.2em;
+    color: #d1d1d1;
+    opacity: 0.55;
+}
+
+/* ---------------------------------------------
+   Selected file
+---------------------------------------------- */
+
+.mp3Up-selectedCard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 42px;
+    align-items: center;
+    gap: 12px;
+}
+
+.mp3Up-selectedInfo {
+    min-width: 0;
+}
+
+.mp3Up-selectedInfo p {
+    margin: 0px;
+    padding: 0px;
+}
+
+.mp3Up-selectedEyebrow {
+    font-size: 8pt;
+    line-height: 1em;
+    color: #b3b3b3;
+    opacity: 0.55;
+    margin-bottom: 6px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.mp3Up-fileName {
+    max-width: 100%;
+    font-size: 11pt;
+    line-height: 1.2em;
+    color: #d1d1d1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.mp3Up-fileMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 7px;
+}
+
+.mp3Up-fileMeta span {
+    font-family: var(--font-sans);
+    display: inline-block;
+    width: fit-content;
+    padding: 4px 7px;
+    border-radius: 999px;
+    background-color: rgba(97, 97, 97, 0.596);
+    color: #ffffff;
+    font-size: 10pt;
+    line-height: 1em;
+}
+
+.mp3Up-removeBtn {
+    width: 42px;
+}
+
+/* Prevent nested controls from opening picker */
+.mp3Up-noOpen {
+    cursor: default;
+}
+
+/* ---------------------------------------------
+   Visualizer
+---------------------------------------------- */
+
+.mp3Up-visualizerWrap {
+    margin-top: 15px;
+    cursor: default;
+}
+
+/* ---------------------------------------------
+   Mobile
+---------------------------------------------- */
+
+@media (max-width: 500px) {
+    .mp3Up-selectedCard {
+        grid-template-columns: minmax(0, 1fr) 42px;
+    }
 }

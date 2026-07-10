@@ -6,9 +6,8 @@ const COLLECTION = 'wrongPinAttempts';
 
 // Create a fresh wrong-pin doc for an IP (after deleting any previous ones)
 export async function createWrongPinDocument(ip: string): Promise<WrongPinDoc> {
-    console.log(ip);
-
     try {
+
         const now = new Date();
 
         const docData: Omit<WrongPinDoc, 'id'> = {
@@ -16,7 +15,8 @@ export async function createWrongPinDocument(ip: string): Promise<WrongPinDoc> {
             dateCreated: now,
             attempts: 1,
             blocked: false,
-            lastTouched: now
+            updatedAt: now,
+            lastAttempt: now
         };
 
         // Step 1: Query for existing docs with same IP
@@ -31,7 +31,6 @@ export async function createWrongPinDocument(ip: string): Promise<WrongPinDoc> {
 
         // Step 3: Add new doc
         const newDocRef = await db.collection(COLLECTION).add(docData);
-        console.log('Wrong PIN attempt logged.');
 
         // Return full typed doc (id is NOT stored in Firestore, just returned)
         return {
@@ -46,6 +45,7 @@ export async function createWrongPinDocument(ip: string): Promise<WrongPinDoc> {
 // Fetch the latest wrong-pin doc for an IP
 export async function getWrongPinDocByIP(ip: string): Promise<WrongPinDoc | null> {
     try {
+
         const snapshot = await db
             .collection(COLLECTION)
             .where('ip', '==', ip)
@@ -77,7 +77,7 @@ export async function incrementLastPinDoc(ip: string): Promise<WrongPinDoc> {
         );
 
         if (querySnap.empty) {
-            throw new Error(`WrongPin doc not found for ip ${ip}`);
+            throw new Error(`Wrong PIN DoC Not Found`);
         }
 
         const docSnap = querySnap.docs[0];
@@ -86,7 +86,7 @@ export async function incrementLastPinDoc(ip: string): Promise<WrongPinDoc> {
         const data = docSnap.data() as Omit<WrongPinDoc, 'id'>;
 
         // 2️⃣ Update attempts + lastTouched
-        const now = new Date();
+        const now = new Date(); 
         const newAttempts = (data.attempts ?? 0) + 1;
 
         // 3️⃣ Determine if blocked
@@ -95,7 +95,8 @@ export async function incrementLastPinDoc(ip: string): Promise<WrongPinDoc> {
         // 4️⃣ Apply update in Firestore
         tx.update(docRef, {
             attempts: newAttempts,
-            lastTouched: now,
+            updatedAt: now,
+            lastAttempt: now,
             blocked
         });
 
@@ -104,7 +105,8 @@ export async function incrementLastPinDoc(ip: string): Promise<WrongPinDoc> {
             id: docRef.id,
             ...data,
             attempts: newAttempts,
-            lastTouched: now,
+            lastAttempt: now,
+            updatedAt: now,
             blocked
         };
     });

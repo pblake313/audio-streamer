@@ -1,6 +1,6 @@
 .singleNotification {
     margin-bottom: 15px;
-    border-radius: 4px;
+    border-radius: 10px;
     transition: .3s;
     background-color: #f7f7f7;
     display: flex;
@@ -24,7 +24,7 @@
     left: 0px;
     height: 100%;
     width: 4px;
-    border-radius: 6px;
+    border-radius: 8px;
     background-color: #0091ff;
 }
 .holdIconJoint {

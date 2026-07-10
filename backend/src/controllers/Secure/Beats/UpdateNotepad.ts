@@ -1,33 +1,42 @@
-import { Request, Response } from "express";
-import { updateBeat } from "../../../helpers/UpdateBeatHelper";
+import { NextFunction, Request, Response } from "express";
+import admin from "firebase-admin";
 
-export async function updateNotepad(req: Request, res: Response) {
+export async function updateNotepad(req: Request, res: Response, next: NextFunction) {
     try {
-
-        console.log(req.body)
-
         const beatId = req.params.beatId;
+        if (!beatId) {
+            throw new Error("Missing beat id.");
+        }
+
         const newNotepad = req.body.newNotepad;
-        const newDestinations = req.body.newDestinations
-        if (newNotepad && typeof newNotepad !== 'string') {
-            throw new Error('Invalid Request')
+
+        if (typeof newNotepad !== "string") {
+            throw new Error("Invalid request. Notepad must be a string.");
         }
 
-        // Validate futureDestinations -------------------
-        if (!Array.isArray(newDestinations)) {
-            throw new Error("Invalid request: destinations must be an array.");
-        }
-        if (!newDestinations.every((d) => typeof d === "string")) {
-            throw new Error("Invalid request: destinations must contain only strings.");
+        if (newNotepad.length > 750) {
+            throw new Error("Notepad must be under 750 characters.");
         }
 
-        const updatedBeat = await updateBeat(beatId, {
-            notepad: newNotepad, 
-            futureDestinations: newDestinations
+
+        const beatRef = admin
+            .firestore()
+            .collection("Beats")
+            .doc(beatId);
+
+        const beatSnap = await beatRef.get();
+
+        if (!beatSnap.exists) {
+            throw new Error("Beat not found.");
+        }
+
+        await beatRef.update({
+            notepad: newNotepad,
+            updatedAt: new Date()
         });
 
-        return res.status(200).json({ updatedBeat });
+        return res.status(200).send({ notepad: newNotepad });
     } catch (err: any) {
-        return res.status(500).json({ error: err.message || 'An unknown error has occurred.' });
+        next(err)
     }
 }

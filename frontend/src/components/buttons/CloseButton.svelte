@@ -5,7 +5,7 @@
     export let buttonStyle: "standard" | "ghost" = "standard";
     export let tightPad: boolean = false;
     export let iconThickness: "thin" | "thick" = "thin";
-    export let color = "#393939";
+    export let color = "f7f7f7";
 </script>
 
 <button type="button" on:click class={buttonStyle} class:tighten={tightPad}>

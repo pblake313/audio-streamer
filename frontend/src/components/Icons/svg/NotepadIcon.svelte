@@ -2,7 +2,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
 
-    export let color: string = 'ffffff'
+    export let color: string = 'f7f7f7'
 
     let uniqueId = '';
 

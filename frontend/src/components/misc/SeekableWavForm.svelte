@@ -1,13 +1,7 @@
 <script lang="ts">
     import { onDestroy, onMount, tick } from "svelte";
-    import { get } from "svelte/store";
-    import {
-        audioStore,
-        audioPlayerState,
-        resetTrackTimer,
-        userTapped,
-    } from "../../stores/AudioPlayerStore";
 
+    export let audio: HTMLAudioElement | undefined = undefined;
     export let audioUrl: string | null = null;
 
     export let height = 26;
@@ -22,16 +16,21 @@
     export let seekWhileScrolling = false;
     export let scrollLockThresholdPx = 10;
 
-    export let mirrorScale = 0.55; // bottom is smaller than top
-    export let gapPx = 4; // separation band thickness
-    export let gapOpacity = 0.12; // how visible the band is
+    // Keep waveform bars from disappearing.
+    // This makes every visible waveform bar at least 1px high.
     export let minBarPx = 1;
 
-    export let bottomFadeStart = 0.0;
-    // if true, a tap/drag seek will start playback if currently paused/idle
+    export let noAudioMessage = "No audio preview available.";
+    export let audioErrorFallbackMessage =
+        "Unable to load this audio preview.";
+
+    // Smooth fade-out duration when changing tracks.
+    export let waveformOutMs = 220;
+
+    // If true, seeking starts playback when the audio is paused.
     export let autoPlayOnSeek = false;
 
-    // timeouts
+    // Timeouts.
     export let fetchTimeoutMs = 15000;
     export let decodeTimeoutMs = 9000;
 
@@ -42,6 +41,7 @@
         | "Computing peaks"
         | "Ready"
         | "Error";
+
     let status: VizStatus = "Idle";
     let decodeError: string | null = null;
 
@@ -60,59 +60,102 @@
     let jobId = 0;
     let decodeAbort: AbortController | null = null;
 
-    // cached recompute keys
+    // Cached recompute keys.
     let lastBarCount = 0;
     let lastCssW = 0;
     let lastRawLen = 0;
 
-    // morph animation
+    // Morph animation.
     let morphActive = false;
     let morphStart = 0;
     let morphDur = 220;
     let morphFrom: number[] = [];
     let morphTo: number[] = [];
 
+    // Out transition.
+    let isWaveLeaving = false;
+    let frozenProgress: number | null = null;
+
+    $: displayedErrorMessage = decodeError;
+
+    $: shouldDrawWaveform =
+        displayPeaks.length > 0 &&
+        !displayedErrorMessage &&
+        (status === "Ready" || isWaveLeaving);
+
+    function sleep(ms: number) {
+        return new Promise<void>((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+    function nextFrame() {
+        return new Promise<void>((resolve) => {
+            requestAnimationFrame(() => resolve());
+        });
+    }
+
     function withTimeout<T>(
-        p: Promise<T>,
+        promise: Promise<T>,
         ms: number,
         label: string,
     ): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            const t = setTimeout(
-                () => reject(new Error(`${label} timed out after ${ms}ms`)),
-                ms,
-            );
-            p.then(
-                (v) => {
-                    clearTimeout(t);
-                    resolve(v);
+            const timeout = setTimeout(() => {
+                reject(
+                    new Error(
+                        `${label} timed out after ${ms}ms`,
+                    ),
+                );
+            }, ms);
+
+            promise.then(
+                (value) => {
+                    clearTimeout(timeout);
+                    resolve(value);
                 },
-                (e) => {
-                    clearTimeout(t);
-                    reject(e);
+                (error) => {
+                    clearTimeout(timeout);
+                    reject(error);
                 },
             );
         });
     }
 
-    function easeInOutCubic(x: number) {
-        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-    }
-    function lerp(a: number, b: number, t: number) {
-        return a + (b - a) * t;
+    function easeInOutCubic(value: number) {
+        return value < 0.5
+            ? 4 * value * value * value
+            : 1 - Math.pow(-2 * value + 2, 3) / 2;
     }
 
-    function ensureDisplayLength(n: number) {
-        if (displayPeaks.length === n) return;
-        const next = new Array(n).fill(0);
-        for (let i = 0; i < Math.min(displayPeaks.length, n); i++)
-            next[i] = displayPeaks[i];
+    function lerp(
+        start: number,
+        end: number,
+        progress: number,
+    ) {
+        return start + (end - start) * progress;
+    }
+
+    function ensureDisplayLength(length: number) {
+        if (displayPeaks.length === length) return;
+
+        const next = new Array(length).fill(0);
+
+        for (
+            let index = 0;
+            index < Math.min(displayPeaks.length, length);
+            index++
+        ) {
+            next[index] = displayPeaks[index];
+        }
+
         displayPeaks = next;
     }
 
     function startMorph(to: number[], ms = 220) {
-        const n = to.length;
-        ensureDisplayLength(n);
+        const length = to.length;
+
+        ensureDisplayLength(length);
 
         morphFrom = displayPeaks.slice();
         morphTo = to.slice();
@@ -124,52 +167,85 @@
     function stepMorph(now: number) {
         if (!morphActive) return;
 
-        const p = Math.min(1, (now - morphStart) / morphDur);
-        const e = easeInOutCubic(p);
+        const progress = Math.min(
+            1,
+            (now - morphStart) / morphDur,
+        );
 
-        const n = morphTo.length;
-        ensureDisplayLength(n);
+        const easedProgress = easeInOutCubic(progress);
+        const length = morphTo.length;
 
-        for (let i = 0; i < n; i++) {
-            displayPeaks[i] = lerp(morphFrom[i] ?? 0, morphTo[i] ?? 0, e);
+        ensureDisplayLength(length);
+
+        for (let index = 0; index < length; index++) {
+            displayPeaks[index] = lerp(
+                morphFrom[index] ?? 0,
+                morphTo[index] ?? 0,
+                easedProgress,
+            );
         }
 
-        if (p >= 1) {
+        if (progress >= 1) {
             morphActive = false;
             displayPeaks = morphTo.slice();
         }
     }
 
     function getAudio() {
-        return get(audioStore);
+        return audio;
     }
 
     function getCurrentTime() {
-        const a = getAudio();
-        return a?.currentTime ?? 0;
+        const currentAudio = getAudio();
+
+        return currentAudio?.currentTime ?? 0;
     }
 
     function getDuration() {
-        // prefer decoded duration; fallback to media element
-        const a = getAudio();
-        const d = duration || (a?.duration ?? 0);
-        return isFinite(d) ? d : 0;
+        const currentAudio = getAudio();
+
+        const currentDuration =
+            duration || currentAudio?.duration || 0;
+
+        return Number.isFinite(currentDuration)
+            ? currentDuration
+            : 0;
     }
 
     function getProgress() {
-        const d = getDuration();
-        if (d <= 0) return 0;
-        return getCurrentTime() / d;
+        const currentDuration = getDuration();
+
+        if (currentDuration <= 0) return 0;
+
+        return getCurrentTime() / currentDuration;
+    }
+
+    function getDrawProgress() {
+        const progress = frozenProgress ?? getProgress();
+
+        return Math.max(
+            0,
+            Math.min(1, progress || 0),
+        );
     }
 
     function calcCanvasWidth(): number {
-        const minW = wrapEl?.clientWidth ?? 300;
-        return Math.max(1, Math.floor(minW * Math.max(1, zoom)));
+        const minimumWidth = wrapEl?.clientWidth ?? 300;
+
+        return Math.max(
+            1,
+            Math.floor(
+                minimumWidth * Math.max(1, zoom),
+            ),
+        );
     }
 
     let resizeRaf = 0;
+
     function requestResize() {
+        if (typeof window === "undefined") return;
         if (resizeRaf) return;
+
         resizeRaf = requestAnimationFrame(() => {
             resizeRaf = 0;
             resizeCanvas();
@@ -180,35 +256,63 @@
         if (!canvasEl || !wrapEl) return;
 
         const dpr = window.devicePixelRatio || 1;
-        const cssW = calcCanvasWidth();
+        const cssWidth = calcCanvasWidth();
+        const cssHeight = Math.max(
+            1,
+            Math.floor(height),
+        );
 
-        canvasEl.style.width = `${cssW}px`;
-        canvasEl.width = Math.max(1, Math.floor(cssW * dpr));
-        canvasEl.height = Math.max(1, Math.floor(height * dpr));
+        canvasEl.style.width = `${cssWidth}px`;
+        canvasEl.style.height = `${cssHeight}px`;
 
-        const g = canvasEl.getContext("2d");
-        if (!g) return;
-        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        canvasEl.width = Math.max(
+            1,
+            Math.floor(cssWidth * dpr),
+        );
 
-        // if we have raw data, we might need to recompute peaks for new width
+        canvasEl.height = Math.max(
+            1,
+            Math.floor(cssHeight * dpr),
+        );
+
+        const context = canvasEl.getContext("2d");
+
+        if (!context) return;
+
+        context.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0,
+        );
+
         if (rawData) {
-            const cssWNow = parseFloat(
-                canvasEl.style.width || `${canvasEl.clientWidth}`,
+            const currentCssWidth = parseFloat(
+                canvasEl.style.width ||
+                    `${canvasEl.clientWidth}`,
             );
-            const barCountNow = Math.max(
+
+            const currentBarCount = Math.max(
                 1,
-                Math.floor((cssWNow + barGap) / (barWidth + barGap)),
+                Math.floor(
+                    (currentCssWidth + barGap) /
+                        (barWidth + barGap),
+                ),
             );
 
             const needsRecompute =
                 !peaks.length ||
                 lastRawLen !== rawData.length ||
-                lastBarCount !== barCountNow ||
-                Math.abs(lastCssW - cssWNow) >= 1;
+                lastBarCount !== currentBarCount ||
+                Math.abs(
+                    lastCssW - currentCssWidth,
+                ) >= 1;
 
             if (needsRecompute) {
-                lastCssW = cssWNow;
-                lastBarCount = barCountNow;
+                lastCssW = currentCssWidth;
+                lastBarCount = currentBarCount;
                 lastRawLen = rawData.length;
 
                 computePeaks();
@@ -223,205 +327,233 @@
 
         status = "Computing peaks";
 
-        const cssW = parseFloat(
-            canvasEl.style.width || `${canvasEl.clientWidth}`,
+        const cssWidth = parseFloat(
+            canvasEl.style.width ||
+                `${canvasEl.clientWidth}`,
         );
+
         const barCount = Math.max(
             1,
-            Math.floor((cssW + barGap) / (barWidth + barGap)),
+            Math.floor(
+                (cssWidth + barGap) /
+                    (barWidth + barGap),
+            ),
         );
-        const blockSize = Math.max(1, Math.floor(rawData.length / barCount));
 
-        const nextPeaks = new Array(barCount);
+        const blockSize = Math.max(
+            1,
+            Math.floor(
+                rawData.length / barCount,
+            ),
+        );
+
+        const nextPeaks = new Array<number>(barCount);
+
         let maxPeak = 0;
 
-        // sample down a bit so it’s not expensive
-        const SAMPLES_PER_BAR = 1024;
+        const samplesPerBar = 1024;
 
-        for (let i = 0; i < barCount; i++) {
+        for (
+            let barIndex = 0;
+            barIndex < barCount;
+            barIndex++
+        ) {
             let peak = 0;
-            const start = i * blockSize;
-            const end = Math.min(rawData.length, start + blockSize);
+
+            const start = barIndex * blockSize;
+            const end = Math.min(
+                rawData.length,
+                start + blockSize,
+            );
+
             const span = end - start;
 
             if (span > 0) {
-                const step = Math.max(1, Math.floor(span / SAMPLES_PER_BAR));
-                for (let j = start; j < end; j += step) {
-                    const v = Math.abs(rawData[j]);
-                    if (v > peak) peak = v;
+                const step = Math.max(
+                    1,
+                    Math.floor(
+                        span / samplesPerBar,
+                    ),
+                );
+
+                for (
+                    let sampleIndex = start;
+                    sampleIndex < end;
+                    sampleIndex += step
+                ) {
+                    const value = Math.abs(
+                        rawData[sampleIndex],
+                    );
+
+                    if (value > peak) {
+                        peak = value;
+                    }
                 }
             }
 
-            nextPeaks[i] = peak;
-            if (peak > maxPeak) maxPeak = peak;
+            nextPeaks[barIndex] = peak;
+
+            if (peak > maxPeak) {
+                maxPeak = peak;
+            }
         }
 
         if (maxPeak > 0) {
-            for (let i = 0; i < nextPeaks.length; i++)
-                nextPeaks[i] = nextPeaks[i] / maxPeak;
+            for (
+                let index = 0;
+                index < nextPeaks.length;
+                index++
+            ) {
+                nextPeaks[index] =
+                    nextPeaks[index] / maxPeak;
+            }
         }
 
         peaks = nextPeaks;
 
-        // morph to new peaks (smooth)
         if (peaks.length) {
-            if (!displayPeaks.length)
-                displayPeaks = new Array(peaks.length).fill(0);
+            if (!displayPeaks.length) {
+                displayPeaks = new Array(
+                    peaks.length,
+                ).fill(0);
+            }
+
+            isWaveLeaving = false;
+            frozenProgress = null;
+
             startMorph(peaks, 180);
+
             status = "Ready";
         } else {
             displayPeaks = [];
             status = "Idle";
         }
     }
+
     function drawBaseline(
-        g: CanvasRenderingContext2D,
-        cssW: number,
-        cssH: number,
+        context: CanvasRenderingContext2D,
+        cssWidth: number,
+        cssHeight: number,
     ) {
-        const midY = cssH / 2;
+        context.fillStyle = baseColor;
 
-        // separation band
-        g.save();
-        g.globalAlpha = gapOpacity;
-        g.fillStyle = "#000";
-        g.fillRect(0, midY - gapPx / 2, cssW, gapPx);
-        g.restore();
-
-        // baseline line
-        g.fillStyle = baseColor;
-        g.fillRect(0, midY, cssW, 1);
+        context.fillRect(
+            0,
+            cssHeight - 1,
+            cssWidth,
+            1,
+        );
     }
 
     function drawBars(
-        g: CanvasRenderingContext2D,
-        cssH: number,
+        context: CanvasRenderingContext2D,
+        cssHeight: number,
         color: string,
-        clipW: number | null,
+        clipWidth: number | null,
     ) {
-        const cssW = parseFloat(
-            canvasEl.style.width || `${canvasEl.clientWidth}`,
-        );
-        const midY = cssH / 2;
+        if (clipWidth !== null) {
+            context.save();
+            context.beginPath();
 
-        const topMax = midY - gapPx / 2; // bottom edge of top region
-        const botMax = midY + gapPx / 2; // top edge of bottom region
+            context.rect(
+                0,
+                0,
+                clipWidth,
+                cssHeight,
+            );
 
-        const topH = topMax; // space available above the gap
-        const botH = cssH - botMax; // space available below the gap
-
-        // clip to played region if needed
-        if (clipW != null) {
-            g.save();
-            g.beginPath();
-            g.rect(0, 0, clipW, cssH);
-            g.clip();
+            context.clip();
         }
 
-        // ---------- TOP (full opacity, untouched by bottom fade) ----------
-        g.save();
-        g.fillStyle = color;
+        context.fillStyle = color;
 
-        for (let i = 0; i < displayPeaks.length; i++) {
-            const v = displayPeaks[i] || 0;
-            const x = i * (barWidth + barGap);
+        for (
+            let index = 0;
+            index < displayPeaks.length;
+            index++
+        ) {
+            const value = displayPeaks[index] || 0;
+            const x = index * (barWidth + barGap);
 
-            const hTop = Math.max(minBarPx, v * topH);
-            const yTop = topMax - hTop;
-            g.fillRect(x, yTop, barWidth, hTop);
-        }
-        g.restore();
+            const barHeight = Math.max(
+                minBarPx,
+                Math.round(value * cssHeight),
+            );
 
-        // ---------- BOTTOM (slightly less opaque + fades out to 0) ----------
-        // You asked: "bottom generally slightly less opaque"
-        // tweak this number as you like
-        const bottomBaseAlpha = 0.45;
+            const y = cssHeight - barHeight;
 
-        // 1) draw bottom bars in a bottom-only clip
-        g.save();
-        g.beginPath();
-        g.rect(0, botMax, cssW, cssH - botMax);
-        g.clip();
-
-        g.globalAlpha = bottomBaseAlpha;
-        g.fillStyle = color;
-
-        for (let i = 0; i < displayPeaks.length; i++) {
-            const v = displayPeaks[i] || 0;
-            const x = i * (barWidth + barGap);
-
-            const hBot = Math.max(minBarPx, v * botH * mirrorScale);
-            const yBot = botMax;
-            g.fillRect(x, yBot, barWidth, hBot);
-        }
-
-        // 2) apply fade mask ONLY to bottom region (does not affect top)
-        g.globalCompositeOperation = "destination-in";
-
-        const grad = g.createLinearGradient(0, botMax, 0, cssH);
-
-        // full at top of bottom region
-        grad.addColorStop(0, "rgba(255,255,255,1)");
-
-        // optional: keep a bit solid before fading (0..1)
-        if (bottomFadeStart > 0) {
-            grad.addColorStop(
-                Math.min(0.99, bottomFadeStart),
-                "rgba(255,255,255,1)",
+            context.fillRect(
+                x,
+                y,
+                barWidth,
+                barHeight,
             );
         }
 
-        // fade to 0 at the bottom
-        grad.addColorStop(1, "rgba(255,255,255,0)");
-
-        g.fillStyle = grad;
-        g.fillRect(0, botMax, cssW, cssH - botMax);
-
-        g.restore();
-
-        // restore played clip if we used it
-        if (clipW != null) g.restore();
+        if (clipWidth !== null) {
+            context.restore();
+        }
     }
 
     function draw() {
         if (!canvasEl) return;
-        const g = canvasEl.getContext("2d");
-        if (!g) return;
 
-        const cssW = parseFloat(
-            canvasEl.style.width || `${canvasEl.clientWidth}`,
+        const context = canvasEl.getContext("2d");
+
+        if (!context) return;
+
+        const cssWidth = parseFloat(
+            canvasEl.style.width ||
+                `${canvasEl.clientWidth}`,
         );
-        const cssH = height;
 
-        g.clearRect(0, 0, cssW, cssH);
+        const cssHeight = Math.max(
+            1,
+            Math.floor(height),
+        );
 
-        if (!displayPeaks.length) {
-            drawBaseline(g, cssW, cssH);
-            return;
+        context.clearRect(
+            0,
+            0,
+            cssWidth,
+            cssHeight,
+        );
+
+        if (!shouldDrawWaveform) return;
+
+        drawBars(
+            context,
+            cssHeight,
+            baseColor,
+            null,
+        );
+
+        const playedWidth =
+            cssWidth * getDrawProgress();
+
+        if (playedWidth > 0) {
+            drawBars(
+                context,
+                cssHeight,
+                playedColor,
+                playedWidth,
+            );
         }
 
-        // 1) base waveform (unplayed)
-        drawBars(g, cssH, baseColor, null);
+        drawBaseline(
+            context,
+            cssWidth,
+            cssHeight,
+        );
 
-        // 2) played overlay clipped to progress width
-        const playedW = cssW * getProgress();
-        if (playedW > 0) {
-            drawBars(g, cssH, playedColor, playedW);
-        }
+        context.fillStyle = "#fff";
 
-        // 3) separation band (gap) on top so it’s crisp
-        const midY = cssH / 2;
-        g.save();
-        g.globalAlpha = gapOpacity;
-        g.fillStyle = "#000";
-        g.fillRect(0, midY - gapPx / 2, cssW, gapPx);
-        g.restore();
-
-        // 4) playhead line
-
-        const topMax = midY - gapPx / 2;
-        g.fillStyle = "#fff";
-        g.fillRect(playedW, 0, 1, topMax);
+        context.fillRect(
+            playedWidth,
+            0,
+            1,
+            cssHeight,
+        );
     }
 
     function hardCancelJobs() {
@@ -430,11 +562,45 @@
         morphActive = false;
     }
 
-    async function loadAndDecode(url: string, signal: AbortSignal) {
+    function clearWaveformData() {
+        peaks = [];
+        displayPeaks = [];
+        rawData = null;
+        duration = 0;
+
+        lastBarCount = 0;
+        lastCssW = 0;
+        lastRawLen = 0;
+    }
+
+    async function transitionOutCurrentWaveform(
+        token: number,
+    ) {
+        if (!displayPeaks.length) return;
+
+        frozenProgress = getProgress();
+        isWaveLeaving = true;
+        morphActive = false;
+
+        draw();
+
+        await tick();
+        await nextFrame();
+        await sleep(waveformOutMs);
+
+        if (token !== jobId) return;
+
+        isWaveLeaving = false;
+        frozenProgress = null;
+    }
+
+    async function loadAndDecode(
+        url: string,
+        signal: AbortSignal,
+    ) {
         status = "Loading";
 
-        // IMPORTANT: if your signed URL is cacheable you can change this
-        const resp = await withTimeout(
+        const response = await withTimeout(
             fetch(url, {
                 method: "GET",
                 mode: "cors",
@@ -446,60 +612,101 @@
             "Waveform fetch",
         );
 
-        if (!resp.ok) throw new Error(`Waveform fetch failed (${resp.status})`);
+        if (!response.ok) {
+            throw new Error(
+                `Audio preview failed to load (${response.status}).`,
+            );
+        }
 
-        const buf = await withTimeout(
-            resp.arrayBuffer(),
+        const buffer = await withTimeout(
+            response.arrayBuffer(),
             fetchTimeoutMs,
             "Waveform read",
         );
 
         status = "Decoding";
 
-        const AC = (window.AudioContext ||
-            (window as any).webkitAudioContext) as typeof AudioContext;
-        const audioCtx = new AC();
+        const AudioContextClass = (
+            window.AudioContext ||
+            (window as any).webkitAudioContext
+        ) as typeof AudioContext;
+
+        const audioContext =
+            new AudioContextClass();
 
         try {
             const audioBuffer = await withTimeout(
-                audioCtx.decodeAudioData(buf.slice(0)),
+                audioContext.decodeAudioData(
+                    buffer.slice(0),
+                ),
                 decodeTimeoutMs,
                 "decodeAudioData",
             );
+
             duration = audioBuffer.duration;
-            rawData = audioBuffer.getChannelData(0);
+
+            rawData =
+                audioBuffer.getChannelData(0);
         } finally {
-            await audioCtx.close().catch(() => {});
+            await audioContext
+                .close()
+                .catch(() => {});
         }
     }
 
-    function seekFromClientX(clientX: number) {
-        const a = getAudio();
-        if (!a) return;
+    function canSeekWaveform() {
+        return (
+            !!audio &&
+            !!audioUrl &&
+            !displayedErrorMessage &&
+            !isWaveLeaving &&
+            displayPeaks.length > 0 &&
+            status === "Ready" &&
+            getDuration() > 0
+        );
+    }
 
-        const d = getDuration();
-        if (!canvasEl || d <= 0) return;
+    function seekFromClientX(
+        clientX: number,
+    ) {
+        if (!canSeekWaveform()) return;
 
-        const rect = canvasEl.getBoundingClientRect();
-        const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
-        const pct = x / rect.width;
+        const currentAudio = getAudio();
 
-        userTapped.set(true);
-        resetTrackTimer();
+        if (!currentAudio) return;
 
-        a.currentTime = pct * d;
+        const currentDuration = getDuration();
 
-        if (autoPlayOnSeek) {
-            const state = get(audioPlayerState);
-            if (state !== "Playing") {
-                // don’t call your internal play wrapper here (it does timer logic),
-                // just call the element directly:
-                a.play().catch(() => {});
-            }
+        if (!canvasEl || currentDuration <= 0) {
+            return;
+        }
+
+        const rect =
+            canvasEl.getBoundingClientRect();
+
+        const x = Math.max(
+            0,
+            Math.min(
+                rect.width,
+                clientX - rect.left,
+            ),
+        );
+
+        const percentage = x / rect.width;
+
+        currentAudio.currentTime =
+            percentage * currentDuration;
+
+        if (
+            autoPlayOnSeek &&
+            currentAudio.paused
+        ) {
+            currentAudio
+                .play()
+                .catch(() => {});
         }
     }
 
-    // touch-safe seek (your logic)
     let dragging = false;
     let pointerId: number | null = null;
     let startX = 0;
@@ -514,112 +721,229 @@
         isScrollGesture = false;
     }
 
-    function onPointerDown(e: PointerEvent) {
+    function onPointerDown(
+        event: PointerEvent,
+    ) {
         if (!enableSeek) return;
-        if (e.pointerType === "mouse" && e.button !== 0) return;
+        if (!canSeekWaveform()) return;
+
+        if (
+            event.pointerType === "mouse" &&
+            event.button !== 0
+        ) {
+            return;
+        }
 
         dragging = true;
-        pointerId = e.pointerId;
-        startX = e.clientX;
-        startY = e.clientY;
+        pointerId = event.pointerId;
+        startX = event.clientX;
+        startY = event.clientY;
         decided = false;
         isScrollGesture = false;
 
-        (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+        (
+            event.currentTarget as HTMLElement
+        ).setPointerCapture?.(
+            event.pointerId,
+        );
     }
 
-    function onPointerMove(e: PointerEvent) {
-        if (!dragging || pointerId !== e.pointerId) return;
+    function onPointerMove(
+        event: PointerEvent,
+    ) {
+        if (
+            !dragging ||
+            pointerId !== event.pointerId
+        ) {
+            return;
+        }
 
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
+        if (!canSeekWaveform()) return;
+
+        const deltaX =
+            event.clientX - startX;
+
+        const deltaY =
+            event.clientY - startY;
 
         if (!decided) {
-            const adx = Math.abs(dx);
-            const ady = Math.abs(dy);
+            const absoluteX =
+                Math.abs(deltaX);
 
-            if (adx < scrollLockThresholdPx && ady < scrollLockThresholdPx)
+            const absoluteY =
+                Math.abs(deltaY);
+
+            if (
+                absoluteX <
+                    scrollLockThresholdPx &&
+                absoluteY <
+                    scrollLockThresholdPx
+            ) {
                 return;
+            }
 
             decided = true;
-            isScrollGesture = ady > adx;
 
-            if (isScrollGesture && !seekWhileScrolling) {
-                (e.currentTarget as HTMLElement).releasePointerCapture?.(
-                    e.pointerId,
+            isScrollGesture =
+                absoluteY > absoluteX;
+
+            if (
+                isScrollGesture &&
+                !seekWhileScrolling
+            ) {
+                (
+                    event.currentTarget as HTMLElement
+                ).releasePointerCapture?.(
+                    event.pointerId,
                 );
+
                 return;
             }
         }
 
-        if (isScrollGesture && !seekWhileScrolling) return;
+        if (
+            isScrollGesture &&
+            !seekWhileScrolling
+        ) {
+            return;
+        }
 
-        e.preventDefault?.();
-        seekFromClientX(e.clientX);
+        event.preventDefault();
+
+        seekFromClientX(
+            event.clientX,
+        );
     }
 
-    function onPointerUp(e: PointerEvent) {
-        if (pointerId !== e.pointerId) return;
+    function onPointerUp(
+        event: PointerEvent,
+    ) {
+        if (
+            pointerId !== event.pointerId
+        ) {
+            return;
+        }
 
-        // tap-to-seek if they didn’t move enough to decide
-        if (!decided && enableSeek) {
-            seekFromClientX(e.clientX);
+        if (
+            !decided &&
+            enableSeek &&
+            canSeekWaveform()
+        ) {
+            seekFromClientX(
+                event.clientX,
+            );
         }
 
         resetPointerState();
     }
 
-    function onPointerCancel(e: PointerEvent) {
-        if (pointerId !== e.pointerId) return;
+    function onPointerCancel(
+        event: PointerEvent,
+    ) {
+        if (
+            pointerId !== event.pointerId
+        ) {
+            return;
+        }
+
         resetPointerState();
     }
 
     function startLoop() {
+        if (typeof window === "undefined") {
+            return;
+        }
+
         const loop = (now: number) => {
             raf = requestAnimationFrame(loop);
+
             stepMorph(now);
             draw();
         };
+
         raf = requestAnimationFrame(loop);
     }
 
-    // URL change behavior
     let lastUrl: string | null = null;
 
-    async function handleUrlChange(url: string, token: number) {
-        decodeError = null;
+    async function handleMissingAudio(
+        token: number,
+    ) {
         hardCancelJobs();
+        decodeError = null;
+
+        if (displayPeaks.length) {
+            await transitionOutCurrentWaveform(
+                token,
+            );
+        }
+
+        if (token !== jobId) return;
+
+        status = "Idle";
+
+        clearWaveformData();
+        draw();
+    }
+
+    async function handleUrlChange(
+        url: string,
+        token: number,
+    ) {
+        hardCancelJobs();
+        decodeError = null;
+
+        if (displayPeaks.length) {
+            await transitionOutCurrentWaveform(
+                token,
+            );
+        }
+
+        if (token !== jobId) return;
 
         status = "Loading";
-        peaks = [];
-        displayPeaks = [];
-        rawData = null;
-        duration = 0;
 
+        clearWaveformData();
         draw();
 
-        decodeAbort = new AbortController();
+        const controller =
+            new AbortController();
+
+        decodeAbort = controller;
 
         try {
-            await loadAndDecode(url, decodeAbort.signal);
-        } catch (err: any) {
+            await loadAndDecode(
+                url,
+                controller.signal,
+            );
+        } catch (error: any) {
             const aborted =
-                decodeAbort?.signal.aborted || err?.name === "AbortError";
-            if (aborted) return;
+                controller.signal.aborted ||
+                error?.name === "AbortError";
 
-            decodeError = err?.message ?? "Waveform decode failed";
+            if (aborted) return;
+            if (token !== jobId) return;
+
+            decodeError =
+                error?.message ??
+                audioErrorFallbackMessage;
+
             status = "Error";
+
+            clearWaveformData();
+            draw();
+
             return;
         }
 
         if (token !== jobId) return;
 
-        // reset recompute keys for new data
         lastBarCount = 0;
         lastCssW = 0;
         lastRawLen = 0;
 
         requestResize();
+
         await tick();
 
         if (token !== jobId) return;
@@ -630,8 +954,16 @@
     onMount(async () => {
         await tick();
 
-        resizeObserver = new ResizeObserver(() => requestResize());
-        if (wrapEl) resizeObserver.observe(wrapEl);
+        resizeObserver =
+            new ResizeObserver(() => {
+                requestResize();
+            });
+
+        if (wrapEl) {
+            resizeObserver.observe(
+                wrapEl,
+            );
+        }
 
         requestResize();
         startLoop();
@@ -639,28 +971,45 @@
 
     $: {
         if (!audioUrl) {
-            if (lastUrl !== null) lastUrl = null;
+            if (lastUrl !== null) {
+                lastUrl = null;
+            }
+
             const token = ++jobId;
 
-            hardCancelJobs();
-            decodeError = null;
-            status = "Idle";
-            peaks = [];
-            displayPeaks = [];
-            rawData = null;
-            duration = 0;
+            handleMissingAudio(token).catch(
+                () => {
+                    status = "Idle";
 
-            draw();
+                    clearWaveformData();
+                    draw();
+                },
+            );
         } else if (audioUrl !== lastUrl) {
             lastUrl = audioUrl;
+
             const token = ++jobId;
-            handleUrlChange(audioUrl, token).catch((err) => {
+
+            handleUrlChange(
+                audioUrl,
+                token,
+            ).catch((error) => {
                 const aborted =
-                    decodeAbort?.signal.aborted || err?.name === "AbortError";
+                    decodeAbort?.signal
+                        .aborted ||
+                    error?.name ===
+                        "AbortError";
+
                 if (aborted) return;
 
-                decodeError = err?.message ?? "Waveform error";
+                decodeError =
+                    error?.message ??
+                    audioErrorFallbackMessage;
+
                 status = "Error";
+
+                clearWaveformData();
+                draw();
             });
         }
     }
@@ -670,22 +1019,36 @@
         barWidth;
         barGap;
         zoom;
+        minBarPx;
+
         requestResize();
     }
 
     onDestroy(() => {
         cancelAnimationFrame(raf);
         cancelAnimationFrame(resizeRaf);
+
         resizeObserver?.disconnect();
         decodeAbort?.abort();
     });
 </script>
 
-<div class="wrap" bind:this={wrapEl}>
-    <div class="inner">
+<div
+    class="wrap"
+    bind:this={wrapEl}
+    style="
+        --wave-height: {Math.max(1, Math.floor(height))}px;
+        --wave-out-ms: {waveformOutMs}ms;
+    "
+>
+    <div
+        class="inner"
+        class:waveLeaving={isWaveLeaving}
+    >
         <canvas
             bind:this={canvasEl}
-            style="height: {height}px;"
+            aria-label="Audio waveform"
+            style="height: {Math.max(1, Math.floor(height))}px;"
             on:pointerdown={onPointerDown}
             on:pointermove|nonpassive={onPointerMove}
             on:pointerup={onPointerUp}
@@ -693,30 +1056,98 @@
             on:pointerleave={onPointerUp}
         />
     </div>
-</div>
 
-{#if decodeError}
-    <p class="err">{decodeError}</p>
-{/if}
+    <div class="swf_message">
+        {#if !audioUrl && !isWaveLeaving}
+            <p class="waveMessage">
+                {noAudioMessage}
+            </p>
+        {:else if displayedErrorMessage && !isWaveLeaving}
+            <p
+                class="waveMessage waveMessage_error"
+            >
+                {displayedErrorMessage ||
+                    audioErrorFallbackMessage}
+            </p>
+        {:else if !isWaveLeaving &&
+            (status === "Loading" ||
+                status === "Decoding" ||
+                status === "Computing peaks")}
+            <p class="waveMessage">
+                {status}...
+            </p>
+        {/if}
+    </div>
+</div>
 
 <style>
     .wrap {
         width: 100%;
-        overflow-x: auto;
+        min-height: var(--wave-height);
+
+        overflow-x: hidden;
         overflow-y: hidden;
+
         cursor: pointer;
+        position: relative;
     }
 
     .inner {
         width: fit-content;
+
+        opacity: 1;
+
+        transform: translateY(0) scaleY(1);
+        transform-origin: center bottom;
+
+        transition:
+            opacity var(--wave-out-ms) ease,
+            transform var(--wave-out-ms)
+                cubic-bezier(0.22, 1, 0.36, 1),
+            filter var(--wave-out-ms) ease;
+
+        will-change:
+            opacity,
+            transform,
+            filter;
     }
+
+    .inner.waveLeaving {
+        opacity: 0;
+
+        transform:
+            translateY(2px)
+            scaleY(0.72);
+
+        filter: blur(0.4px);
+
+        pointer-events: none;
+    }
+
+    .swf_message {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        pointer-events: none;
+    }
+
     canvas {
         display: block;
-        touch-action: pan-y; /* allows vertical scroll; we preventDefault only on scrub */
+        touch-action: pan-y;
     }
-    .err {
+
+    .waveMessage {
+        margin: 0;
+
         font-size: 10pt;
+        line-height: 1.2;
+
         opacity: 0.7;
-        margin-top: 6px;
+        white-space: nowrap;
+    }
+
+    .waveMessage_error {
+        opacity: 0.85;
     }
 </style>

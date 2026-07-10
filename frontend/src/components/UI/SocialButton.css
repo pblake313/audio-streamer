@@ -1,0 +1,16 @@
+.socialLink {
+    display: block;
+    height: fit-content;
+    opacity: .5;
+}
+
+.socialLink:hover {
+    opacity: 1;
+}
+
+@media (pointer: coarse) {
+    .socialLink {
+        opacity: 1;
+    }
+    
+}

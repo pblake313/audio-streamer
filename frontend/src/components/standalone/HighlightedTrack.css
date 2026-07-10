@@ -1,317 +1,200 @@
-.wrapHighlightedTrack {
-    padding-top: 60px;
-    padding-bottom: 25px;
+.ht_wrapper {
     position: relative;
     overflow: hidden;
+    padding-top: 60px;
+    padding-bottom: 25px;
 }
 
-.insideHighlight {
-    max-width: 1550px;
-    margin: auto;
-    margin-top: 25px;
-    padding: 0px 25px 25px 25px;
+.ht_insideContainer {
+    max-width: 1250px;
+    margin: 45px auto 0 auto;
     display: flex;
     justify-content: space-between;
+    padding: 0px 25px;
 }
-.highlightedTrackBackground {
+
+.ht_background {
     position: absolute;
-    min-width: 150%;
-    min-height: 150%;
+    min-width: 115%;
+    min-height: 115%;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
     z-index: -2;
-    filter: blur(0px);
-    opacity: .1;
-    filter: blur(0px);
+    transform: translate(-50%, -50%);
+    opacity: 0.1;
+    filter: blur(20px) saturate(250%);
 }
-.topperGradient {
+
+.ht_topFade,
+.ht_bottomFade {
     position: absolute;
-    z-index: -1;
-    top: 0px;
-    left: 0px;
+    left: 0;
     width: 100%;
+    z-index: -1;
+    color: #f7f7f736;
+}
+
+.ht_topFade {
+    top: 0;
     height: 25%;
     background: linear-gradient(to bottom, #222222, transparent);
 }
-.bommo {
-    position: absolute;
-    z-index: -1;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
+
+.ht_bottomFade {
+    bottom: 0;
     height: 45%;
     background: linear-gradient(to top, #222222, transparent);
 }
 
-.artPlayPause {
-    height: 320px;
-    width: 320px;
-    border-radius: 5px;
+.ht_artworkContainer {
+    display: flex;
+    width: 350px;
+    height: fit-content;
+    border-radius: 8px;
+
     overflow: hidden;
+}
+
+.ht_artworkButton {
     position: relative;
-    outline: none;
-    border: none;
-    box-shadow: none;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
     padding: 0;
     margin: 0;
-    background: transparent;
-    -webkit-tap-highlight-color: transparent; /* iOS tap highlight */
-        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
-
-}
-
-.artPlayPause:focus,
-.artPlayPause:focus-visible,
-.artPlayPause:active {
+    border: none;
+    border-radius: 10px;
     outline: none;
-    box-shadow: none;
+    background: transparent;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+
+.ht_artworkButton:focus,
+.ht_artworkButton:focus-visible,
+.ht_artworkButton:active {
+    outline: none;
     border: none;
 }
 
-/* Make sure the img fills cleanly, no inline gaps */
-.trackArtworkImage {
+.ht_albumOverlay{
+    background-color: rgba(0, 0, 0, 0.562);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    opacity: 0;
+    transition: .3s;
+}
+.ht_largePP{
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    display: block;
-    border: none;
+}
+.ht_artworkButton:hover .ht_albumOverlay {
+    opacity: 1;
 }
 
-
-.highlightedTrackInfo {
-    width: calc(100% - 350px);
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-}
-  
-.trackArtworkImage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    border: none;
-}
-.trackStateFlex {
-    display: flex;
-    align-items: center;
-}
-.trackIcon {
-    margin-right: 15px;
-    width: 15px;
-    height: 15px;
-}
-
-.trackStateText p {
-    font-size: 9pt;
-}
-.highlightedTrackControls {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-top: 25px;
-    
-}
-
-.trackInfoBottom {
-    display: flex;  
-    justify-content: space-between;
-
-}
-.trackControls {
-    width: 100%;
+.ht_trackInfo {
+    width: calc(100% - 400px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-}
-.containVisualizer {
-   width: calc(100% - 400px);;
-   position: relative;
-}
-.wPlayPlauser {
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-top: 2px;
-}
-.holdBeatArt {
-    display: flex;
-    justify-content: space-between;
+
 }
 
-.smallerTrackInfo {
-    display: none;
-}
-.keyandMode {
-    opacity: .5;
-    font-size: 11pt;
-}
-.wrapHighlightedTitle {
+.ht_title {
     width: 100%;
     overflow: hidden;
-    margin: 10px 0px 12px 0px;
-  }
-  
-  .wrapHighlightedTitle h2 {
+    font-size: 60pt;
+    white-space: nowrap;
+    line-height: 1.15em;
+    text-overflow: ellipsis;
+}
+
+
+.ht_stateAndKey{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ht_keyAndMode{
+    font-size: 10pt;
+    padding-top: 5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  
-.mobTrackIcon {
-    width: 15px;
-    height: 15px;
+}
+.ht_mobileRange{
     display: none;
 }
-.audioError{
-    opacity: 1;
-    background-color: transparent;
-    font-weight: bold;
-    padding: 0px 5px;
-    border-radius: 5px;
-    height: fit-content;
-    margin-top: 1px;
-    font-size: 9pt;
-    padding: 8px 0px;
-    color:  red;
-
+@media (max-width: 1000px) {
+    .ht_title {
+        font-size: 45pt;
+    }
+    
 }
-
-.retryOnError{
-    display: flex;
-    gap: 15px;
-    align-items: center;
-
-}
-
-@media(max-width: 1250px){
-    .smallerTrackInfo {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width:  calc(100% - 350px);
+@media (max-width: 850px) {
+    .ht_insideContainer{
+        flex-direction:column;   
     }
-    .highlightedTrackInfo .trackInfoTop {
-        display: none;
-    }
-    .highlightedTrackInfo .trackInfoBottom .trackControls {
-        display: none;
-    }
-    .insideHighlight {
-        flex-direction: column;
-
-    }
-    .trackControls {
-        width: 100%;
-    }
-    .highlightedTrackInfo {
-        width: 100%;
-    }
-    .containVisualizer {
-        width: 100%;
-        margin-top: 15px;
-    }
-    .wrapHighlightedTitle h2 {
-        font-size: 20pt;
-
-    }
-
-    .trackInfoTop {
-        margin-bottom: 15px;
-    }
-}
-@media(max-width: 900px){
-    .wrapHighlightedTrack {
-        padding-top: 55px;
-    }
-    .highlightedTrackBackground{
-        filter: blur(20px);
-    }
-}
-@media (max-width:850px){
-    .holdBeatArt {
-        flex-direction: column;
-        align-items: center;
-    }
-    .insideHighlight {
-        margin-top: 0px;
-    }
-    .smallerTrackInfo {
+    .ht_artworkContainer{
         width: 100%;
         margin: auto;
-        max-width: 500px;
-        margin-top: 15px;
+        max-width: 550px;
     }
-    .artPlayPause {
-        height: auto;
+    .ht_trackInfo {
         width: 100%;
-        aspect-ratio: 1 / 1;
-        max-width: 500px;
-        border: none;
-        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.541);
-
-    }
-    .trackArtworkImage:focus {
-        border: none;
-        outline: none;
-    }
-    .highlightedTrackBackground {
-        opacity: .35;
-    }
-    .highlightedTrackControls {
-        width: fit-content;
         margin: auto;
+        max-width: 550px;
+        margin-top: 25px;
     }
-    .wPlayPlauser {
-        margin-left: 45px;
-        margin-right: 45px;
-        margin-top: 2px;
+    .ht_title {
+        font-size: 35pt;
     }
-    .trackControls{
-        margin-bottom: 0px;
+    .ht_wrapper{
+        padding-top: 35px;
     }
-    .wrapHighlightedTitle {
-        margin-top: 5px;
-        margin-bottom: 5px;
+}
+@media (max-width: 750px) {
+        .ht_wrapper{
+        padding-top: 25px;
     }
-    .wrapHighlightedTitle h2 {
-        font-size: 18pt;
-        font-weight: 450;
+}
+@media (max-width: 650px) {
+    .ht_title {
+        font-size: 25pt;
     }
-    .keyandMode {
-        font-size: 9pt;
+    .ht_stateAndKey{
+        width: 100%;
+        justify-content: space-between;
+        flex-direction: row-reverse;
     }
-    .trackStateFlex  {
+    .ht_deskRange{
         display: none;
     }
-    .wrapHighlightedTitle {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .trackIcon {
-        padding: 0px;
-        margin: 0px;
-    }
-    .mobTrackIcon {
+    .ht_mobileRange{
+        margin-top: 25px;
         display: block;
     }
-    .retryOnError {
-        padding-bottom: 15px;
+    .ht_trackInfo{
+        margin-top: 10px;
     }
+
 }
-@media (max-width:575px){
-    .insideHighlight {
+@media (max-width: 600px) {
+    .ht_insideContainer {
         padding: 0px 15px;
     }
-    .wrapHighlightedTitle {
-        overflow: visible;
-      }
+    
+}
+@media (pointer: coarse) {
+    .ht_albumOverlay{
+        display: none;
+    }
+    
 }

@@ -1,54 +1,105 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
-
     import "./Tracklist.css";
-    import { allBeatPagesFetched, beats, fetchBeats, getNextBeatPageToFetch } from "../../../stores/AudioPlayer/beatArrayStore";
+    import {
+        allBeatPagesFetched,
+        allFilteredBeatPagesFetched,
+        artistFilter,
+        beats,
+        beatTypeFilter,
+        fetchBeats,
+        fetchBeatsWithFilters,
+        fetchFilteredBeatsError,
+        filteredBeats,
+        getNextBeatPageToFetch,
+        isFetchingBeats,
+        isFetchingFilteredBeats,
+        moodFilter,
+        tagFilter,
+    } from "../../../stores/AudioPlayer/BeatsStore";
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
     import TrackListItem from "../../list-items/Tracks/TrackListItem.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";
-    import SpinLoader from "../../loaders/SpinLoader.svelte";
-
-    let loadingNewBeats: boolean = false;
+    import BeatFilters from "../../standalone/BeatFilters.svelte";
+    import {
+        audioMode,
+        toggleAudioMode,
+    } from "../../../stores/AudioPlayerStore";
+    import ABIcon from "../../Icons/svg/ABIcon.svelte";
+    import StreamIcon from "../../Icons/svg/StreamIcon.svelte";
 
     async function loadMoreBeats() {
         // console.log($beatPagesFetched)
-        if ($allBeatPagesFetched) {
-            // console.log('Already fetched all beat pages!')
-            return;
-        }
+        await fetchBeats(getNextBeatPageToFetch());
+    }
 
-        loadingNewBeats = true;
-
-        try {
-            await fetchBeats(getNextBeatPageToFetch());
-        } finally {
-            loadingNewBeats = false;
-        }
+    async function loadMoreFilteredBeats() {
+        await fetchBeatsWithFilters();
     }
 </script>
 
-
-{#if $beats.length === 0}
-    <AddTrackPointer /> 
-{:else}
-    {#each $beats as beat, i}
-        <TrackListItem {beat} isEven={i % 2 === 0}></TrackListItem>
-    {/each}
-{/if}
-
-{#if !$allBeatPagesFetched}
-    <div class="wrapOnlyButton">
-        {#if loadingNewBeats}
-            <div in:fade={{duration: 300, delay: 200}}>
-                <div style="padding: 50px; 0px">
-                    <SpinLoader></SpinLoader>
-                </div>
+<div class="trackList_megaWrap">
+    {#if $beats.length === 0}
+        <AddTrackPointer />
+    {:else}
+        <div class="trackList_filtersModeFlex">
+            <div class="trackList_filters">
+                <BeatFilters />
             </div>
+
+            <div class="trackList_modeToggler">
+                <button
+                    class="trackList_modeToggleButton"
+                    on:click={toggleAudioMode}
+                >
+                    {#if $audioMode === "abTester"}
+                        <StreamIcon height={"24px"} />
+                    {:else}
+                        <ABIcon height={"18px"} />
+                    {/if}
+                </button>
+            </div>
+        </div>
+
+        {#if $filteredBeats.length >= 1}
+            {#each $filteredBeats as beat, i}
+                <TrackListItem {beat} isEven={i % 2 === 0} />
+            {/each}
         {:else}
-            <div in:fade={{ duration: 500, delay: 200 }} out:fade={{duration: 200}}>
-                <BoxButton tightPad={true} buttonText={'Fetch More'} on:click={loadMoreBeats}></BoxButton>
+            <p>no filtered beats.</p>
+        {/if}
+    {/if}
+
+    {#if $moodFilter.length >= 1 || $tagFilter.length >= 1 || $artistFilter.length >= 1 || $beatTypeFilter.length >= 1}
+        {#if !$allFilteredBeatPagesFetched}
+            <div class="wrapOnlyButton">
+                <BoxButton
+                    tightPad={true}
+                    buttonText={$isFetchingFilteredBeats ? null : "Fetch More"}
+                    buttonIcon={$isFetchingFilteredBeats ? "loading" : null}
+                    isDisabled={$isFetchingFilteredBeats}
+                    on:click={loadMoreFilteredBeats}
+                />
             </div>
         {/if}
-    </div>
-{/if}
 
+        {#if $fetchFilteredBeatsError}
+            <p style="color: red;">
+                {$fetchFilteredBeatsError}
+            </p>
+        {/if}
+    {:else}
+        <!-- no filters set, use standard pagination. -->
+        {#if !$allBeatPagesFetched}
+            <div class="wrapOnlyButton">
+                <BoxButton
+                    tightPad={true}
+                    buttonText={$isFetchingBeats ? null : "Fetch More"}
+                    buttonIcon={$isFetchingBeats ? "loading" : null}
+                    isDisabled={$isFetchingBeats}
+                    buttonStyle={"glass"}
+                    on:click={loadMoreBeats}
+                />
+            </div>
+        {/if}
+    {/if}
+</div>

@@ -1,0 +1,127 @@
+.abf_formContainer {
+    max-width: 1250px;
+    margin: auto;
+    padding: 0 25px;
+    margin-bottom: 150px;
+}
+
+.abf_form {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    margin-top: 25px;
+    transition: 0.5s;
+}
+
+.abf_details {
+    width: 50%;
+}
+
+.abf_files {
+    width: 50%;
+}
+
+.abf_trackDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.abf_multiInputFlex {
+    display: flex;
+    gap: 20px;
+}
+
+.abf_bpm {
+    width: 40%;
+}
+
+.abf_key {
+    width: 20%;
+}
+
+.abf_mode {
+    width: 40%;
+}
+
+.cTag {
+    width: 60%;
+}
+
+.customColor {
+    width: 40%;
+}
+
+.tagHalf {
+    width: 50%;
+}
+
+.abf_wrapFiles {
+    margin-top: 15px;
+}
+
+.wrapFIn {
+    margin-bottom: 15px;
+}
+
+.abf_submit {
+    margin-top: 25px;
+}
+.abf_error{
+    margin-top: 20px;
+}
+
+@media (max-width: 950px) {
+    .abf_form {
+        gap: 25px;
+        flex-direction: column;
+    }
+    .abf_details{
+        width: 100%;
+    }
+    .abf_files{
+        width: 100%;
+    }
+}
+
+@media (max-width: 750px) {
+    .abf_multiInputFlex {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .abf_files{
+        margin-top: 25px;
+    }
+
+
+    .abf_bpm,
+    .abf_key,
+    .abf_mode,
+    .cTag,
+    .customColor,
+    .tagHalf {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .abf_formContainer {
+        padding: 0px 15px;
+    }
+    
+}
+
+@media (max-width: 575px) {
+
+    .abf_form {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .abf_details,
+    .abf_files {
+        width: 100%;
+    }
+}

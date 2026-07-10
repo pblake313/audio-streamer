@@ -1,0 +1,123 @@
+.bts_wrapper {
+    position: relative;
+
+    width: fit-content;
+    max-width: 100%;
+
+    overflow: hidden;
+
+    /*
+     * Change this to match the background behind the tags.
+     */
+    --bts-fade-color: #222222;
+    --bts-fade-width: 15px;
+}
+
+.bts_wrapper::before,
+.bts_wrapper::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    bottom: 0;
+
+    width: var(--bts-fade-width);
+
+    z-index: 5;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition: opacity 0.2s ease;
+}
+
+.bts_wrapper::before {
+    left: 0;
+
+    background: linear-gradient(
+        to right,
+        var(--bts-fade-color) 0%,
+        color-mix(
+            in srgb,
+            var(--bts-fade-color) 85%,
+            transparent
+        ) 30%,
+        transparent 100%
+    );
+}
+
+.bts_wrapper::after {
+    right: 0;
+
+    background: linear-gradient(
+        to left,
+        var(--bts-fade-color) 0%,
+        color-mix(
+            in srgb,
+            var(--bts-fade-color) 85%,
+            transparent
+        ) 30%,
+        transparent 100%
+    );
+}
+
+.bts_wrapper.canScrollLeft::before {
+    opacity: 1;
+}
+
+.bts_wrapper.canScrollRight::after {
+    opacity: 1;
+}
+
+.bts_container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    width: fit-content;
+    max-width: 100%;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    white-space: nowrap;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+
+    scrollbar-width: none;
+
+    cursor: grab;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+
+    touch-action: pan-y;
+}
+
+.bts_container.isDragging,
+.bts_container.isBlockingClicks {
+    cursor: grabbing;
+}
+
+.bts_container::-webkit-scrollbar {
+    display: none;
+}
+
+.bts_container :global(*) {
+    flex: 0 0 auto;
+
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .bts_container,
+    .bts_container.isDragging,
+    .bts_container.isBlockingClicks {
+        cursor: default;
+    }
+}

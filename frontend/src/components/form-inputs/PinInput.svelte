@@ -85,44 +85,92 @@
         />
     {/each}
 </div>
-
 <style>
     .pin-input-wrapper {
+        box-sizing: border-box;
         display: grid;
         grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 0.7rem;
+        gap: 0.75rem;
         width: 100%;
-        margin: auto;
-        max-width: 450px;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 4px 0;
+        overflow: visible;
     }
 
     .pin-box {
+        appearance: none;
+        -webkit-appearance: none;
+
         box-sizing: border-box;
+        display: block;
+
         aspect-ratio: 1 / 1;
         width: 100%;
         min-width: 0;
-        font-size: 1.5rem;
-        background-color: transparent;
+
+        padding: 0;
+        margin: 0;
+
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 14px;
+
+        background: transparent;
+
+        color: #fff;
         text-align: center;
-        border: 1px solid #404040;
-        border-radius: 0.375rem;
+        font-family: inherit;
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: 0.04em;
+
         outline: none;
-        transition: border-color 0.2s;
-        color: #c0c0c0;
+        caret-color: transparent;
+
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+
+        transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
+    }
+
+    .pin-box:hover {
+        border-color: rgba(255, 255, 255, 0.5);
     }
 
     .pin-box:focus {
-        border-color: white;
-        box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.336);
+        border-color: rgba(255, 255, 255, 0.95);
+
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.22),
+            inset 0 0 14px rgba(255, 255, 255, 0.08);
+    }
+
+    .pin-box::selection {
+        background: transparent;
     }
 
     @media (max-width: 600px) {
         .pin-input-wrapper {
-            gap: 0.4rem;
+            gap: 0.45rem;
+            padding: 3px 0;
         }
 
         .pin-box {
-            font-size: 1.2rem;
+            border-radius: 10px;
+            font-size: 1.25rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .pin-input-wrapper {
+            gap: 0.35rem;
+        }
+
+        .pin-box {
+            border-radius: 8px;
+            font-size: 1.1rem;
         }
     }
 </style>

@@ -1,473 +1,437 @@
-.trackButton {
-    display: flex;
-    align-items: center;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    border-radius: 5px;
-    width: 100%;
-    text-align: left;
-    padding: 1px;
-    margin-bottom: 6px;
-    position: relative;
-    justify-content: space-between;
-
-}
-.artworkWrapper {
-    height: 65px;
-    width: 65px;
-    border-radius: 5px;
-    position: relative;
-    overflow: hidden;
-}
-.playingOverArt {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.555);
-}
-
-.wplay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.flexDaysOld {
-    display: flex;
-    align-items: center;
-}
-.mobileDestinations {
-    display: none;
-}
-.trackButton:hover {
-    cursor: pointer;
-    background-color: #272727;
-}
-.artworkImage {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.allButArt {
-    width: calc(100% - 85px);
+.tli_button {
     display: flex;
     align-items: center;
     gap: 12px;
+
+    border: none;
+    outline: none;
+    background-color: transparent;
+    border-radius: 10px;
+
+    width: 100%;
+    text-align: left;
+    position: relative;
+
+    padding: 0;
+    margin-bottom: 12px;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
-.smallText {
-    font-size: 10pt;
-    padding: 0px;
-    margin: 0px;
-    color: rgb(140, 140, 140);
+
+.tli_button:focus,
+.tli_button:focus-visible,
+.tli_button:active {
+    outline: none;
+    box-shadow: none;
 }
-.tjoint {
-    padding: 0px;
-    margin: 0px;
+
+.tli_button:hover {
+    background-color: #2e2e2e;
+}
+
+
+/* ========================= */
+/* ARTWORK                   */
+/* ========================= */
+
+.tli_artworkContainer {
+    height: 65px;
+    width: 65px;
+    flex: 0 0 65px;
+
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tli_playOverlay {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+
+    background-color: rgba(0, 0, 0, 0.705);
+}
+
+.tli_playPauseOverlay {
+    transition: 0.3s;
+    opacity: 0;
+}
+
+.tli_button:hover .tli_artworkContainer .tli_playPauseOverlay {
+    opacity: 1;
+}
+
+.tli_selectedTrackOverlay {
+    transition: 0.3s;
+}
+
+.tli_button:hover .tli_artworkContainer .tli_selectedTrackOverlay {
+    opacity: 0;
+}
+
+.hiderJ {
+    opacity: 0;
+}
+
+.tli_wrapIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+    transition: 0.3s;
+}
+
+/* ========================= */
+/* CONTENT BESIDE ARTWORK    */
+/* ========================= */
+
+.tli_allButArtContainer {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    overflow: hidden;
+}
+
+.tli_titleContainer {
+    flex: 0 0 300px;
+
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+
+    overflow: hidden;
+}
+
+.tli_titleContainer p {
+    white-space: nowrap;
+}
+
+.tli_titleNotepadFlex {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    min-width: 0;
+}
+
+.tli_notepadContainer {
+    flex: 0 0 auto;
+    padding-top: 2px;
+}
+
+.tli_title {
+    min-width: 0;
+
+    padding: 0;
+    margin: 0;
+
     font-size: 12pt;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    color: var(--font-color-heading);
+}
+
+.tli_keyReference {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
     width: 100%;
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.tli_dot {
+    height: 10px;
+    width: 10px;
+    flex: 0 0 10px;
+
+    border-radius: 50%;
+    background-color: rgba(13, 255, 66, 0.932);
+
+    margin-bottom: 2px;
+}
+
+.tli_reference {
+    flex: 0 0 auto;
+
+    font-size: 9pt;
+    line-height: 1.13em;
+
+    margin: 0 0 2px;
+    padding: 1px 5px;
+
+    color: #21d3ff;
+
+    border: 1px solid #4abdff3a;
+    border-radius: 50px;
+
+    background-color: #4abdff36;
+
+    white-space: nowrap;
+}
+
+.smallText {
+    min-width: 0;
+
+    font-size: 10pt;
+
+    padding: 0;
+    margin: 0;
+
+    color: rgb(140, 140, 140);
+
+    white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
-.titleWrap {
+
+/* ========================= */
+/* DESKTOP TAGS              */
+/* ========================= */
+
+.tli_tags {
+    flex: 0 1 auto;
+
+    width: fit-content;
+    max-width: 100%;
+    min-width: 0;
+
     overflow: hidden;
-    width: calc(20%);
 }
-.titleWrap p {
-    white-space: nowrap;
+
+.tli_tags > * {
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .taggerflexer {
     display: flex;
     align-items: center;
-    overflow: hidden;
-    width: calc(30%);
     gap: 8px;
-}
-.futureDestinationsWrapper {
-    width: 20%;
-}
-.destinationFlex {
-    display: flex;
-    align-items: center;
-}
-.wrapb {
+
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
+
     overflow: hidden;
-    width: calc(15%);
 }
-.ratingJ {
-    width: calc(100% - 50px);
-    display: flex;
-    align-items: center;
 
-}
-.mobileDays {
-    opacity: .5;
-    font-size: 8pt;
-    margin-left: 5pt;
+/* ========================= */
+/* MOBILE TAGS               */
+/* ========================= */
+
+.tli_mobileTags {
     display: none;
-}
-.moreInfoC {
-    width: 15%;
-    display: flex;
-    justify-content: space-between;
-}
-.wrappamo {
-    margin-right: 5px;
-}
-.trackWrap {
-    display: flex;
-    width: 100px;
-    flex-direction: row-reverse;
+    min-width: 0;
 }
 
-.wrapMoreJoint {
-    width: 50px;
-    display: flex;
-    flex-direction: row-reverse;
-}
+/* ========================= */
+/* RIGHT SIDE                */
+/* ========================= */
 
-.finnaTag {
-    padding: 0px;
-    margin: 0px;
-    color: rgb(145, 145, 145);
-    font-size: 9pt;
-    margin-right: 8px;
-    padding: 3px 10px 2px 10px;
-    border-radius: 50px;
-    background-color: transparent;
-    border: 1px solid #424242f1;
-    white-space: nowrap;
-    background-color: transparent;
-}
+.tli_destinations {
+    flex: 0 0 125px;
 
-.wrappricer {
-    width: 100px;
-}
-.mobileAddCart {
-    display: none;
-}
+    width: 125px;
+    min-width: 125px;
+    max-width: 125px;
 
-.mobBeatPrice {
-    display: none;
-}
+    margin-left: auto;
 
-
-.dontshowhighlight {
-    background-color: transparent;
-}
-.dontshowhighlight:hover {
-    background-color: transparent;
-}
-
-.moreButtonCity {
-    padding: 0px;
-    margin: 0px;
-    padding-top: 2px;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    opacity: .7;
-    transition: .3s;
-}
-.moreButtonCity:hover {
-    opacity: 1;
-}
-
-.MoreOpTop {
-    padding: 10px;
     overflow: hidden;
-    position: relative;
-    border-bottom: 1px solid lightgray;
 }
-.morOPBack {
-    position: absolute;
-    filter: blur(35px);
-    opacity: .15;
-    top: 50%;
-    left: 50%;
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-    z-index: -1;
-}
-.moreOpIn{
+
+.tli_rating {
+    flex: 0 0 90px;
+
+    width: 90px;
+    min-width: 90px;
+    max-width: 90px;
+
     display: flex;
     align-items: center;
 
+    overflow: hidden;
+}
 
-}
-.moreOpArtWrap {
-    height: 35px;
-    width: 35px;
-    overflow: hidden;
-    position: relative;
-    border-radius: 3px;
-    overflow: hidden;
-}
-.fullerTitle {
-    width: calc(100% - 45px);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    margin-left: 10px;
-}
-.wrapOpper {
+.tli_moreInfoContainer {
+    flex: 0 0 auto;
+
     display: flex;
-    justify-content: space-between;
-    position: sticky;
-    top: 330px;
-    background-color: #f7f7f7;
-    z-index: 6;
-    height: 0px;    
+    justify-content: flex-end;
+    align-items: center;
 }
-.moreOptionsWrapper {
-    width: 210px;
-    border-radius: 6px;
-    background-color: #f7f7f7;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.261);
-    z-index: 6;
-    right: 0px;
-    bottom: 0px;
-    position: absolute;
-    overflow: hidden;
-}
-.mobTagsFlex {
-    display: none;
-}
-.evenButton {
-    background-color: #252525;
 
-}
-.editBeatInfoBox {
-    width: 100%;
-    text-align: left;
-    margin-top: 10px;
-    overflow: visible;
-}
 .moreIconButton {
     border: none;
-    padding: 11px 8px 8px 8px;
-    margin: 0px;
+
+    padding: 8px 4px 4px;
+    margin: 0 10px 0 0;
+
     background-color: transparent;
+
     cursor: pointer;
     border-radius: 4px;
+
     transform: rotate(90deg);
-    transition: .3s;
+    transition: 0.3s;
+
+    -webkit-tap-highlight-color: transparent;
 }
+
+.moreIconButton:focus,
+.moreIconButton:focus-visible,
+.moreIconButton:active {
+    outline: none;
+    box-shadow: none;
+}
+
 .moreIconButton:hover {
     background-color: rgba(255, 255, 255, 0.192);
-    transition: .3s;
-
-}
-.ppoverlay {
-    opacity: 0;
-}
-.trackButton:hover .artworkWrapper .ppoverlay {
-    opacity: 1;
-}
-.selTrackItem{
-    /* background-color: rgba(255, 217, 0, 0.596); */
-}
-.trackButton:hover .artworkWrapper .selTrackItem {
-    opacity: 0;
-}
-.hiderJ {
-    opacity: 0;
-}
-.wrapNoteLoader{
-    padding: 50px 0px 20px 0px;
-
-}
-.wl{
-    margin: auto;
-}
-.flexDaysOld {
-    position: relative;
-}
-.daysOldFader {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 15px;
-    background: linear-gradient(to right, #38383800, #222);
-    transition: .5s;
 }
 
-.evenfade{
-    background: linear-gradient(to right, #38383800, #252525);
-    transition: .3s;
+.tli_mobileDestinations {
+    display: none;
 }
 
-.trackButton:hover .allButArt .titleWrap .flexDaysOld .daysOldFader {
-    background: linear-gradient(to right, #38383800, #272727);
-}
-.trackButton:hover .allButArt .titleWrap .flexDaysOld .evenfade {
-    background: linear-gradient(to right, #38383800, #272727);
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
 
-}
+@media (max-width: 1050px) {
+    .tli_rating {
+        display: none;
+    }
 
-@media (max-width: 1300px) {
-    .mobileDestinations {
+    .tli_mobileDestinations {
         display: block;
+        flex: 0 0 auto;
     }
-    .futureDestinationsWrapper {
+
+    .tli_destinations {
         display: none;
     }
-    .titleWrap {
-        width: 30%;
-    }
-    .taggerflexer {
-        width: 40%;
-    color: #b8b8b8;
 
+    .tli_moreInfoContainer {
+        margin-left: auto;
     }
 }
-@media(max-width: 1125px) {
-    .wrapb {
+
+@media (max-width: 850px) {
+    .tli_destinations {
         display: none;
     }
-    .moreInfoC {
-        width: 30%;
 
-    }
-    .titleWrap {
-        width: calc(50% - 65px);
+    .tli_moreInfoContainer {
+        margin-left: auto;
     }
 }
-@media(max-width: 850px) {
-    .taggerflexer {
+
+@media (max-width: 725px) {
+    .tli_tags {
         display: none;
     }
-    .titleWrap {
-        width: calc(100% - 80px);
-        margin-right: 15px;
+
+    .tli_mobileTags {
+        display: block;
+
+        flex: 0 1 auto;
+
+        width: fit-content;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow: hidden;
     }
-    .trackButton {
-        width: calc(100% + 5px);
+
+    .tli_mobileTags > * {
+        width: fit-content;
+        max-width: 100%;
+        min-width: 0;
     }
-    .moreOptionsWrapper {
-        right: 5px;
+
+    .tli_mobileTags .bts_container {
+        width: fit-content;
+        max-width: 100%;
+        min-width: 0;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
-    .mobTagsFlex {
-        display: flex;
-        gap: 8px;
-    }   
+
+    .tli_mobileTags .bts_container::-webkit-scrollbar {
+        display: none;
+    }
+
     .smallText {
         display: none;
     }
-    .finnaTag {
-        font-size: 8pt;
-        padding: 1px 5px 0px 5px;
-    }
-    .mobileDays {
-        display: inline-block;
 
+    .tli_titleContainer {
+        flex: 1 1 auto;
+
+        width: auto;
+        min-width: 0;
+        max-width: none;
     }
 
-}
-@media(max-width: 650px){
-    .trackWrap {
-        display: none;
-    }
-    .ratingJ {
-        width: 0px;
-        overflow: hidden;
-    }
-    .moreInfoC {
-        width: 50px;
-    }
-    .moreButtonCity {
-        transform: rotate(90deg);
-        padding-top: 11px;
-    }
-    .playingOverArt {
-        display: block;
-    }
-    .spacefilla {
-        display: none;   
-    }
-    .wrapOpper {
-        top: 300px;
-    }
-    .artworkWrapper {
-        height: 60px;
-        width: 60px;
-    }
-    .allButArt {
-        width: calc(100% - 70px);
-        gap: 0px;
-    }
-    .titleWrap {
-        padding-left: 10px;
-    }
-    .finnaTag {
-        font-size: 7pt;
-    }
-}
-@media(max-width: 600px){
-    .wrapSaveButton{
+    .tli_keyReference {
         width: 100%;
-    }
-}
-@media (max-width: 575px){
-    .hideout {
-        display: none;
-    }
-}
-@media(max-width: 500px) {
-
-    .trackWrap {
-        width: 80px;
-    }
-    .titleWrap {
-        width: calc(100% - 60px);
-        margin-right: 15px;
-    }
-    .wrapMoreJoint {
-        width: 25px;
-        padding-left: 5px;
+        min-width: 0;
     }
 
+    .tli_moreInfoContainer {
+        margin-left: auto;
+    }
 }
-@media(pointer: coarse) {
-    .trackButton:hover {
-        cursor: pointer;
+
+/* ========================= */
+/* TOUCH DEVICES             */
+/* ========================= */
+
+@media (pointer: coarse) {
+    .tli_button:hover {
         background-color: transparent;
     }
+
     .evenButton:hover {
         background-color: hsla(0, 0%, 89%, 0.02);
-
     }
-    .ppoverlay {
+
+    .tli_playPauseOverlay {
         display: none;
     }
 
-    .selTrackItem {
+    .tli_selectedTrackOverlay {
         opacity: 1;
     }
-    .trackButton:hover .artworkWrapper .selTrackItem {
+
+    .tli_button:hover .tli_artworkContainer .tli_selectedTrackOverlay {
         opacity: 1;
     }
+
     .goHide {
         opacity: 0;
         display: none;
     }
 
-    .trackButton:hover .allButArt .titleWrap .flexDaysOld .daysOldFader {
-        background: linear-gradient(to right, #38383800, #222);
+    .moreIconButton:hover {
+        background-color: transparent;
     }
-    .trackButton:hover .allButArt .titleWrap .flexDaysOld .evenfade {
-        background: linear-gradient(to right, #38383800, #252525);
-
-    }
-
 }

@@ -1,104 +1,161 @@
 <script lang="ts">
     import "./Nav.css";
-    import { page } from "$app/stores";
-    import { navOpen, navStyle } from "../../../stores/navstore";
-    import EarIcon from "../../Icons/svg/EarIcon.svelte";
-    import SettingsIcon from "../../Icons/svg/SettingsIcon.svelte";
-    import { onMount, onDestroy } from "svelte";
-    import { browser } from "$app/environment";
+
+    import { onMount } from "svelte";
     import { goto } from "$app/navigation";
+
+    import { mobileNavOpen } from "../../../stores/navstore";
+    import { user } from "../../../stores/UserStore";
     import { logout } from "../../../helpers/Auth/authFunctions";
-    import LogoutIcon from "../../Icons/svg/LogoutIcon.svelte";
+
+    import GitHubLink from "../../links/GitHubLink.svelte";
+    import BoxButton from "../../buttons/BoxButton.svelte";
+    import NavigationLink from "../../buttons/NavigationLink.svelte";
+    import MobileMenuToggler from "../../UI/MobileMenuToggler.svelte";
+    import MobileNav from "./MobileNav.svelte";
     import Logo from "../../Icons/Logos/Logo.svelte";
 
     let isScrolled = false;
+    let activeHash = "";
 
-    $: isActive = (route: any) => $page.url.pathname === route;
+    const sectionIds = ["summary", "photos", "features", "wheres-my-pin"];
 
-    $: isOnBeatPage = $page.url.pathname.startsWith("/portal");
+    function updateActiveSection() {
+        isScrolled = window.scrollY > 0;
 
-    let handleScroll: () => void;
+        const activationOffset = 160;
+        const scrollPosition = window.scrollY + activationOffset;
 
-    if (browser) {
-        onMount(() => {
-            handleScroll = () => {
-                isScrolled = window.scrollY > 0;
-            };
+        if (window.scrollY < 100) {
+            activeHash = "";
+            return;
+        }
 
-            handleScroll(); // initial check
-            window.addEventListener("scroll", handleScroll);
-        });
+        let currentSection = "";
 
-        onDestroy(() => {
-            window.removeEventListener("scroll", handleScroll);
-        });
+        for (const id of sectionIds) {
+            const section = document.getElementById(id);
+
+            if (!section) continue;
+
+            const sectionTop =
+                section.getBoundingClientRect().top + window.scrollY;
+
+            if (sectionTop <= scrollPosition) {
+                currentSection = `#${id}`;
+            }
+        }
+
+        activeHash = currentSection;
     }
+
+    onMount(() => {
+        updateActiveSection();
+
+        window.addEventListener("scroll", updateActiveSection, {
+            passive: true,
+        });
+
+        window.addEventListener("resize", updateActiveSection);
+
+        return () => {
+            window.removeEventListener("scroll", updateActiveSection);
+
+            window.removeEventListener("resize", updateActiveSection);
+        };
+    });
 </script>
 
 <div
-    class="navContainer"
-    class:scrolled={isScrolled || $navOpen}
-    class:addLine={$navStyle.addLine}
+    class="nav_container"
+    class:nav_scrolled={isScrolled}
+    class:nav_scrolledMobileNav={isScrolled && $mobileNavOpen}
 >
-    <div class="insideNav" class:maxoutnav={$navStyle.capWidth}>
-        <div class="leftSideNav">
-            <button
-                class="logoButtonRouter"
-                on:click={() => {
-                    goto("/portal");
-                }}
-            >
-                <div class="wrapDeskHomeLogo">
-                    <Logo color={"#f7f7f7"} width={"120px"}></Logo>
-                </div>
-                <div class="wrapMobileHomeLogo">
-                    <Logo color={"#f7f7f7"} width={"100px"}></Logo>
-                </div>
-            </button>
-
-            <button on:click={logout} class="logoutJoint">
-                <p style="font-size: 9pt;">Logout</p>
-                <LogoutIcon height={"15px"} color={"#f7f7f7"}></LogoutIcon>
-            </button>
-        </div>
-
-        <!-- is removed for mobile -->
-        <div class="loginFlex">
-            <div class="flexcartside">
-                <div class="navButtons">
-                    <a
-                        class:navActive={isActive("/portal")}
-                        class="desktopNavigation"
-                        href="/portal">Listen</a
-                    >
-
-                    <a
-                        class:navActive={isActive("/portal/manage-beats")}
-                        class="desktopNavigation"
-                        href="/portal/manage-beats">Manage</a
-                    >
-                </div>
-
-                <div class="mobileNavButtons">
-                    <button
-                        class:navActive={isActive("/portal")}
-                        on:click={(e) => {
-                            goto("/portal");
-                        }}
-                        class="mainNavBtn"
-                    >
-                        <EarIcon></EarIcon>
-                    </button>
-
-                    <a
-                        class:navActive={isActive("/portal/manage-beats")}
-                        class="mainNavBtn"
-                        href="/portal/manage-beats"
-                    >
-                        <SettingsIcon></SettingsIcon>
+    <div class="nav_inside">
+        {#if $user}
+            <div class="nav_userFlex">
+                <div class="nav_logoFlex">
+                    <a href="/" aria-label="Go to home page">
+                        <Logo color="#f7f7f7" width="120px" />
                     </a>
                 </div>
+
+                <div class="nav_rightFlex">
+                    <NavigationLink linkText="Home" linksTo="/" />
+
+                    <NavigationLink linkText="Tracks" linksTo="/portal" />
+
+                    <NavigationLink
+                        linkText="Add Track"
+                        linksTo="/portal/add-beat"
+                    />
+
+                    <NavigationLink
+                        linkText="Manage"
+                        linksTo="/portal/manage-beats"
+                    />
+
+                    <BoxButton
+                        buttonText="Logout"
+                        on:click={logout}
+                        tightPad={true}
+                        buttonStyle="glass"
+                    />
+                </div>
+
+                <div class="nav_mobileToggle">
+                    <MobileMenuToggler />
+                </div>
             </div>
-        </div>
+        {:else}
+            <div class="nav_noUserFlex">
+                <div class="nav_githubFlex">
+                    <GitHubLink gitText="@pblake313" />
+                </div>
+
+                <div class="nav_rightFlex">
+                    <NavigationLink linkText="Home" linksTo="/" {activeHash} />
+
+                    <NavigationLink
+                        linkText="Summary"
+                        linksTo="/#summary"
+                        {activeHash}
+                    />
+
+                    <NavigationLink
+                        linkText="Photos"
+                        linksTo="/#photos"
+                        {activeHash}
+                    />
+
+                    <NavigationLink
+                        linkText="Features"
+                        linksTo="/#features"
+                        {activeHash}
+                    />
+                    <NavigationLink
+                        linkText="Where's My PIN"
+                        linksTo="/#wheres-my-pin"
+                        {activeHash}
+                    />
+
+                    <BoxButton
+                        buttonText="Login"
+                        tightPad={true}
+                        on:click={() => {
+                            goto("/login");
+                        }}
+                    />
+                </div>
+
+                <div class="nav_mobileToggle">
+                    <MobileMenuToggler />
+                </div>
+            </div>
+        {/if}
     </div>
 </div>
+
+{#if $mobileNavOpen}
+    <MobileNav />
+{/if}

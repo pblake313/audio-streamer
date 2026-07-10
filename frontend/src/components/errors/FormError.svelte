@@ -1,63 +1,87 @@
 <script lang="ts">
     import AlertIcon from "../Icons/svg/AlertIcon.svelte";
 
-    export let errorMessage: string | null = null
-    export let errorTitle: string | null = null  
+    export let errorMessage: string | null = null;
+    export let errorTitle: string | null = null;
 
+    export let textAlign: "center" | "left" = "left";
 
-    export let textAlign: 'center' | 'left' = 'left'
+    // text + icon use this same color
+    export let color: string = "gold";
 </script>
 
-
-<div class="wrapFormError">
-
+<div class="wrapFormError" style={`--form-error-color: ${color};`}>
     {#if errorTitle}
-        <div class="errorTitleFlex" class:squareUpError={textAlign === 'center'}>
-            <AlertIcon  color={"#f7f7f7"} height="24px"></AlertIcon>
-            <p class="eTitle" ><b>{errorTitle}</b></p>
+        <div
+            class="errorTitleFlex"
+            class:centerError={textAlign === "center"}
+        >
+            <AlertIcon color={color} height="20px" />
+
+            <p class="formError_title">
+                {errorTitle}
+            </p>
         </div>
-        
     {/if}
 
     {#if errorMessage}
-        <div class="errorTitleFlex" class:squareUpMessage={textAlign === 'center'}>
+        <div
+            class="errorMessageFlex"
+            class:centerError={textAlign === "center"}
+        >
             {#if !errorTitle}
-                <AlertIcon color={"#f7f7f7"} height="24px"></AlertIcon>
+                <AlertIcon color={color} height="20px" />
             {/if}
-            <p class="eTitle suberr" class:noETitle={!errorTitle}>{errorMessage}</p>
-        </div>
-        
-    {/if}
 
+            <p
+                class="formError_message"
+                class:messageWithIcon={!errorTitle}
+            >
+                {errorMessage}
+            </p>
+        </div>
+    {/if}
 </div>
 
-
 <style>
-    .eTitle {
-        margin-left: 10px;
-        color: #a5a5a5;
+    .wrapFormError {
+        color: var(--form-error-color);
     }
-    .suberr{
-        opacity: .8;
-        margin-left: 0px;
-        margin-top: 10px;
 
-    }
-    .errorTitleFlex {
+    .errorTitleFlex,
+    .errorMessageFlex {
         display: flex;
         align-items: center;
         margin-top: 10px;
     }
-    .squareUpError {
+
+    .centerError {
         width: fit-content;
-        margin: auto;
-    }
-    .squareUpMessage {
+        margin-left: auto;
+        margin-right: auto;
         text-align: center;
-        margin: auto;
-        width: fit-content;
     }
-    .noETitle {
+
+    .formError_title {
+        margin: 0;
+        margin-left: 10px;
+
+        color: var(--form-error-color);
+        font-weight: 550;
+        font-size: 14pt;
+    }
+
+    .formError_message {
+        margin: 0;
+
+        color: var(--form-error-color);
+        opacity: 0.9;
+        font-weight: 400;
+        font-size: 12pt;
+    }
+
+    .messageWithIcon {
+        margin-top: 0;
         margin-left: 10px;
     }
 </style>
