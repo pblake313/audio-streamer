@@ -183,7 +183,7 @@
 
             <div class="tli_keyReference">
         
-                {#if getDateAgeInDays(beat.createdAt) >= 8 && beat.trackType === 'Beat'}
+                {#if getDateAgeInDays(beat.createdAt) >= 30 && beat.trackType === 'Beat'}
                     <div class="tli_dot"></div>
                 {/if}
 
