@@ -3,6 +3,10 @@
     import "./ConverterForm.css";
     import AddIcon from "../Icons/svg/AddIcon.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
+    import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
+
+
+    $: console.log(files)
 
     let files: File[] = [];
     let fileInput: HTMLInputElement;
@@ -145,7 +149,27 @@
     }
 
     async function convertFiles() {
-        console.log("works");
+
+        try {
+            const formData = new FormData();
+
+            for (const file of files) {
+                formData.append("wavFiles", file);
+            }
+
+            const response = await authorizedFetch('/secure/converter/wav-to-mp3', {
+                method: "POST",
+                body: formData,
+            })
+
+            console.log(response)
+
+        } catch (error){
+            console.log(error)
+            
+        } finally {
+
+        }
     }
 
     onDestroy(() => {
@@ -212,7 +236,7 @@
             {/each}
         </div>
 
-        <div style="margin-top: 10px;">
+        <div style="margin-top: 15px;">
             <BoxButton
                 buttonText={"Convert Files"}
                 on:click={convertFiles}
