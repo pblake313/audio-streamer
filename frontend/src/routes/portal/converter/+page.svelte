@@ -1,6 +1,7 @@
 <script lang="ts">
 
     import ConverterForm from '../../../components/forms/ConverterForm.svelte';
+    import ConvertedFileList from '../../../components/lists/ConvertedFiles.svelte/ConvertedFileList.svelte';
 import './ConverterPage.css'
 
 </script>
@@ -14,5 +15,9 @@ import './ConverterPage.css'
     </div>
 
     <ConverterForm />
+
+    <div class="converter_filesList">
+        <ConvertedFileList />
+    </div>
 
 </div>

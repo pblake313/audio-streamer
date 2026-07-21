@@ -4,9 +4,14 @@
     import AddIcon from "../Icons/svg/AddIcon.svelte";
     import BoxButton from "../buttons/BoxButton.svelte";
     import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
+    import { getSocket } from "../../stores/socketStore";
+    import {
+        fileSizeTranslator,
+        removeFileExtension,
+    } from "../../helpers/formatters";
+    import Loader from "../loaders/Loader.svelte";
 
-
-    $: console.log(files)
+    let isConverting: boolean = false;
 
     let files: File[] = [];
     let fileInput: HTMLInputElement;
@@ -142,33 +147,42 @@
         clearError();
     }
 
-    function formatFileSize(bytes: number) {
-        const megabytes = bytes / (1024 * 1024);
-
-        return `${megabytes.toFixed(2)} MB`;
-    }
-
     async function convertFiles() {
-
         try {
+            if (isConverting) return;
+
+            isConverting = true;
+
+            const io = await getSocket();
+            const socketId = io.id;
+
+            if (!socketId) {
+                throw new Error(
+                    "No frontend socket id exists. One is required to convert.",
+                );
+            }
+
             const formData = new FormData();
+
+            formData.append("socketId", socketId);
 
             for (const file of files) {
                 formData.append("wavFiles", file);
             }
 
-            const response = await authorizedFetch('/secure/converter/wav-to-mp3', {
-                method: "POST",
-                body: formData,
-            })
+            const response = await authorizedFetch(
+                "/secure/converter/wav-to-mp3",
+                {
+                    method: "POST",
+                    body: formData,
+                },
+            );
 
-            console.log(response)
-
-        } catch (error){
-            console.log(error)
-            
+            console.log(response);
+        } catch (error) {
+            console.log(error);
         } finally {
-
+            isConverting = false;
         }
     }
 
@@ -191,56 +205,70 @@
     />
 
     {#if files.length >= 1}
-        <div class="converter-uploader__header">
-            <h5>Selected Files ({files.length})</h5>
+            <div class="converter-uploader__header">
+                <h5>Selected Files ({files.length})</h5>
 
-            <div class="conveterUploader_headerButtons">
-                <BoxButton
-                    on:click={() => fileInput.click()}
-                    buttonText={"Add More"}
-                    buttonIcon={"add"}
-                    buttonStyle={"opacityIncrease"}
-                    tightPad={true}
-                />
+                        
+                    <div class="conveterUploader_headerButtons">
+                        <BoxButton
+                            on:click={() => fileInput.click()}
+                            buttonText={"Add More"}
+                            buttonIcon={"add"}
+                            buttonStyle={"opacityIncrease"}
+                            tightPad={true}
+                            isDisabled={isConverting}
 
-                <BoxButton
-                    buttonStyle={"glass"}
-                    buttonText={"Clear All"}
-                    on:click={clearFiles}
-                    tightPad={true}
-                />
+                        />
+
+                        <BoxButton
+                            buttonStyle={"glass"}
+                            buttonText={"Clear All"}
+                            on:click={clearFiles}
+                            tightPad={true}
+                            isDisabled={isConverting}
+                        />
+                    </div>
+
             </div>
-        </div>
+
 
         <div class="converter-uploader__files">
             {#each files as file, index (`${file.name}-${file.size}-${file.lastModified}`)}
                 <div class="converter-uploader__file">
                     <div class="converter-uploader__file-info">
-                        <p class="converter-uploader_filename">{file.name}</p>
+                        <p class="converter-uploader_filename">
+                            {removeFileExtension(file.name)}
+                        </p>
                         <p style="font-size: 10pt;">
-                            {formatFileSize(file.size)}
+                            {fileSizeTranslator(file.size)}
                         </p>
                     </div>
 
-                    <BoxButton
-                        on:click={() => {
-                            removeFile(index);
-                        }}
-                        buttonText={null}
-                        buttonIcon={"trash"}
-                        iconColor={"#f7f7f7"}
-                        tightPad={true}
-                        buttonStyle={"opacityIncrease"}
-                    />
+                    {#if !isConverting}
+                        <BoxButton
+                            on:click={() => {
+                                removeFile(index);
+                            }}
+                            buttonText={null}
+                            buttonIcon={"trash"}
+                            iconColor={"#f7f7f7"}
+                            tightPad={true}
+                            buttonStyle={"opacityIncrease"}
+                            isDisabled={isConverting}
+                        />
+                    {/if}
+
                 </div>
             {/each}
         </div>
 
         <div style="margin-top: 15px;">
             <BoxButton
-                buttonText={"Convert Files"}
+                buttonText={isConverting ? null : "Convert Files"}
                 on:click={convertFiles}
                 fullWidth={true}
+                isDisabled={isConverting}
+                buttonIcon={isConverting ? "loading" : null}
             />
         </div>
 
@@ -254,6 +282,10 @@
                 {error}
             </p>
         {/if}
+    {:else if isConverting}
+        <!-- should never see this. -->
+        <Loader />
+        <p>Hang tight... converting.</p>
     {:else}
         <button
             type="button"

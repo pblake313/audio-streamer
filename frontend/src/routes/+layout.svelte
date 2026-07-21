@@ -22,18 +22,6 @@
         let socket: Awaited<ReturnType<typeof getSocket>> | null = null;
         let destroyed = false;
 
-        function handleConnect() {
-            console.log("Socket connected:", socket?.id);
-        }
-
-        function handleDisconnect(reason: string) {
-            console.log("Socket disconnected:", reason);
-        }
-
-        function handleConnectError(error: Error) {
-            console.error("Socket connection error:", error.message);
-        }
-
         async function initialize() {
             if (!$autoLoginAttempted) {
                 await autoLogin();
@@ -49,14 +37,6 @@
                 return;
             }
 
-            socket.on("connect", handleConnect);
-            socket.on("disconnect", handleDisconnect);
-            socket.on("connect_error", handleConnectError);
-
-            // The socket may have connected before the listeners were added.
-            if (socket.connected) {
-                handleConnect();
-            }
         }
 
         initialize().catch((error) => {
@@ -65,10 +45,6 @@
 
         return () => {
             destroyed = true;
-
-            socket?.off("connect", handleConnect);
-            socket?.off("disconnect", handleDisconnect);
-            socket?.off("connect_error", handleConnectError);
         };
     });
 </script>

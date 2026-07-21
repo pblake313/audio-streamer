@@ -8,14 +8,18 @@
       display: none;
   }
 
-  .conveterUploader_headerButtons{
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  .conveterUploader_headerButtons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
   }
-  .converter-uploader_filename{
-    color: var(--font-color-heading);
+
+  .converter-uploader_filename {
+      color: var(--font-color-heading);
+      padding-top: 2px;
+
   }
+
   .converter-uploader__dropzone {
       width: 100%;
       min-height: 180px;

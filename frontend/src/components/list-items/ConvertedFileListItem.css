@@ -1,0 +1,17 @@
+.cfli_button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+    text-align: left;
+}
+
+.cfli_filename {
+    color: var(--font-color-heading);
+    padding-top: 2px;
+}
