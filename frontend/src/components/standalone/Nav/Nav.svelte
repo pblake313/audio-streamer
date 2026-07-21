@@ -94,6 +94,10 @@
                         linkText="Manage"
                         linksTo="/portal/manage-beats"
                     />
+                    <NavigationLink
+                        linkText="Converter"
+                        linksTo="/portal/converter"
+                    />
 
                     <BoxButton
                         buttonText="Logout"
