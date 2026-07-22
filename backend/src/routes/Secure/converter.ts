@@ -3,6 +3,7 @@ import multer from "multer";
 
 import { wavToMp3 } from "../../controllers/Secure/Converter/wav-to-mp3";
 import { getConvertedFilesByPage } from "../../controllers/Secure/Converter/get-files";
+import { downloadConvertedFile } from "../../controllers/Secure/Converter/download-converted-file";
 
 const router = Router();
 
@@ -38,5 +39,7 @@ const wavToMp3Files = multer({
 router.post("/wav-to-mp3", wavToMp3Files, wavToMp3);
 
 router.get('/get-files/:page', getConvertedFilesByPage)
+
+router.get('/download-converted-file/:fileId', downloadConvertedFile)
 
 export default router;

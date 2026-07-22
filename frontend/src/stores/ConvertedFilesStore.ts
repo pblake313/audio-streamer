@@ -4,6 +4,8 @@ import { authorizedFetch } from "../helpers/Fetchers/authorizedFetch";
 
 export const isFetchingFiles = writable<boolean>(false);
 export const isFetchingMoreFiles = writable<boolean>(false);
+export const convertedFileFetchError = writable<string | null>(null)
+
 
 export const oneSuccessfulFileBatchFetched =
     writable<boolean>(false);
@@ -20,6 +22,8 @@ export async function fetchFileDocsByPage(): Promise<ConvertedFileDoc[]> {
     if (get(allFileBatchesFetched)) {
         return [];
     }
+    
+    convertedFileFetchError.set(null)
 
     const pageToFetch = nextPageToFetch;
 
@@ -56,13 +60,38 @@ export async function fetchFileDocsByPage(): Promise<ConvertedFileDoc[]> {
         }
 
         return fetchedFiles;
-    } catch (err) {
-        console.error(err);
+    } catch (err: any) {
+
+        convertedFileFetchError.set(err.message || 'An unknown error has occurred.')
+        // console.error(err);
+
         return [];
     } finally {
         isFetchingFiles.set(false);
         isFetchingMoreFiles.set(false);
     }
+}
+
+function getCreatedAtTime(value: unknown): number {
+    if (value instanceof Date) {
+        return value.getTime();
+    }
+
+    if (typeof value === "string" || typeof value === "number") {
+        return new Date(value).getTime();
+    }
+
+    if (typeof value === "object" && value !== null) {
+        if ("seconds" in value && typeof value.seconds === "number") {
+            return value.seconds * 1000;
+        }
+
+        if ("_seconds" in value && typeof value._seconds === "number") {
+            return value._seconds * 1000;
+        }
+    }
+
+    return 0;
 }
 
 export function upsertConvertedFile(
@@ -74,14 +103,20 @@ export function upsertConvertedFile(
                 currentFile.id === file.id
         );
 
+        let updatedFiles: ConvertedFileDoc[];
+
         if (existingIndex === -1) {
-            return [...currentFiles, file];
+            updatedFiles = [...currentFiles, file];
+        } else {
+            updatedFiles = [...currentFiles];
+
+            updatedFiles[existingIndex] = file;
         }
 
-        const updatedFiles = [...currentFiles];
-
-        updatedFiles[existingIndex] = file;
-
-        return updatedFiles;
+        return updatedFiles.sort(
+            (a, b) =>
+                getCreatedAtTime(b.createdAt) -
+                getCreatedAtTime(a.createdAt)
+        );
     });
 }

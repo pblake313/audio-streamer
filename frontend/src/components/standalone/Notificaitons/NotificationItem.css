@@ -1,4 +1,4 @@
-.singleNotification {
+.notification_container {
     margin-bottom: 15px;
     border-radius: 10px;
     transition: .3s;
@@ -10,7 +10,7 @@
     box-shadow: 0px 0px 25px black;
     
 }
-.noteIconJoint {
+.notification_megaIconContainer {
     width: 75px;
     display: flex;
     justify-content: space-evenly;
@@ -18,7 +18,7 @@
     position: relative;
     background-color: #cacaca8f;
 }
-.iconLeftColor {
+.notification_color {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -27,7 +27,7 @@
     border-radius: 8px;
     background-color: #0091ff;
 }
-.holdIconJoint {
+.notification_iconContainer {
     padding: 10px 0px 5px 0px;
 }
 .holdNotiTitle {
@@ -45,29 +45,29 @@
     align-items: center;
     padding: 10px 5px 10px 0px;
 }
-.notit {
-    font-size: 10pt;
+.notification_title {
+    font-size: 12pt;
     font-weight: bold;
     color: #222222;
 }
-.nmess {
+.notification_message {
     color: #404040;
-    font-size: 9pt;
+    font-size: 11pt;
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
 }
 
-.singleNotification.error .noteIconJoint .iconLeftColor {
+.notification_container.error .notification_megaIconContainer .notification_color {
     background-color: #d63232;
 }
-.singleNotification.warning .noteIconJoint .iconLeftColor {
+.notification_container.warning .notification_megaIconContainer .notification_color {
     background-color: #ff9f0a;
 }
-.singleNotification.success .noteIconJoint .iconLeftColor{
+.notification_container.success .notification_megaIconContainer .notification_color{
     background-color: #30d158;
 }
-.singleNotification.neutral .noteIconJoint .iconLeftColor {
+.notification_container.neutral .notification_megaIconContainer .notification_color {
     background-color: #0091ff;
 }
 .notificationIcon {

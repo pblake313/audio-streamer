@@ -64,6 +64,12 @@ export async function authorizedFetch<T = any>(
         accessToken.set(refreshedToken);
     }
 
+    const contentType = res.headers.get("content-type") || "";
+
+    if (res.ok && !contentType.includes("application/json")) {
+        return (await res.blob()) as T;
+    }
+
     let body: any = null;
 
     try {
@@ -89,7 +95,6 @@ export async function authorizedFetch<T = any>(
                 ? "Session expired."
                 : rawMessage;
                 
-
 
         const error = {
             status: body?.status || res.status,
