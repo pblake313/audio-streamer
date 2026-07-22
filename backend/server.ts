@@ -4,12 +4,12 @@ import http from "node:http";
 
 import app from "./src/app";
 import { initializeSocket } from "./src/socket";
+import { startConvertedFileCleanupWorker } from "./src/workers/conversion-cleanup-worker";
 
 const PORT = Number(process.env.PORT) || 3000;
 
 const server = http.createServer(app);
 
-// Attach Socket.IO to the same server used by Express.
 initializeSocket(server);
 
 server.on("error", (error: NodeJS.ErrnoException) => {
@@ -26,4 +26,6 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 
 server.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
+
+    startConvertedFileCleanupWorker();
 });

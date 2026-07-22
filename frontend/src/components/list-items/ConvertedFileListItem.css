@@ -9,9 +9,13 @@
     background: rgba(255, 255, 255, 0.04);
     cursor: pointer;
     text-align: left;
+    transition: .3s;
 }
 
 .cfli_filename {
     color: var(--font-color-heading);
     padding-top: 2px;
+}
+.cfli_button:disabled {
+    opacity: .4;
 }

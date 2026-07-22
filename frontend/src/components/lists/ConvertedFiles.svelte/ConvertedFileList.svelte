@@ -68,10 +68,6 @@
             </div>
         {/if}
     {:else}
-        <p style="text-align: center; opacity: .7;">
-            No recent conversions. <br /> Files are automatically deleted after 2
-            weeks.
-        </p>
 
         {#if $convertedFileFetchError}
             <FormError

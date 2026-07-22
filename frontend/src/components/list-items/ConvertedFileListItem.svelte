@@ -54,7 +54,7 @@
     }
 </script>
 
-<button class="cfli_button" on:click={handleDownload}>
+<button class="cfli_button" on:click={handleDownload} disabled={isDownloading}>
     <div>
         <p class="cfli_filename">{removeFileExtension(file.filename)}</p>
         <p style="font-size: 10pt; padding-top: 3px">
