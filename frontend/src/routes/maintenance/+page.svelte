@@ -22,7 +22,7 @@
         </div>
         <p>
             Our site is currently undergoing maintenance. We should be up and
-            running shortly. Sorry for the inconveinence.
+            running shortly. Check back later.
         </p>
     </div>
 </div>
