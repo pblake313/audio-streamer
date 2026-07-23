@@ -18,6 +18,20 @@ export const convertedFiles =
 
 let nextPageToFetch = 1;
 
+
+export function resetFileStoreToDefaultValues(): void {
+    isFetchingFiles.set(false);
+    isFetchingMoreFiles.set(false);
+    convertedFileFetchError.set(null);
+
+    oneSuccessfulFileBatchFetched.set(false);
+    allFileBatchesFetched.set(false);
+
+    convertedFiles.set([]);
+
+    nextPageToFetch = 1;
+}
+
 export async function fetchFileDocsByPage(): Promise<ConvertedFileDoc[]> {
     if (get(allFileBatchesFetched)) {
         return [];

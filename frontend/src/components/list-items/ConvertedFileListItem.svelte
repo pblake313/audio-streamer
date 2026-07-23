@@ -54,17 +54,25 @@
     }
 </script>
 
-<button class="cfli_button" on:click={handleDownload} disabled={isDownloading}>
-    <div>
-        <p class="cfli_filename">{removeFileExtension(file.filename)}</p>
-        <p style="font-size: 10pt; padding-top: 3px">
-            {fileSizeTranslator(file.mp3Bytes)} - Expires {formatDate(
-                file.expiresAt,
-            )}
+<button
+    type="button"
+    class="cfli_button"
+    on:click={handleDownload}
+    disabled={isDownloading}
+>
+    <div class="cfli_text">
+        <p class="cfli_filename">
+            {removeFileExtension(file.filename)}
+        </p>
+
+        <p class="cfli_details">
+            {fileSizeTranslator(file.mp3Bytes)}
+            <span>•</span>
+            Expires {formatDate(file.expiresAt)}
         </p>
     </div>
 
-    <div>
+    <div class="cfli_download">
         {#if isDownloading}
             <Loader height={"24px"} />
         {:else}

@@ -4,6 +4,10 @@
     import { Navigation } from "swiper/modules";
     import { fade } from "svelte/transition";
 
+
+
+    // ALL IMAGES ARE CAPTURED AT 1250PX BY 700
+
     // @ts-ignore: CSS side-effect import for Swiper
     import "swiper/css";
     // @ts-ignore: CSS side-effect import for Swiper navigation
@@ -13,15 +17,18 @@
 
     export let images: string[] = [
         "/Images/ScreenShots/Desktop/desk1.webp",
+        "/Images/ScreenShots/Desktop/desk10.webp",
         "/Images/ScreenShots/Desktop/desk2.webp",
         "/Images/ScreenShots/Desktop/desk3.webp",
         "/Images/ScreenShots/Desktop/desk4.webp",
+        "/Images/ScreenShots/Desktop/desk12.webp",
         "/Images/ScreenShots/Desktop/desk5.webp",
+        "/Images/ScreenShots/Desktop/desk13.webp",
         "/Images/ScreenShots/Desktop/desk6.webp",
+        "/Images/ScreenShots/Desktop/desk11.webp",
         "/Images/ScreenShots/Desktop/desk7.webp",
         "/Images/ScreenShots/Desktop/desk8.webp",
         "/Images/ScreenShots/Desktop/desk9.webp",
-        "/Images/ScreenShots/Desktop/desk10.webp",
     ];
 
     let swiperContainer: HTMLDivElement;

@@ -4,17 +4,12 @@
     import MobileScreenshotSwiper from "../swipers/MobileScreenshotSwiper.svelte";
     import "./ProjectDetails.css";
 
-
     let slideType: "mobile" | "desktop" = "mobile";
 </script>
 
-
 <div class="projectDetails_container">
-    
-
     <!-- summary -->
     <div class="projectDetails_section" id="summary">
-
         <h2 class="projectDetails_header">Summary</h2>
 
         <p>
@@ -37,7 +32,6 @@
 
     <!-- photos swiper -->
     <div class="projectDetails_swiperMegaContainer" id="photos">
-
         <div class="projectDetails_photoFlex">
             <div class="headingSide">
                 <h2>Photos</h2>
@@ -50,18 +44,15 @@
                 }}
             />
         </div>
-
- 
     </div>
 
-           <div class="projectDetails_swiperSection">
-            {#if slideType === "desktop"}
-                <DesktopScreenshotSwiper />
-            {:else}
-                <MobileScreenshotSwiper />
-            {/if}
-        </div>
-
+    <div class="projectDetails_swiperSection">
+        {#if slideType === "desktop"}
+            <DesktopScreenshotSwiper />
+        {:else}
+            <MobileScreenshotSwiper />
+        {/if}
+    </div>
 
     <!-- features -->
     <div class="projectDetails_section" id="features">
@@ -74,6 +65,11 @@
             <p>
                 <span class="projectDetails_li_starter">A/B Audio Testing:</span
                 > Compare your track against another reference track in real time.
+            </p>
+            <p>
+                <span class="projectDetails_li_starter"
+                    >WAV to MP3 Converter:</span
+                > Convert WAV files to MP3 files.
             </p>
             <p>
                 <span class="projectDetails_li_starter">Track Filtering:</span> Filter
@@ -146,10 +142,8 @@
         </p>
     </div>
 
-    
     <div class="projectDetails_section" id="wheres-my-pin">
-
-        <h2 class="projectDetails_header" >Authentication</h2>
+        <h2 class="projectDetails_header">Authentication</h2>
         <p>
             Access is protected by a <strong>PIN-based authentication</strong>
             system combined with <strong>IP validation</strong>. The backend
@@ -179,7 +173,6 @@
             and deploy your own instance. Every deployment uses its own PIN, so
             there isn't a shared PIN that grants access to this demo.
         </p>
-
     </div>
 
     <div class="projectDetails_section">
@@ -272,6 +265,14 @@
                 <span class="projectDetails_li_starter">File Handling:</span>
                 Memory-based uploads, image conversion and optimization, file validation,
                 Firebase Storage uploads, and controlled media access.
+            </p>
+            <p>
+                <span class="projectDetails_li_starter"
+                    >WAV-to-MP3 Converter:</span
+                >
+                Converts uploaded WAV files into MP3 format with real-time conversion
+                progress. Converted files are securely stored and automatically removed
+                from the database and cloud storage after two weeks.
             </p>
 
             <p>

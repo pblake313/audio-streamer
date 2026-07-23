@@ -16,7 +16,7 @@ async function runJob() {
     isRunning = true;
 
     try {
-        console.log("Running cleanup job...");
+        // console.log("Running cleanup job...");
 
         const expiredDocs = await getExpiredConvertedDocs();
 

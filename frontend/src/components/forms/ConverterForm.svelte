@@ -456,9 +456,7 @@
 
     {#if files.length >= 1}
         <div class="converter-uploader__header">
-            <h5>
-                Selected Files ({files.length})
-            </h5>
+            <h5 class="converter-uploader_title"> Selected Files ({files.length})</h5>
 
             <div class="conveterUploader_headerButtons">
                 <BoxButton

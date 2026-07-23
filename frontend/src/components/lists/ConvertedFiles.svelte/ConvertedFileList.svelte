@@ -27,6 +27,9 @@
     {#if $isFetchingFiles}
         <Loader text={"Fetching recently converted files."} />
     {:else if $convertedFiles.length >= 1}
+
+        <h5 style="margin-bottom: 10px;">Converted Files</h5>
+
         <div class="cfl_listContainer">
             {#each $convertedFiles as file}
                 <ConvertedFileListItem {file} />

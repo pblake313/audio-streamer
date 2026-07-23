@@ -17,17 +17,20 @@
   .converter-uploader_filename {
       color: var(--font-color-heading);
       padding-top: 2px;
-
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
   }
 
-  .converter_confetti{
-    z-index: -5;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
+  .converter_confetti {
+      z-index: -5;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
   }
+
   .converter-uploader__dropzone {
       width: 100%;
       min-height: 180px;
@@ -137,73 +140,73 @@
 
 
   .converter-uploader__file-info {
-    flex: 1;
-    min-width: 0;
-}
+      flex: 1;
+      min-width: 0;
+  }
 
-.converter-uploader__file-size {
-    margin: 0;
-    font-size: 10pt;
-}
+  .converter-uploader__file-size {
+      margin: 0;
+      font-size: 10pt;
+  }
 
-.converter-uploader__progress-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    margin-top: 10px;
-}
+  .converter-uploader__progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 10px;
+  }
 
-.converter-uploader__progress-header p,
-.converter-uploader__progress-header span {
-    margin: 0;
-    font-size: 10pt;
-}
+  .converter-uploader__progress-header p,
+  .converter-uploader__progress-header span {
+      margin: 0;
+      font-size: 10pt;
+  }
 
-.converter-uploader__progress-header p {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+  .converter-uploader__progress-header p {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+  }
 
-.converter-uploader__progress-header span {
-    flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
-}
+  .converter-uploader__progress-header span {
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+  }
 
-.converter-uploader__progress-header .complete {
-    color: #8be3a1;
-}
+  .converter-uploader__progress-header .complete {
+      color: #8be3a1;
+  }
 
-.converter-uploader__progress-header .error {
-    color: #ff8181;
-}
+  .converter-uploader__progress-header .error {
+      color: #ff8181;
+  }
 
-.converter-uploader__progress {
-    width: 100%;
-    height: 6px;
-    margin-top: 7px;
-    overflow: hidden;
-    border-radius: 999px;
-    background-color: rgba(255, 255, 255, 0.12);
-}
+  .converter-uploader__progress {
+      width: 100%;
+      height: 6px;
+      margin-top: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background-color: rgba(255, 255, 255, 0.12);
+  }
 
-.converter-uploader__progress-fill {
-    width: 0;
-    height: 100%;
-    border-radius: inherit;
-    background-color: #32994c;
-    transition: width 0.2s linear;
-}
+  .converter-uploader__progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background-color: #32994c;
+      transition: width 0.2s linear;
+  }
 
-.converter-uploader__progress-fill.is-complete {
-    background-color: #32994c;
-}
+  .converter-uploader__progress-fill.is-complete {
+      background-color: #32994c;
+  }
 
-.converter-uploader__progress-fill.is-error {
-    background-color: #ff8181;
-}
+  .converter-uploader__progress-fill.is-error {
+      background-color: #ff8181;
+  }
 
   @media (hover: none) {
 
@@ -216,5 +219,18 @@
       .converter-uploader__dropzone:hover {
           border-color: rgba(255, 255, 255, 0.25);
           background: rgba(255, 255, 255, 0.04);
+      }
+  }
+
+  @media (max-width: 550px) {
+      .converter-uploader_title {
+          display: none;
+      }
+
+      .conveterUploader_headerButtons {
+          width: 100%;
+          justify-content: space-between;
+          flex-direction: row-reverse;
+          align-items: center;
       }
   }
