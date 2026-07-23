@@ -276,6 +276,14 @@
 
                 <div class="mobileNav_linkItem">
                     <MobileNavLink
+                        isActive={isRouteActive("/portal/converter", true)}
+                        title="Converter"
+                        on:click={() => goToPage("/portal/converter")}
+                    />
+                </div>
+
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
                         isActive={isRouteActive("/portal/add-beat")}
                         title="Add Track"
                         on:click={() => goToPage("/portal/add-beat")}

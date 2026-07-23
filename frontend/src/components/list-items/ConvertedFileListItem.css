@@ -1,0 +1,82 @@
+.cfli_button {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+    padding: 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+    text-align: left;
+
+    transition: 0.3s;
+}
+
+.cfli_text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.cfli_filename {
+    width: 100%;
+    min-width: 0;
+
+    color: var(--font-color-heading);
+    font-size: 12pt;
+    font-weight: 500;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cfli_details {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    padding-top: 4px;
+
+    color: var(--font-color-light);
+    font-size: 10pt;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cfli_download {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cfli_button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+@media (max-width: 500px) {
+    .cfli_button {
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .cfli_filename {
+        font-size: 11pt;
+    }
+
+    .cfli_details {
+        font-size: 9pt;
+    }
+}

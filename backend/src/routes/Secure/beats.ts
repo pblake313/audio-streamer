@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { addBeat } from "../../../controllers/Secure/Beats/AddBeat";
+import { addBeat } from "../../controllers/Secure/Beats/AddBeat";
 import multer from 'multer';
-import { editBeat } from "../../../controllers/Secure/Beats/EditBeat";
-import { updateNotepad } from "../../../controllers/Secure/Beats/UpdateNotepad";
-import { deleteBeat } from "../../../controllers/Secure/Beats/DeleteBeat";
-import { getSingleBeat } from "../../../controllers/Secure/Beats/GetSingleBeat";
-import { getLiveBeatsByPage } from "../../../controllers/Secure/Beats/GetLiveBeatsByPage";
-import { toggleBeatDestination } from "../../../controllers/Secure/Beats/ToggleDestination";
-import { updateBeatRating } from "../../../controllers/Secure/Beats/UpdateRating";
-import { markBeatAsTrash } from "../../../controllers/Secure/Beats/MarkTrash";
-import { getFilteredBeatsByPage } from "../../../controllers/Secure/Beats/GetFilteredBeatsByPage";
+import { editBeat } from "../../controllers/Secure/Beats/EditBeat";
+import { updateNotepad } from "../../controllers/Secure/Beats/UpdateNotepad";
+import { deleteBeat } from "../../controllers/Secure/Beats/DeleteBeat";
+import { getSingleBeat } from "../../controllers/Secure/Beats/GetSingleBeat";
+import { getLiveBeatsByPage } from "../../controllers/Secure/Beats/GetLiveBeatsByPage";
+import { toggleBeatDestination } from "../../controllers/Secure/Beats/ToggleDestination";
+import { updateBeatRating } from "../../controllers/Secure/Beats/UpdateRating";
+import { markBeatAsTrash } from "../../controllers/Secure/Beats/MarkTrash";
+import { getFilteredBeatsByPage } from "../../controllers/Secure/Beats/GetFilteredBeatsByPage";
 const router = Router()
 
 const storage = multer.memoryStorage();

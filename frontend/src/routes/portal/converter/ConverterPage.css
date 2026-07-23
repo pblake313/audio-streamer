@@ -1,0 +1,30 @@
+.converterPage_container {
+    max-width: 1250px;
+    padding: 0 25px;
+    margin: auto;
+    padding-top: 25px;
+    margin-bottom: 150px;
+
+}
+
+.converter_topper {
+    margin: auto;
+    text-align: center;
+    padding-top: 90px;
+    padding-bottom: 50px;
+}
+.mbp_subtitle{
+    padding-top: 15px;
+}
+
+.converter_filesList {
+    padding: 100px 0px;
+    
+}
+
+
+@media(max-width:575px) {
+    .converterPage_container {
+        padding: 0 15px;
+    }
+}

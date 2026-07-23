@@ -1,6 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { io } from '../../../../server';
-import { getStorage } from 'firebase-admin/storage';
 import admin from 'firebase-admin';
 import { uploadBeatArtwork, uploadBeatMp3 } from "../../../helpers/BeatFileUploads";
 import { validateAddBeatRequest } from "../../../helpers/AddBeatHelpers";

@@ -7,6 +7,7 @@ import { audioMode, stopTrack } from "../../stores/AudioPlayerStore"
 import { allBeatPagesFetched, beatPagesFetched, beats, fetchBeatsAttempted, oneBeatFetchSuccessfull } from "../../stores/AudioPlayer/BeatsStore"
 import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore"
 import { goto } from "$app/navigation"
+import { resetFileStoreToDefaultValues } from "../../stores/ConvertedFilesStore"
 
 
 export const attemptingAutoLogin = writable<boolean>(false)
@@ -62,6 +63,8 @@ export async function logout() {
 
         accessToken.set(null);
         user.set(false);
+
+        resetFileStoreToDefaultValues()
 
         allBeatPagesFetched.set(false);
         beatPagesFetched.set([]);

@@ -8,18 +8,25 @@
 
     import "./MobileScreenshotSwiper.css";
 
+
+    // ALL IMAGES ARE CAPTURED AT 390PX BY 800PX
+
+
     export let images: string[] = [
-        "/Images/ScreenShots/Mobile/mobile2.webp",
-        "/Images/ScreenShots/Mobile/mobile3.webp",
-        "/Images/ScreenShots/Mobile/mobile4.webp",
         "/Images/ScreenShots/Mobile/mobile5.webp",
+        "/Images/ScreenShots/Mobile/mobile4.webp",
         "/Images/ScreenShots/Mobile/mobile6.webp",
+        "/Images/ScreenShots/Mobile/mobile13.webp",
         "/Images/ScreenShots/Mobile/mobile7.webp",
-        "/Images/ScreenShots/Mobile/mobile8.webp",
         "/Images/ScreenShots/Mobile/mobile1.webp",
         "/Images/ScreenShots/Mobile/mobile9.webp",
+        "/Images/ScreenShots/Mobile/mobile3.webp",
         "/Images/ScreenShots/Mobile/mobile10.webp",
+        "/Images/ScreenShots/Mobile/mobile8.webp",
         "/Images/ScreenShots/Mobile/mobile11.webp",
+        "/Images/ScreenShots/Mobile/mobile12.webp",
+        "/Images/ScreenShots/Mobile/mobile2.webp",
+        "/Images/ScreenShots/Mobile/mobile14.webp",
     ];
 
     let mobileSwiperContainer: HTMLDivElement;

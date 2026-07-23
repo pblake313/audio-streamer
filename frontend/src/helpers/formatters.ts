@@ -103,3 +103,87 @@ export function getUploadedAtString(timestamp: any): string | null {
     const years = Math.floor(diffMs / year);
     return `Uploaded ${years} ${years === 1 ? "year" : "years"} ago.`;
 }
+
+export function fileSizeTranslator(fileSizeBytes: number): string {
+    if (!Number.isFinite(fileSizeBytes) || fileSizeBytes < 0) {
+        return "Invalid file size";
+    }
+
+    if (fileSizeBytes === 0) {
+        return "0 bytes";
+    }
+
+    const units = ["bytes", "KB", "MB", "GB"];
+    const unitIndex = Math.min(
+        Math.floor(Math.log(fileSizeBytes) / Math.log(1024)),
+        units.length - 1
+    );
+
+    const size = fileSizeBytes / Math.pow(1024, unitIndex);
+    const decimals = unitIndex === 0 ? 0 : size >= 10 ? 1 : 2;
+
+    return `${size.toFixed(decimals)} ${units[unitIndex]}`;
+}
+
+export function removeFileExtension(filename: string): string {
+    const lastDotIndex = filename.lastIndexOf(".");
+
+    const filenameWithoutExtension =
+        lastDotIndex <= 0
+            ? filename
+            : filename.slice(0, lastDotIndex);
+
+    return filenameWithoutExtension
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+export function formatDate(value: unknown): string {
+    if (!value) {
+        return "";
+    }
+
+    let date: Date;
+
+    if (value instanceof Date) {
+        date = value;
+    } else if (typeof value === "string" || typeof value === "number") {
+        date = new Date(value);
+    } else if (
+        typeof value === "object" &&
+        value !== null &&
+        "_seconds" in value
+    ) {
+        date = new Date(
+            Number((value as { _seconds: number })._seconds) * 1000
+        );
+    } else if (
+        typeof value === "object" &&
+        value !== null &&
+        "seconds" in value
+    ) {
+        date = new Date(
+            Number((value as { seconds: number }).seconds) * 1000
+        );
+    } else if (
+        typeof value === "object" &&
+        value !== null &&
+        "toDate" in value &&
+        typeof (value as { toDate: () => Date }).toDate === "function"
+    ) {
+        date = (value as { toDate: () => Date }).toDate();
+    } else {
+        return "";
+    }
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+
+    }).format(date);
+}

@@ -1,4 +1,4 @@
-.mnl_link{
+.mnl_link {
     width: 100%;
     display: block;
     text-align: right;
@@ -6,16 +6,45 @@
     font-weight: 500;
     background-color: transparent;
     border: none;
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     color: var(--font-color-light);
+    cursor: pointer;
+    transition: color 0.3s;
+
+    /* Removes the mobile tap flash */
+    -webkit-tap-highlight-color: transparent;
 }
-.mnl_active{
+
+/* Only use hover on devices with an actual mouse/trackpad */
+@media (hover: hover) and (pointer: fine) {
+    .mnl_link:hover {
+        color: var(--font-color-heading);
+    }
+}
+
+.mnl_active {
     color: var(--font-color-heading);
 }
+
+/* Remove touch-screen hover and focus styling */
+@media (hover: none) and (pointer: coarse) {
+    .mnl_link:hover,
+    .mnl_link:focus,
+    .mnl_link:focus-visible {
+        color: var(--font-color-light);
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* Keep the active link highlighted */
+    .mnl_link.mnl_active {
+        color: var(--font-color-heading);
+    }
+}
+
 @media (max-width: 600px) {
-    .mnl_link{
+    .mnl_link {
         font-size: 30pt;
     }
-    
 }

@@ -17,13 +17,13 @@
     }
   </script>
   
-<div class="singleNotification {notification.alertType.toLowerCase()}" in:fly={{ y: -200, duration: 500, opacity: 0 }} out:fade={{ duration: 500 }}>
+<div class="notification_container {notification.alertType.toLowerCase()}" in:fly={{ y: -200, duration: 500, opacity: 0 }} out:fade={{ duration: 500 }}>
 
 
-    <div class="noteIconJoint">
-        <div class="iconLeftColor"></div>
+    <div class="notification_megaIconContainer">
+        <div class="notification_color"></div>
 
-        <div class="holdIconJoint">
+        <div class="notification_iconContainer">
             {#if notification.alertType === 'Error'}
                     <ErrorIcon height='30px'></ErrorIcon>
             {:else if notification.alertType === 'Neutral'}
@@ -39,8 +39,8 @@
     <div class="noteMessageSide">
         <div class="messageCloseFlex">
             <div class="holdNotiTitle">
-                <p class="notit">{notification.title}</p>
-                <p class="nmess">{notification.message}</p>
+                <p class="notification_title">{notification.title}</p>
+                <p class="notification_message">{notification.message}</p>
 
             </div>
             <CloseButton color={'222222'} on:click={handleClose}></CloseButton>

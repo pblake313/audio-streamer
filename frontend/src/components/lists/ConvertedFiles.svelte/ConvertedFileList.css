@@ -1,0 +1,14 @@
+.cfl_listContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.cfl_fetchMore{
+    margin: auto;
+    margin-top: 25px;
+    width: fit-content;
+}
+.cfl_container{
+    margin: auto;
+    max-width: 700px;
+}

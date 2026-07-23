@@ -21,28 +21,25 @@
         position: fixed;
         width: 400px;
         top: 75px;
-        right: calc((100vw - 1600px) / 2 + 25px); /* This offsets it relative to centered content */
+
+        /* Aligns with the right edge of a centered 1250px nav */
+        right: max(25px, calc((100vw - 1250px) / 2));
+
         z-index: 999999;
     }
 
-    @media (max-width: 1850px){
-        .notificationsWrapper {
-            max-width: 400px;
-            margin: auto;
-            right: 25px;
-        }
-    }
-    @media(max-width: 850px){
+    @media (max-width: 850px) {
         .notificationsWrapper {
             top: 55px;
         }
     }
+
     @media (max-width: 600px) {
-        .notificationsWrapper{
-            width: calc(100% - 25px);
-            max-width: 100%;
-            right: 0px;
-            padding: 0px 10px;
+        .notificationsWrapper {
+            width: calc(100% - 20px);
+            max-width: none;
+            right: 10px;
+            padding: 0;
         }
     }
 </style>
