@@ -39,6 +39,9 @@ body {
     padding: 0px;
     margin: 0px;
     overflow-x: hidden;
+
+    /* default for any text without its own font (spans, divs, labels...) */
+    font-family: var(--font-sans);
 }
 button {
     font-family: var(--font-sans);
