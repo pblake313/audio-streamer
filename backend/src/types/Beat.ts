@@ -3,9 +3,10 @@ export type Beat = {
     tagOne: string | null,
     tagTwo: string | null,
     mood: string | null,
-    bpm: number,
-    key: "C" | "G" | "D" | "A" | "E" | "B" | "F♯" | "C♯" | "F" | "B♭" | "E♭" | "A♭";
-    mode: "Major" | "Minor" | "Harmonic Minor" | "Melodic Minor" | "Dorian" | "Phrygian" | "Lydian" | "Mixolydian" | "Locrian";
+    // bpm / key / mode are optional for references, required for beats
+    bpm: number | null,
+    key: "C" | "G" | "D" | "A" | "E" | "B" | "F♯" | "C♯" | "F" | "B♭" | "E♭" | "A♭" | null;
+    mode: "Major" | "Minor" | "Harmonic Minor" | "Melodic Minor" | "Dorian" | "Phrygian" | "Lydian" | "Mixolydian" | "Locrian" | null;
     trackType: TrackType
     customTag: string | null,
     customTagColor: string | null,

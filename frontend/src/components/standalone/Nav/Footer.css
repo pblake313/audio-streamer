@@ -7,7 +7,7 @@
 .footer_insideContainer {
     padding: 0px 25px;
     margin: auto;
-    max-width: 1250px;
+    max-width: var(--site-width);
     position: relative;
     z-index: 1;
     margin-bottom: 25px;

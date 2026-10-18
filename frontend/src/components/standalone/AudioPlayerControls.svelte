@@ -2,6 +2,8 @@
     import { audioPlayerState, pauseTrack, playTrack, resetTrackTimer, smartNextTrack, smartPreviousTrack, userTapped } from "../../stores/AudioPlayerStore";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import SeekButton from "../buttons/music/SeekButton.svelte";
+    import ShuffleButton from "../buttons/music/ShuffleButton.svelte";
+    import RepeatButton from "../buttons/music/RepeatButton.svelte";
     import './AudioPlayerControls.css'
 
 
@@ -27,6 +29,10 @@
 </script>
 
 <div class="apc_container">
+    <div class="apc_mode">
+        <ShuffleButton size={"32px"} />
+    </div>
+
     <SeekButton
         iconHeight={"18px"}
         isDisabled={["Buffering", "Loading"].includes($audioPlayerState) &&
@@ -64,4 +70,8 @@
         height={'55px'}
 
     />
+
+    <div class="apc_mode">
+        <RepeatButton size={"32px"} />
+    </div>
 </div>

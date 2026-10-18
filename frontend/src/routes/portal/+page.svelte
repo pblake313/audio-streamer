@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { formatTrackMeta } from "../../helpers/formatters";
     import { onMount } from "svelte";
     import HighlightedTrack from "../../components/standalone/HighlightedTrack.svelte";
     import {
@@ -32,7 +33,7 @@
             title: $selectedBeat.beatTitle,
             artist: "PATTSWAY",
             album:
-                `${$selectedBeat.bpm} BPM - ${$selectedBeat.key} ${$selectedBeat.mode}` ||
+                formatTrackMeta($selectedBeat) ||
                 "Unknown Album",
             artwork: [
                 {
@@ -95,13 +96,13 @@
     .wrapTrackList {
         margin: auto;
         padding: 25px;
-        max-width: 1250px;
+        max-width: var(--site-width);
     }
 
     @media (max-width: 575px) {
         .wrapTrackList {
             margin: auto;
-            max-width: 1250px;
+            max-width: var(--site-width);
             padding: 0px 15px;
         }
     }

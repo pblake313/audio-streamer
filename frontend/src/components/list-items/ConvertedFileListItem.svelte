@@ -60,6 +60,8 @@
     on:click={handleDownload}
     disabled={isDownloading}
 >
+    <span class="cv_badge cv_badge_mp3">MP3</span>
+
     <div class="cfli_text">
         <p class="cfli_filename">
             {removeFileExtension(file.filename)}

@@ -1,22 +1,39 @@
 .cfli_button {
-    width: 100%;
-    min-width: 0;
-
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 14px;
 
-    gap: 20px;
-    padding: 14px;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
 
-    background: rgba(255, 255, 255, 0.04);
-    cursor: pointer;
     text-align: left;
+    cursor: pointer;
 
-    transition: 0.3s;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .cfli_button:hover:not(:disabled) {
+        border-color: rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.055);
+    }
+
+    .cfli_button:hover:not(:disabled) .cfli_download {
+        background: rgba(255, 255, 255, 0.15);
+    }
+}
+
+.cfli_button:focus-visible {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 .cfli_text {
@@ -30,8 +47,7 @@
     min-width: 0;
 
     color: var(--font-color-heading);
-    font-size: 12pt;
-    font-weight: 500;
+    font-size: 11pt;
 
     white-space: nowrap;
     overflow: hidden;
@@ -43,37 +59,44 @@
     align-items: center;
     gap: 6px;
 
-    padding-top: 4px;
+    padding-top: 2px;
 
-    color: var(--font-color-light);
-    font-size: 10pt;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 9.5pt;
 
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+/* round download button on the right */
 .cfli_download {
-    flex-shrink: 0;
-
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+
+    width: 36px;
+    height: 36px;
+
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.07);
+
+    transition: background-color 0.2s ease;
 }
 
 .cfli_button:disabled {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: default;
 }
 
 @media (max-width: 500px) {
     .cfli_button {
         gap: 12px;
-        padding: 12px;
     }
 
     .cfli_filename {
-        font-size: 11pt;
+        font-size: 10.5pt;
     }
 
     .cfli_details {

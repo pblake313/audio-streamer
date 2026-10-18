@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { fade } from "svelte/transition";
     import type { Beat } from "../../lib/types/Beats";
     import { abAudioPlayerState } from "../../stores/ABTestStore";
@@ -6,15 +7,31 @@
     import AudioRange from "../misc/AudioRange.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import "./ABTrack.css";
+    import { formatTrackMeta } from "../../helpers/formatters";
 
     export let track: Beat | null;
     export let notActive: boolean = false;
     export let selected: boolean = false;
     export let emptyTitle: string = "Select Track";
+    // "A" or "B", shown as a badge on the artwork
+    export let label: string = "";
 
     export let audioElement: HTMLAudioElement | undefined = undefined;
 
     export let trackClicked: ((track: Beat) => void) | undefined;
+
+    // shorter waveform on phones so it sits nicely beside the smaller artwork
+    let isCompact = false;
+
+    onMount(() => {
+        const query = window.matchMedia("(max-width: 600px)");
+        const update = () => (isCompact = query.matches);
+
+        update();
+        query.addEventListener("change", update);
+
+        return () => query.removeEventListener("change", update);
+    });
 
     function handleTrackClick(event: MouseEvent) {
         event.stopPropagation();
@@ -76,6 +93,9 @@
     >
         <div class="abTrack_artwork">
             <AlbumArtwork width="100%" imageUrl={track.artworkUrl} />
+            {#if label}
+                <span class="abTrack_badge">{label}</span>
+            {/if}
         </div>
 
         <div class="abTrack_details">
@@ -93,9 +113,8 @@
                     {/if}
                 </div>
 
-                <p>
-                    {track.key}
-                    {track.mode} | {track.bpm} BPM
+                <p class="abTrack_meta">
+                    {formatTrackMeta(track)}
                 </p>
             </div>
 
@@ -105,23 +124,22 @@
             >
                 <AudioRange
                     useWaveForm={true}
-                    waveHeight={35}
+                    waveHeight={isCompact ? 28 : 45}
                     audio={audioElement}
                 />
             </div>
         </div>
     </div>
 {:else}
-    <div class="abTrack_container">
-        <div class="abTrack_artwork">
-            <AlbumArtwork width="100%" />
+    <div class="abTrack_container abTrack_empty">
+        <div class="abTrack_artwork abTrack_emptyArt">
+            {#if label}
+                <span class="abTrack_emptyLetter">{label}</span>
+            {/if}
         </div>
-        <div class="abTrack_details">
-
+        <div class="abTrack_details abTrack_emptyDetails">
             <h5>{emptyTitle}</h5>
-
-            <p>Select a track to begin A|B testing.</p>
+            <p class="abTrack_meta">Pick a track from the list below.</p>
         </div>
-
     </div>
 {/if}

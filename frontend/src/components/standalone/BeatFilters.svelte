@@ -10,7 +10,6 @@
         beatTypeFilter,
         clearAllFilters,
         clearArtistFilter,
-        clearBeatTypeFilter,
         clearMoodFilter,
         clearTagFilter,
         fetchBeatsWithFilters,
@@ -20,6 +19,8 @@
 
     import CloseIcon from "../Icons/svg/CloseIcon.svelte";
     import "./BeatFilters.css";
+
+    const ICON_COLOR = "f7f7f7";
 
     let scrollEl: HTMLDivElement;
 
@@ -46,11 +47,12 @@
         $moodFilter.length > 0,
         $tagFilter.length > 0,
         $artistFilter.length > 0,
-        $beatTypeFilter.length > 0,
     ].filter(Boolean).length;
 
     /*
-     * Fetch whenever at least one filter is active.
+     * Fetch whenever at least one filter is active. The track type
+     * view (Beats / References) is always set, so this also refetches
+     * when that toggle changes.
      */
     $: if (
         $moodFilter.length >= 1 ||
@@ -118,7 +120,11 @@
         isDragging = false;
         isBlockingClicks = false;
 
-        scrollEl.setPointerCapture(event.pointerId);
+        /*
+         * Pointer capture is deferred until a drag actually starts.
+         * Capturing here would retarget the click to the scroll
+         * container, so the filter buttons would never receive it.
+         */
     }
 
     function handlePointerMove(event: PointerEvent) {
@@ -129,6 +135,12 @@
             return;
         }
 
+        // the button was released outside the bar before a drag started
+        if ((event.buttons & 1) !== 1) {
+            handlePointerEnd(event);
+            return;
+        }
+
         const distanceX = event.clientX - startX;
 
         if (
@@ -136,6 +148,10 @@
             Math.abs(distanceX) < DRAG_THRESHOLD
         ) {
             return;
+        }
+
+        if (!isDragging) {
+            scrollEl.setPointerCapture(event.pointerId);
         }
 
         isDragging = true;
@@ -251,14 +267,14 @@
                         clearMoodFilter,
                     )}
             >
-                <span class="beatFilter_iconContainer">
-                    <span class="beatFilter_icon">
-                        <CloseIcon height="16px" />
-                    </span>
-                </span>
-
                 <span class="beatFilter_text">
                     {$moodFilter.join(", ")}
+                </span>
+
+                <span class="beatFilter_iconContainer" aria-hidden="true">
+                    <span class="beatFilter_icon">
+                        <CloseIcon height="9px" color={ICON_COLOR} />
+                    </span>
                 </span>
             </button>
         {/if}
@@ -273,14 +289,14 @@
                         clearTagFilter,
                     )}
             >
-                <span class="beatFilter_iconContainer">
-                    <span class="beatFilter_icon">
-                        <CloseIcon height="16px" />
-                    </span>
-                </span>
-
                 <span class="beatFilter_text">
                     {$tagFilter.join(", ")}
+                </span>
+
+                <span class="beatFilter_iconContainer" aria-hidden="true">
+                    <span class="beatFilter_icon">
+                        <CloseIcon height="9px" color={ICON_COLOR} />
+                    </span>
                 </span>
             </button>
         {/if}
@@ -295,36 +311,14 @@
                         clearArtistFilter,
                     )}
             >
-                <span class="beatFilter_iconContainer">
-                    <span class="beatFilter_icon">
-                        <CloseIcon height="16px" />
-                    </span>
-                </span>
-
                 <span class="beatFilter_text">
                     {$artistFilter.join(", ")}
                 </span>
-            </button>
-        {/if}
 
-        {#if $beatTypeFilter.length >= 1}
-            <button
-                type="button"
-                class="beatFilters_button"
-                on:click={(event) =>
-                    handleFilterClick(
-                        event,
-                        clearBeatTypeFilter,
-                    )}
-            >
-                <span class="beatFilter_iconContainer">
+                <span class="beatFilter_iconContainer" aria-hidden="true">
                     <span class="beatFilter_icon">
-                        <CloseIcon height="16px" />
+                        <CloseIcon height="9px" color={ICON_COLOR} />
                     </span>
-                </span>
-
-                <span class="beatFilter_text">
-                    {$beatTypeFilter.join(", ")}
                 </span>
             </button>
         {/if}
@@ -342,14 +336,8 @@
                         clearAllFilters,
                     )}
             >
-                <span class="beatFilter_iconContainer">
-                    <span class="beatFilter_icon">
-                        <CloseIcon height="16px" />
-                    </span>
-                </span>
-
                 <span class="beatFilter_text">
-                    Clear All Filters
+                    Clear all
                 </span>
             </button>
         {/if}

@@ -6,6 +6,9 @@
 }
 
 :root {
+    /* max content width for every page container (nav, footer, pages) */
+    --site-width: 1500px;
+
     --font-sans: 'Google Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
     --color-bg: #222222;
@@ -16,7 +19,8 @@
 
     --border-light: 1px solid rgba(255, 255, 255, 0.096);
 
-    --color-red: #c30d0d;
+    /* bright enough to read on the dark background */
+    --color-red: #ff6b6b;
 }
 
 html {
@@ -25,6 +29,10 @@ html {
     margin: 0px;
     color: rgba(255, 255, 255, 0.11);
     scroll-behavior: smooth;
+
+    /* stop mobile browsers from inflating some text (font boosting / landscape zoom) */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -187,3 +195,17 @@ li {
     }
 }
 
+
+/* scroll reveal (see reveal action in helpers/transitions.ts) */
+.reveal {
+    opacity: 0;
+    transform: translateY(var(--reveal-y, 24px));
+    transition:
+        opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+        transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+
+.reveal.reveal_visible {
+    opacity: 1;
+    transform: none;
+}

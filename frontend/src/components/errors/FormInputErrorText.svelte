@@ -9,7 +9,7 @@
 
 <style>
     .inputErrorText{
-        color: #c30d0d;
+        color: var(--color-red);
         font-size: 11pt;
     }
 </style>

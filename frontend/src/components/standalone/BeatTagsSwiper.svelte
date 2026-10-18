@@ -12,26 +12,22 @@
 
     import {
         artistFilter,
-        beatTypeFilter,
-        isFetchingFilteredBeats,
         moodFilter,
         tagFilter,
         toggleArtistFilter,
-        toggleBeatTypeFilter,
         toggleMoodFilter,
         toggleTagFilter,
     } from "../../stores/AudioPlayer/BeatsStore";
 
     export let beat: Beat;
 
-    export let tagPadding = "3px 6px 2px 6px";
+    export let tagPadding = "3px 9px 2px 9px";
     export let tagFontSize = "10pt";
 
     type TagType =
         | "mood"
         | "tag"
-        | "custom"
-        | "beatType";
+        | "custom";
 
     let scrollEl: HTMLDivElement;
     let contentEl: HTMLDivElement;
@@ -237,11 +233,12 @@
         event.preventDefault();
         event.stopPropagation();
 
-        if (
-            isBlockingClicks ||
-            !tag ||
-            $isFetchingFilteredBeats
-        ) {
+        /*
+         * Toggling is allowed while a filtered fetch is in flight —
+         * fetchBeatsWithFilters waits for it and refetches with the
+         * latest filters.
+         */
+        if (isBlockingClicks || !tag) {
             return;
         }
 
@@ -259,10 +256,6 @@
 
             case "tag":
                 toggleArtistFilter(tag);
-                break;
-
-            case "beatType":
-                toggleBeatTypeFilter(tag);
                 break;
 
             case "custom":
@@ -355,7 +348,6 @@
                     )}
                     padding={tagPadding}
                     fontSize={tagFontSize}
-                    isDisabled={$isFetchingFilteredBeats}
                     on:click={(event) =>
                         handleTagClick(
                             event,
@@ -373,7 +365,6 @@
                     )}
                     padding={tagPadding}
                     fontSize={tagFontSize}
-                    isDisabled={$isFetchingFilteredBeats}
                     on:click={(event) =>
                         handleTagClick(
                             event,
@@ -391,7 +382,6 @@
                     )}
                     padding={tagPadding}
                     fontSize={tagFontSize}
-                    isDisabled={$isFetchingFilteredBeats}
                     on:click={(event) =>
                         handleTagClick(
                             event,
@@ -409,32 +399,11 @@
                     )}
                     padding={tagPadding}
                     fontSize={tagFontSize}
-                    isDisabled={$isFetchingFilteredBeats}
                     on:click={(event) =>
                         handleTagClick(
                             event,
                             beat.mood,
                             "mood",
-                        )}
-                />
-            {/if}
-
-            {#if beat.trackType === "Reference"}
-                <BeatTag
-                    tagColor="#4abdff"
-                    tagText="Reference"
-                    tagTextColor="#222222"
-                    isActive={$beatTypeFilter.includes(
-                        beat.trackType,
-                    )}
-                    padding={tagPadding}
-                    fontSize={tagFontSize}
-                    isDisabled={$isFetchingFilteredBeats}
-                    on:click={(event) =>
-                        handleTagClick(
-                            event,
-                            beat.trackType,
-                            "beatType",
                         )}
                 />
             {/if}

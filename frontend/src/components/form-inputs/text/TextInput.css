@@ -48,13 +48,13 @@
 }
 
 .error .textInput {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d; 
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red); 
 }
 
 .error .textInput:hover:not(:focus) {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d;
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red);
     background-color: #252525;
 }
 
@@ -97,8 +97,8 @@
     }
 
     .error .textInput:hover {
-        border-color: #c30d0d;
-        box-shadow: 0px 0px 0px 1px #c30d0d;
+        border-color: var(--color-red);
+        box-shadow: 0px 0px 0px 1px var(--color-red);
         background-color: #222222;
     }
 }

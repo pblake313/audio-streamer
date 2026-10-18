@@ -367,34 +367,46 @@ export function clearArtistFilter() {
 }
 
 
-// beat type filter
-export const beatTypeFilter = writable<string[]>([]);
+// track type view
+// Driven by the Beats / References / Both select rather than removable
+// filter pills. "All" leaves the filter empty, so the list falls back to
+// the unfiltered pagination.
+export type TrackTypeView = "Beat" | "Reference" | "All";
 
-export function toggleBeatTypeFilter(beatType: string) {
+export const beatTypeFilter = writable<string[]>(["Beat"]);
+
+export const trackTypeView = derived(
+    beatTypeFilter,
+    ($beatTypeFilter): TrackTypeView =>
+        $beatTypeFilter.length === 1
+            ? ($beatTypeFilter[0] as TrackTypeView)
+            : "All"
+);
+
+export function setTrackTypeView(view: TrackTypeView) {
+    if (get(trackTypeView) === view) return;
+
     resetFilteredBeatPagination();
-
-    beatTypeFilter.update((currentBeatTypes) => {
-        if (currentBeatTypes.includes(beatType)) {
-            return currentBeatTypes.filter(
-                (currentBeatType) => currentBeatType !== beatType
-            );
-        }
-
-        return [...currentBeatTypes, beatType];
-    });
+    beatTypeFilter.set(view === "All" ? [] : [view]);
 }
 
-export function clearBeatTypeFilter() {
-    resetFilteredBeatPagination();
-    beatTypeFilter.set([]);
+
+// trash visibility (client side: trashed tracks are marked with a custom tag)
+export const showTrash = writable<boolean>(false);
+
+export function toggleShowTrash() {
+    showTrash.update((current) => !current);
+}
+
+export function isTrashBeat(beat: Beat): boolean {
+    return beat.customTag === "Trash" && beat.customTagColor === "ff1a1a";
 }
 
 
-// all filters
+// all filters (the track type view is a toggle, not a removable filter)
 export function clearAllFilters() {
     resetFilteredBeatPagination();
 
-    beatTypeFilter.set([]);
     artistFilter.set([]);
     tagFilter.set([]);
     moodFilter.set([]);
@@ -423,6 +435,7 @@ export const filteredBeats = derived(
         tagFilter,
         artistFilter,
         beatTypeFilter,
+        showTrash,
     ],
     ([
         $beats,
@@ -430,7 +443,16 @@ export const filteredBeats = derived(
         $tagFilter,
         $artistFilter,
         $beatTypeFilter,
+        $showTrash,
     ]) => {
+        /*
+         * Trash is hidden unless the toggle is on, or the user is
+         * explicitly filtering by the Trash tag.
+         */
+        if (!$showTrash && !$tagFilter.includes("Trash")) {
+            $beats = $beats.filter((beat) => !isTrashBeat(beat));
+        }
+
         const hasActiveFilters =
             $moodFilter.length > 0 ||
             $tagFilter.length > 0 ||

@@ -9,8 +9,8 @@
         abHandlePlayPause,
         abError,
         selectAB,
+        toggleAB,
     } from "../../stores/ABTestStore";
-    import ABToggler from "../buttons/music/ABToggler.svelte";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
     import "./ABTester.css";
     import ABTrack from "./ABTrack.svelte";
@@ -44,6 +44,7 @@
             <ABTrack
                 track={$trackA}
                 emptyTitle={"Track A"}
+                label={"A"}
                 selected={$selectedAB === "A"}
                 bind:audioElement={$trackAAudioElement}
                 notActive={$selectedAB === "B" &&
@@ -66,7 +67,25 @@
         </div>
 
         <div class="ab_toggler">
-            <ABToggler />
+            <!-- clicking anywhere on the switch flips A <-> B -->
+            <button
+                type="button"
+                class="ab_switch"
+                class:ab_switch_b={$selectedAB === "B"}
+                aria-label="Listening to track {$selectedAB}. Switch to track {$selectedAB === "A" ? "B" : "A"}"
+                on:click={toggleAB}
+            >
+                <span class="ab_switchThumb" aria-hidden="true"></span>
+                {#each ["A", "B"] as side}
+                    <span
+                        class="ab_switchOption"
+                        class:ab_switchOption_active={$selectedAB === side}
+                        aria-hidden="true"
+                    >
+                        {side}
+                    </span>
+                {/each}
+            </button>
 
             <PlayPauseButton
                 on:togglePlayPause={abHandlePlayPause}
@@ -82,6 +101,7 @@
             <ABTrack
                 track={$trackB}
                 emptyTitle={"Track B"}
+                label={"B"}
                 selected={$selectedAB === "B"}
                 bind:audioElement={$trackBAudioElement}
                 notActive={$selectedAB === "A" &&

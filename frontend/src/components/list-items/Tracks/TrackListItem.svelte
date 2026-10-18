@@ -1,5 +1,6 @@
 <script lang="ts">
     import "./TrackListItem.css";
+    import { formatTrackMeta } from "../../../helpers/formatters";
     import SoundPlaying from "../../Icons/svg/SoundPlaying.svelte";
     import {
         selectedBeat,
@@ -25,9 +26,10 @@
     import Loader from "../../loaders/Loader.svelte";
     import { fade } from "svelte/transition";
     import BeatTagsSwiper from "../../standalone/BeatTagsSwiper.svelte";
-    import { getDateAgeInDays } from "../../../helpers/formatters";
     import Destinations from "./Destinations.svelte";
     import NotepadIcon from "../../Icons/svg/NotepadIcon.svelte";
+    import PencilIcon from "../../Icons/svg/PencilIcon.svelte";
+    import ReferenceBadge from "../../misc/ReferenceBadge.svelte";
     import { selectABTrack } from "../../../stores/ABTestStore";
 
     export let isEven: boolean = false;
@@ -174,18 +176,17 @@
         <div class="tli_titleContainer">
             <div class="tli_titleNotepadFlex">
                 <p class="tli_title">{beat.beatTitle}</p>
+                {#if beat.trackType === "Reference"}
+                    <ReferenceBadge />
+                {/if}
                 {#if beat.notepad}
                     <div class="tli_notepadContainer">
-                        <NotepadIcon />
+                        <NotepadIcon color={"fff1a8"} />
                     </div>
                 {/if}
             </div>
 
             <div class="tli_keyReference">
-        
-                {#if getDateAgeInDays(beat.createdAt) >= 30 && beat.trackType === 'Beat'}
-                    <div class="tli_dot"></div>
-                {/if}
 
                 {#if beat.futureDestinations.length >= 1}
                     <div class="tli_mobileDestinations">
@@ -194,7 +195,7 @@
                 {/if}
 
                 <p class="smallText">
-                    {beat.key} {beat.mode} - {beat.bpm} BPM
+                    {formatTrackMeta(beat)}
                 </p>
                 <div
                     class="tli_mobileTags"
@@ -204,7 +205,7 @@
                     on:pointerup|stopPropagation
                     on:pointercancel|stopPropagation
                 >
-                    <BeatTagsSwiper {beat} tagFontSize={'9pt'} tagPadding={'1px 0px'}/>
+                    <BeatTagsSwiper {beat} tagFontSize={'9pt'} tagPadding={'2px 8px 1px 8px'}/>
                 </div>
             </div>
         </div>
@@ -233,6 +234,17 @@
         </div>
 
         <div class="tli_moreInfoContainer">
+            <a
+                class="tli_editLink"
+                href="/portal/edit-beat/{beat.id}"
+                aria-label="Edit track"
+                title="Edit track"
+                on:click|stopPropagation
+                on:keydown|stopPropagation
+                on:pointerdown|stopPropagation
+            >
+                <PencilIcon height={"16px"} />
+            </a>
             <button
                 type="button"
                 class="moreIconButton"

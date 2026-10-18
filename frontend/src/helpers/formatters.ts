@@ -187,3 +187,17 @@ export function formatDate(value: unknown): string {
 
     }).format(date);
 }
+
+/*
+ * "A♭ Minor · 160 BPM". References may have no key, mode, or BPM, so
+ * missing parts are left out (an empty string when there's nothing).
+ */
+export function formatTrackMeta(
+    track: { key?: string | null; mode?: string | null; bpm?: number | null },
+    separator: string = " · ",
+): string {
+    const keyMode = [track.key, track.mode].filter(Boolean).join(" ");
+    const bpm = track.bpm ? `${track.bpm} BPM` : "";
+
+    return [keyMode, bpm].filter(Boolean).join(separator);
+}

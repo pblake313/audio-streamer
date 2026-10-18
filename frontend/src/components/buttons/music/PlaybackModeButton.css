@@ -1,0 +1,72 @@
+/* shared by ShuffleButton and RepeatButton */
+.pmb_button {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pmb_button:hover {
+        color: rgba(255, 255, 255, 0.85);
+        background: rgba(255, 255, 255, 0.06);
+    }
+}
+
+.pmb_button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* on: light fill with a dark icon */
+.pmb_active,
+.pmb_active:hover {
+    color: #222222;
+    background: #f7f7f7;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pmb_active:hover {
+        background: #ffffff;
+    }
+}
+
+/* "1" for repeat-one */
+.pmb_badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+
+    min-width: 12px;
+    height: 12px;
+    padding: 0 2px;
+    box-sizing: border-box;
+
+    border-radius: 6px;
+    background: #222222;
+    color: #f7f7f7;
+    box-shadow: 0 0 0 1.5px #f7f7f7;
+
+    font-family: var(--font-sans);
+    font-size: 7.5pt;
+    font-weight: 600;
+    line-height: 12px;
+    text-align: center;
+}

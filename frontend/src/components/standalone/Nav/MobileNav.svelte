@@ -291,14 +291,6 @@
                 </div>
 
                 <div class="mobileNav_linkItem">
-                    <MobileNavLink
-                        isActive={isRouteActive("/portal/manage-beats")}
-                        title="Manage"
-                        on:click={() => goToPage("/portal/manage-beats")}
-                    />
-                </div>
-
-                <div class="mobileNav_linkItem">
                     <MobileNavLink title="Logout" on:click={handleLogout} />
                 </div>
             {:else}

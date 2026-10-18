@@ -55,13 +55,13 @@
 }
 
 .bpmInputError .bpmInput {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d; 
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red); 
 }
 
 .bpmInputError .bpmInput:hover:not(:focus) {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d;
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red);
     background-color: #252525;
 }
 
@@ -89,8 +89,8 @@
     }
 
     .bpmInputError .bpmInput:hover {
-        border-color: #c30d0d;
-        box-shadow: 0px 0px 0px 1px #c30d0d;
+        border-color: var(--color-red);
+        box-shadow: 0px 0px 0px 1px var(--color-red);
         background-color: #222;
     }
 }

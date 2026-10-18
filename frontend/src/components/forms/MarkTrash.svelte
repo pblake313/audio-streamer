@@ -36,18 +36,22 @@
             isLoading = false;
         }
     }
-</script>
 
-<!-- the active state is if beat.customTag === 'Trash' and if beat.customTagColor === 'ff1a1a' -->
+    // the active state is if beat.customTag === 'Trash' and if beat.customTagColor === 'ff1a1a'
+    $: isTrash = beat.customTag === "Trash" && beat.customTagColor === "ff1a1a";
+</script>
 
 <button
     class="mt_button"
-    class:mt_nonActive={beat.customTag !== "Trash" || beat.customTagColor !== "ff1a1a"}
+    class:mt_nonActive={!isTrash}
+    class:mt_active={isTrash}
+    aria-label={isTrash ? "Unmark as trash" : "Mark as trash"}
+    title={isTrash ? "Unmark as trash" : "Mark as trash"}
     on:click={handleMarkAsTrash}
 >
     {#if !isLoading}
         <div style="padding-top: 2px;">
-            <TrashIcon height={"20px"} />
+            <TrashIcon height={"20px"} color={isTrash ? "#ff1a1a" : "#f7f7f7"} />
         </div>
     {:else}
         <div>

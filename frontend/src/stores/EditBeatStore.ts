@@ -47,8 +47,8 @@ type EditBeatForm = {
     customTagColor: string | null;
     customTag: string | null;
     mood: string | null;
-    key: string;
-    mode: string;
+    key: string | null;
+    mode: string | null;
     trackType: string;
     bpm: number;
 };
@@ -62,15 +62,18 @@ export function createValidEditBeatFormObject(
         throw new Error("Track title is required.");
     }
 
-    if (!Number.isFinite(formObj.bpm) || formObj.bpm <= 0) {
+    // references don't need a key, mode, or BPM; beats do
+    const isBeat = formObj.trackType === "Beat";
+
+    if ((isBeat || formObj.bpm) && (!Number.isFinite(formObj.bpm) || formObj.bpm <= 0)) {
         throw new Error("Enter a valid BPM.");
     }
 
-    if (!formObj.key) {
+    if (isBeat && !formObj.key) {
         throw new Error("Track key is required.");
     }
 
-    if (!formObj.mode) {
+    if (isBeat && !formObj.mode) {
         throw new Error("Track mode is required.");
     }
 
@@ -81,9 +84,9 @@ export function createValidEditBeatFormObject(
     const formData = new FormData();
 
     formData.append("beatTitle", title);
-    formData.append("bpm", String(formObj.bpm));
-    formData.append("key", formObj.key);
-    formData.append("mode", formObj.mode);
+    formData.append("bpm", formObj.bpm ? String(formObj.bpm) : "");
+    formData.append("key", formObj.key ?? "");
+    formData.append("mode", formObj.mode ?? "");
     formData.append("trackType", formObj.trackType);
 
     formData.append("tagOne", formObj.tagOne || "");

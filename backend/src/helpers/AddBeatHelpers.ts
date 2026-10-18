@@ -17,7 +17,10 @@ const validFutureDestinations: FutureDestination[] = [
     "Pattsway",
 ];
 
-const validKeys: Beat["key"][] = [
+type Key = NonNullable<Beat["key"]>;
+type Mode = NonNullable<Beat["mode"]>;
+
+const validKeys: Key[] = [
     "C",
     "G",
     "D",
@@ -32,7 +35,7 @@ const validKeys: Beat["key"][] = [
     "A♭",
 ];
 
-const validModes: Beat["mode"][] = [
+const validModes: Mode[] = [
     "Major",
     "Minor",
     "Harmonic Minor",
@@ -64,7 +67,18 @@ function requiredString(value: unknown, fieldName: string): string {
     return cleaned;
 }
 
-function parseBpm(value: unknown): number {
+/*
+ * BPM, key, and mode are required for beats but optional for references.
+ * When optional, an empty value becomes null; anything provided is still
+ * validated.
+ */
+function isEmpty(value: unknown): boolean {
+    return value === undefined || value === null || cleanString(value) === null;
+}
+
+function parseBpm(value: unknown, required: boolean): number | null {
+    if (!required && isEmpty(value)) return null;
+
     const bpm = Number(value);
 
     if (!Number.isFinite(bpm)) {
@@ -86,26 +100,30 @@ function parseTrackType(value: unknown): TrackType {
     return value as TrackType;
 }
 
-function parseKey(value: unknown): Beat["key"] {
+function parseKey(value: unknown, required: boolean): Beat["key"] {
+    if (!required && isEmpty(value)) return null;
+
     const key = requiredString(value, "Key");
 
     const normalizedKey = key.replace("#", "♯").replace("b", "♭");
 
-    if (!validKeys.includes(normalizedKey as Beat["key"])) {
+    if (!validKeys.includes(normalizedKey as Key)) {
         throw new AppError(400, "Invalid Request: Invalid key.");
     }
 
-    return normalizedKey as Beat["key"];
+    return normalizedKey as Key;
 }
 
-function parseMode(value: unknown): Beat["mode"] {
+function parseMode(value: unknown, required: boolean): Beat["mode"] {
+    if (!required && isEmpty(value)) return null;
+
     const mode = requiredString(value, "Mode");
 
-    if (!validModes.includes(mode as Beat["mode"])) {
+    if (!validModes.includes(mode as Mode)) {
         throw new AppError(400, "Invalid Request: Invalid mode.");
     }
 
-    return mode as Beat["mode"];
+    return mode as Mode;
 }
 
 function parseRating(value: unknown): Beat["rating"] {
@@ -196,15 +214,18 @@ function parseCustomTagColor(value: unknown): string | null {
 export function validateAddBeatRequest(req: Request): ValidatedAddBeatRequest {
     const body = req.body;
 
+    const trackType = parseTrackType(body.trackType);
+    const musicalInfoRequired = trackType === "Beat";
+
     const validObject: ValidatedAddBeatRequest = {
         beatTitle: requiredString(body.title, "Title"),
         tagOne: cleanString(body.tagOne),
         tagTwo: cleanString(body.tagTwo),
         mood: cleanString(body.mood),
-        bpm: parseBpm(body.bpm),
-        key: parseKey(body.key),
-        mode: parseMode(body.mode),
-        trackType: parseTrackType(body.trackType),
+        bpm: parseBpm(body.bpm, musicalInfoRequired),
+        key: parseKey(body.key, musicalInfoRequired),
+        mode: parseMode(body.mode, musicalInfoRequired),
+        trackType,
         customTag: cleanString(body.customTag),
         customTagColor: parseCustomTagColor(body.customTagColor),
         futureDestinations: parseFutureDestinations(body.futureDestinations),

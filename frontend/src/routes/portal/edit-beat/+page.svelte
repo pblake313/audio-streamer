@@ -3,9 +3,9 @@
     import { onMount } from "svelte";
 
     onMount(() => {
-        goto('/portal/manage-beats')
+        goto('/portal')
     })
 </script>
 
 
-<!-- if we dont get a beat id, then just route back to manage beats page. -->
+<!-- if we dont get a beat id, then just route back to the portal. -->

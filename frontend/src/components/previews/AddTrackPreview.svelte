@@ -7,6 +7,7 @@
     import BeatTag from "../misc/BeatTag.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import "./AddTrackPreview.css";
+    import { formatTrackMeta } from "../../helpers/formatters";
 
     export let deleteBeat: Beat | null = null
 
@@ -21,9 +22,11 @@
     export let customTag: string | null = null;
     export let customTagColor: string | null = null;
     export let futureDestinations: string[] = [];
+    // slim single-row version, e.g. pinned to the top of the add track page
+    export let compact: boolean = false;
 </script>
 
-<div class="addTrackPreview_wrapper">
+<div class="addTrackPreview_wrapper" class:addTrackPreview_compact={compact}>
     {#if albumUrl}
         <img
             class="addTrackPreview_backgroundImage"
@@ -40,8 +43,7 @@
 
         <div class="addTrackPreview_trackDetails">
             <p class="addTrackPreview_keyBpm">
-                {key ? key : "KEY"}
-                {mode ? mode : "MODE"} <span style="opacity: .3;">|</span> {bpm ? bpm : "0"} BPM
+                {formatTrackMeta({ key, mode, bpm }) || "Key · BPM"}
             </p>
 
             <h2 class="addTrackPreview_title">{title ? title : "Track Title"}</h2>

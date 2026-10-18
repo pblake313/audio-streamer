@@ -15,7 +15,11 @@
     let Z_COUNTER = 1000;
 
 
-    export let onSelect: ((option: string) => void) | undefined;
+    export let onSelect: ((option: string | null) => void) | undefined;
+
+    // adds a "None" option that clears the selection
+    export let clearable: boolean = false;
+    export let clearLabel: string = "None";
 
     let isOpen = false;
     let openUp = false;
@@ -90,7 +94,7 @@
         decideDirection();
     }
 
-    function selectOption(event: MouseEvent, option: string) {
+    function selectOption(event: MouseEvent, option: string | null) {
         event.stopPropagation();
 
         selectedOption = option;
@@ -105,6 +109,7 @@
 
         if (!value) {
             selectedOption = null;
+            if (clearable) onSelect?.(null);
             return;
         }
 
@@ -182,7 +187,9 @@
             aria-labelledby={labelId}
             aria-invalid={!!inputError}
         >
-            <option value="" disabled>Select...</option>
+            <option value="" disabled={!clearable}>
+                {clearable ? clearLabel : "Select..."}
+            </option>
 
             {#each options as option}
                 <option value={option}>{option}</option>
@@ -236,6 +243,19 @@
                 role="listbox"
                 aria-labelledby={labelId}
             >
+                {#if clearable}
+                    <button
+                        type="button"
+                        role="option"
+                        aria-selected={!selectedOption}
+                        class="selSingle selClear"
+                        class:isPicked={!selectedOption}
+                        on:click={(event) => selectOption(event, null)}
+                    >
+                        <p class="opforsel">{clearLabel}</p>
+                    </button>
+                {/if}
+
                 {#each options as option, index}
                     <button
                         type="button"

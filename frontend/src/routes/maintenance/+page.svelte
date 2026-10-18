@@ -6,7 +6,9 @@
     import "./UnderConstruction.css";
     import Logo from "../../components/Icons/Logos/Logo.svelte";
 
-    onMount(() => {});
+    onMount(() => {
+        
+    });
 </script>
 
 <!-- THIS ROUTE IS UNNECCESSARY TO RUN THE AUDIO STREAMER AND CAN BE DELETED -->

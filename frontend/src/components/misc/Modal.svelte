@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { fade, fly } from "svelte/transition";
+    import { fade } from "svelte/transition";
+    import { quintOut } from "svelte/easing";
     import CloseButton from "../buttons/CloseButton.svelte";
     import "./Modal.css";
     import { createEventDispatcher, onMount } from "svelte";
@@ -19,6 +20,24 @@
             document.body.style.overflow = "";
         };
     });
+
+    // desktop: scale up into place. mobile: slide up as a bottom sheet.
+    function modalIn(node: HTMLElement) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            return { duration: 0 };
+        }
+
+        const isSheet = window.matchMedia("(max-width: 600px)").matches;
+
+        return {
+            duration: isSheet ? 380 : 320,
+            easing: quintOut,
+            css: (t: number, u: number) =>
+                isSheet
+                    ? `transform: translateY(${u * 100}%);`
+                    : `opacity: ${t}; transform: translateY(${u * 14}px) scale(${0.95 + 0.05 * t});`,
+        };
+    }
 
     function handleClose() {
         dispatch("closeModal");
@@ -53,9 +72,11 @@
         aria-modal="true"
         aria-labelledby="modal-title"
         tabindex="-1"
-        in:fly={{ duration: 200, y: 500 }}
+        in:modalIn
         style="width: {modalWidth}"
     >
+        <div class="modalHandle" aria-hidden="true"></div>
+
         <div class="modalHeader">
             <h5 id="modal-title">{modalTitle}</h5>
 

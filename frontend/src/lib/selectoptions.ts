@@ -403,7 +403,6 @@ export let colorOptions: {
     { color: "d6eaff", colorName: "Baby Blue" },
     { color: "d0fff6", colorName: "Mint Mist" },
     { color: "ffefd6", colorName: "Soft Peach" },
-    { color: "fff7cc", colorName: "Cream Yellow" },
     { color: "eaffd6", colorName: "Pastel Lime" },
 
     // NEW soft pastels added
@@ -411,5 +410,45 @@ export let colorOptions: {
     { color: "e6fff9", colorName: "Cloud Mint" },
     { color: "e6f0ff", colorName: "Angel Blue" },
     { color: "faf0ff", colorName: "Morning Lilac" },
-    { color: "fff5ea", colorName: "Peach Milk" }
+    { color: "fff5ea", colorName: "Peach Milk" },
+
+    // --------------------
+    // FILL-INS (mid / light so dark tag text stays readable when active)
+    // --------------------
+
+    // neutrals
+    { color: "ffffff", colorName: "Pure White" },
+    { color: "e0e0e0", colorName: "Silver" },
+    { color: "bdbdbd", colorName: "Ash Gray" },
+    { color: "9e9e9e", colorName: "Stone Gray" },
+    { color: "d7c4b0", colorName: "Sand" },
+
+    // greens / teals
+    { color: "2ee6a6", colorName: "Seafoam" },
+    { color: "14d9b5", colorName: "Lagoon Teal" },
+    { color: "5cd65c", colorName: "Grass Green" },
+    { color: "8fe388", colorName: "Pistachio" },
+    { color: "7ad9c2", colorName: "Soft Teal" },
+    { color: "c5f2a0", colorName: "Celery" },
+
+    // warm
+    { color: "f5c16c", colorName: "Honey" },
+    { color: "e8a87c", colorName: "Clay Peach" },
+    { color: "f2b880", colorName: "Apricot" },
+    { color: "d9a066", colorName: "Caramel" },
+
+    // reds / pinks
+    { color: "ff8a8a", colorName: "Salmon" },
+    { color: "f78fa7", colorName: "Rose Quartz" },
+    { color: "ff9eb5", colorName: "Flamingo" },
+    { color: "e75480", colorName: "Raspberry" },
+
+    // blues / purples
+    { color: "b39ddb", colorName: "Wisteria" },
+    { color: "9fa8ff", colorName: "Periwinkle" },
+    { color: "74d4ff", colorName: "Glacier Blue" },
+    { color: "5ab0c8", colorName: "Steel Teal" },
+    { color: "a0c4d8", colorName: "Dusty Blue" },
+    { color: "d4a5ff", colorName: "Orchid Mist" },
+    { color: "f9a3ff", colorName: "Candy Lilac" },
 ];
