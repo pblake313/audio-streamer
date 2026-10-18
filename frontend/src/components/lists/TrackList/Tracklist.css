@@ -1,9 +1,3 @@
-.wrapOnlyButton {
-    width: fit-content;
-    margin: auto;
-    padding: 25px 0;
-}
-
 .trackList_filtersModeFlex {
     display: flex;
     align-items: center;
@@ -28,41 +22,124 @@
     overflow: hidden;
 }
 
-.trackList_filters :global(.beatFilters_flex) {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-
-    overflow: hidden;
-}
-
 .trackList_modeToggler {
     display: flex;
     flex: 0 0 auto;
     min-height: 30px;
     align-items: center;
+    gap: 14px;
 }
 
-.trackList_modeToggleButton {
+/* Beats / References / Both and trash dropdowns (left side) */
+.trackList_viewSelects {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
-    justify-content: center;
+    gap: 16px;
+    min-width: 0;
+}
 
-    padding: 0;
+/* Stream / A/B segmented toggle (right side) */
+.trackList_typeToggle {
+    display: flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trackList_typeOption {
+    padding: 5px 12px;
     margin: 0;
-
     border: none;
-    background-color: transparent;
-
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-sans);
+    font-size: 9pt;
     cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.3s;
-    padding-right: 12px;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.trackList_modeToggleButton:hover {
-    opacity: 1;
+.trackList_typeOption:hover {
+    color: rgba(255, 255, 255, 0.85);
 }
+
+.trackList_typeOption_active,
+.trackList_typeOption_active:hover {
+    background: #f7f7f7;
+    color: #222222;
+}
+
+.trackList_empty {
+    padding: 40px 0;
+    text-align: center;
+    opacity: 0.6;
+}
+
+/*
+ * mobile: view filter + mode toggle on the first row, active filter
+ * pills on their own row below (only when there are any)
+ */
+@media (max-width: 700px) {
+    .trackList_filtersModeFlex {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "view mode"
+            "filters filters";
+        align-items: center;
+        column-gap: 12px;
+        row-gap: 10px;
+
+        margin-bottom: 12px;
+    }
+
+    .trackList_viewSelects {
+        grid-area: view;
+    }
+
+    .trackList_modeToggler {
+        grid-area: mode;
+        min-height: 0;
+    }
+
+    .trackList_filters {
+        grid-area: filters;
+    }
+
+    /* stays mounted (it drives the filtered fetch), just takes no space */
+    .trackList_filters_empty {
+        display: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .trackList_typeOption {
+        padding: 5px 9px;
+    }
+}
+
 .trackList_megaWrap{
     margin-bottom: 100px;
+}
+
+/* infinite scroll */
+.trackList_sentinel {
+    height: 1px;
+}
+
+.trackList_loadingMore {
+    display: flex;
+    justify-content: center;
+    padding: 25px 0;
+}
+
+.trackList_fetchError {
+    padding: 25px 0;
+    text-align: center;
+    color: #ff6b6b;
 }

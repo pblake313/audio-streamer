@@ -28,7 +28,6 @@
         <Loader text={"Fetching recently converted files."} />
     {:else if $convertedFiles.length >= 1}
 
-        <h5 style="margin-bottom: 10px;">Converted Files</h5>
 
         <div class="cfl_listContainer">
             {#each $convertedFiles as file}
@@ -53,7 +52,7 @@
         {:else}
             <div class="cfl_fetchMore">
                 {#if $allFileBatchesFetched}
-                    <p style="opacity: .7;">All files fetched.</p>
+                    <p class="cfl_allFetched">All files loaded.</p>
                 {:else}
                     <BoxButton
                         buttonStyle={"opacityIncrease"}
@@ -86,9 +85,9 @@
                 />
             </div>
         {:else}
-            <p style="text-align: center; opacity: .7;">
-                No recent conversions. <br /> Files are automatically deleted after
-                2 weeks.
+            <p class="cfl_empty">
+                No recent conversions. Files are automatically deleted after
+                two weeks.
             </p>
         {/if}
     {/if}

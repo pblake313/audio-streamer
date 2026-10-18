@@ -5,6 +5,7 @@
     export let id: string | null = `${Date.now()}-${Math.random()}`;
     export let showInputErrors: boolean = true;
     export let inputError: string | null = null;
+    export let label: string = "BPM";
 
     // numeric source of truth
     export let bpm: number = 0;
@@ -80,7 +81,7 @@
 
 <div class="bpmInputContainer" class:bpmInputError={inputError}>
     <label class="bpmInputLabel" for={id}>
-        <p>BPM</p>
+        <p>{label}</p>
     </label>
     <input
         {id}

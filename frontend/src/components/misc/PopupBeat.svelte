@@ -10,7 +10,9 @@
     import BeatTagsSwiper from "../standalone/BeatTagsSwiper.svelte";
     import { beats } from "../../stores/AudioPlayer/BeatsStore";
     import MarkTrash from "../forms/MarkTrash.svelte";
-    import { getDateAgeInDays, getUploadedAtString } from "../../helpers/formatters";
+    import { formatTrackMeta, getDateAgeInDays, getUploadedAtString } from "../../helpers/formatters";
+    import PencilIcon from "../Icons/svg/PencilIcon.svelte";
+    import ReferenceBadge from "./ReferenceBadge.svelte";
 
     export let beat: Beat;
 
@@ -18,35 +20,69 @@
 </script>
 
 <div class="editBeatInfoBox">
-    <div class="popupBeat_trackInfoFlex">
-        <AlbumArtwork width="90px" imageUrl={beatToUse.artworkUrl} />
+    <div class="popupBeat_header">
+        <div class="popupBeat_trackInfoFlex">
+            <div class="popupBeat_artwork">
+                <AlbumArtwork width="88px" radius="12px" imageUrl={beatToUse.artworkUrl} />
+            </div>
 
-        <div class="popupBeat_trackDetails">
+            <div class="popupBeat_trackDetails">
+                <div class="popupBeat_titleFlex">
+                    <p class="popupBeat_trackTitle">{beatToUse.beatTitle}</p>
+                    {#if beatToUse.trackType === "Reference"}
+                        <ReferenceBadge />
+                    {/if}
+                </div>
 
+                <div class="popupBeat_meta">
+                    {#if formatTrackMeta(beatToUse)}
+                        <span>{formatTrackMeta(beatToUse)}</span>
+                        <span class="popupBeat_metaDot"></span>
+                    {/if}
+                    <span>{getUploadedAtString(beat.createdAt)}</span>
+                </div>
+            </div>
+        </div>
 
-
-            <p class="popupBeat_trackTitle">{beatToUse.beatTitle}</p>
-
-            <p class="popupBeat_subtitle">
-                {getUploadedAtString(beat.createdAt)} 
-            </p>
-                    
+        <div class="popupBeat_tags">
             <BeatTagsSwiper beat={beatToUse}/>
         </div>
     </div>
 
     <div in:fade={{ duration: 300 }}>
-        <div class="popupBeat_clicksFlex">
-            <FutureDestinations beat={beatToUse} />
+        <div class="popupBeat_controls">
+            <div class="popupBeat_control">
+                <p class="popupBeat_label">Destinations</p>
+                <div class="popupBeat_controlBody">
+                    <FutureDestinations beat={beatToUse} />
+                </div>
+            </div>
 
-            <div class="popupBeat_ratingAndTrash">
-                <BeatRatingForm beat={beatToUse} />
-                <MarkTrash beat={beatToUse}/>
+            <div class="popupBeat_control">
+                <p class="popupBeat_label">Rating</p>
+                <div class="popupBeat_controlBody">
+                    <BeatRatingForm beat={beatToUse} />
+                </div>
+            </div>
+
+            <div class="popupBeat_actions">
+                <p class="popupBeat_label popupBeat_actionsLabel">Manage</p>
+                <div class="popupBeat_actionIcons">
+                    <a
+                        class="popupBeat_editLink"
+                        href="/portal/edit-beat/{beatToUse.id}"
+                        aria-label="Edit track"
+                        title="Edit track"
+                    >
+                        <PencilIcon height={"18px"} />
+                    </a>
+                    <MarkTrash beat={beatToUse}/>
+                </div>
             </div>
         </div>
 
         {#if $popupError}
-            <p style="color: red; margin-top: 25px;">{$popupError}</p>
+            <p class="popupBeat_error" in:fade={{ duration: 200 }}>{$popupError}</p>
         {/if}
 
         <NotePadForm

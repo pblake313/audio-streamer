@@ -1,6 +1,7 @@
 .apc_container{
     display: flex;
     align-items: center;
+    gap: 10px;
     width: fit-content;
     justify-content: space-between;
 }
@@ -9,14 +10,35 @@
         margin: auto;
                 margin-top: 25px;
         margin-bottom: 15px;
-        width: 250px;
+        width: 330px;
     }
     
 }
 @media (max-width: 500px) {
     .apc_container {
-        width: 70%;
+        width: 100%;
+        max-width: 330px;
         margin-top: 0px;
     }
     
+}
+
+/* shuffle / repeat sit a little apart from the transport buttons */
+.apc_mode {
+    display: flex;
+    margin: 0 14px;
+}
+
+.apc_mode:first-child {
+    margin-left: 0;
+}
+
+.apc_mode:last-child {
+    margin-right: 0;
+}
+
+@media (max-width: 850px) {
+    .apc_mode {
+        margin: 0;
+    }
 }

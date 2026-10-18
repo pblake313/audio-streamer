@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
+    import { fade, slide } from "svelte/transition";
     import "./NotePadForm.css";
     import type { Beat } from "../../lib/types/Beats";
     import { authorizedFetch } from "../../helpers/Fetchers/authorizedFetch";
@@ -62,17 +62,19 @@
             valueChanged={handleNotepadChange}
             value={localNotepad}
             label="Notepad"
-            placeholder="Enter notes here..."
+            placeholder="Mix notes, ideas, things to fix…"
         />
     </div>
 
-    <div class="notepadForm_submitButton">
-        <BoxButton
-            isDisabled={!canSave}
-            fullWidth={true}
-            buttonIcon={isLoading ? "loading" : null}
-            buttonText={isLoading ? "Saving..." : "Save"}
-            on:click={saveNotepad}
-        />
-    </div>
+    {#if canSave || isLoading}
+        <div class="notepadForm_submitButton" transition:slide={{ duration: 220 }}>
+            <BoxButton
+                isDisabled={!canSave}
+                fullWidth={true}
+                buttonIcon={isLoading ? "loading" : null}
+                buttonText={isLoading ? "Saving..." : "Save"}
+                on:click={saveNotepad}
+            />
+        </div>
+    {/if}
 </div>

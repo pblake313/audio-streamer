@@ -14,16 +14,16 @@ interface ConvertedFileDoc {
 
 export async function downloadConvertedFile(
     req: Request,
-    res: Response,
-    next: NextFunction,
+    res: Response, 
+    next: NextFunction, 
 ) {
-    try {
+    try { 
         const fileDocId = req.params.fileId;
 
         if (!fileDocId) {
-            throw new Error("File ID is required.");
-        }
-
+            throw new Error("File ID is required."); 
+        } 
+ 
         const fileDocSnapshot = await getFirestore()
             .collection("WavConversions")
             .doc(fileDocId)
@@ -31,7 +31,7 @@ export async function downloadConvertedFile(
 
         if (!fileDocSnapshot.exists) {
             throw new Error("Converted file document not found.");
-        }
+        } 
 
         const fileDoc = fileDocSnapshot.data() as ConvertedFileDoc;
 

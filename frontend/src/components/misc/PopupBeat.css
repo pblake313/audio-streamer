@@ -1,36 +1,206 @@
+/* sections are separated by hairlines rather than boxed */
+.popupBeat_header{
+    padding: 20px 0 18px;
+}
 .popupBeat_trackInfoFlex{
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    margin-top: 15px;
+    gap: 16px;
+}
+.popupBeat_artwork{
+    flex-shrink: 0;
+    border-radius: 12px;
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .popupBeat_trackDetails{
-    width: calc(100% - 110px);
+    min-width: 0;
+    flex: 1;
+}
+.popupBeat_titleFlex{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
 }
 .popupBeat_trackTitle{
-    font-size: 13pt;
+    font-size: 15pt;
+    font-weight: 500;
     color: var(--font-color-heading);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.popupBeat_subtitle{
-    font-size: 10pt;
-    opacity: .8;
-    margin-bottom: 6px;
-}
-.popupBeat_mini{
-    font-size: 10pt;
-
-}
-.popupBeat_clicksFlex{
+.popupBeat_meta{
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: center;
-    margin-bottom: 15px;
+    gap: 4px 8px;
+    margin-top: 6px;
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    color: rgba(255, 255, 255, 0.5);
 }
-.popupBeat_ratingAndTrash{
+.popupBeat_metaDot{
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .7;
+}
+
+.popupBeat_tags{
+    margin-top: 16px;
+}
+/* fade the tag swiper's edges with a mask so it works on any background */
+.popupBeat_tags .bts_wrapper::before,
+.popupBeat_tags .bts_wrapper::after{
+    display: none;
+}
+.popupBeat_tags .bts_wrapper.canScrollRight{
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+}
+.popupBeat_tags .bts_wrapper.canScrollLeft{
+    -webkit-mask-image: linear-gradient(to left, #000 85%, transparent);
+    mask-image: linear-gradient(to left, #000 85%, transparent);
+}
+.popupBeat_tags .bts_wrapper.canScrollLeft.canScrollRight{
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent);
+}
+
+/* destinations / rating / actions panel */
+.popupBeat_controls{
+    display: flex;
+    align-items: flex-end;
+    gap: 40px;
+    padding: 18px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.popupBeat_control{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+/* matches .textAreaLabel (the notepad label) */
+.popupBeat_label{
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 8pt;
+    line-height: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.45);
+}
+/* every control row shares one height so the contents line up */
+.popupBeat_controlBody{
+    height: 34px;
     display: flex;
     align-items: center;
+}
+.popupBeat_controlBody .fd_buttonFlex{
+    gap: 18px;
+}
+.popupBeat_controlBody .starRow{
+    gap: 6px;
+    margin-bottom: 0;
+}
+.popupBeat_actions{
+    margin-left: auto;
+    padding-left: 24px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+.popupBeat_actionsLabel{
+    display: none;
+}
+.popupBeat_actionIcons{
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
-    gap: 15px;
+/* pencil + trash as round icon buttons */
+.popupBeat_editLink,
+.popupBeat_actions .mt_button{
+    width: 34px;
+    height: 34px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+}
+.popupBeat_editLink{
+    opacity: .35;
+    transition: .3s;
+}
+.popupBeat_actions .mt_active{
+    background: rgba(255, 26, 26, 0.12);
+}
+.popupBeat_actions .mt_button > div{
+    padding-top: 0 !important;
+    display: flex;
+}
+@media (hover: hover) and (pointer: fine) {
+    .popupBeat_editLink:hover{
+        opacity: .9;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .popupBeat_actions .mt_button:hover{
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .popupBeat_actions .mt_active:hover{
+        background: rgba(255, 26, 26, 0.18);
+    }
+}
 
+.popupBeat_error{
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 10pt;
+    color: #ffb4b4;
+    background: rgba(195, 13, 13, 0.12);
+    border: 1px solid rgba(195, 13, 13, 0.35);
+}
+
+/* mobile: a settings-style list — label left, control right */
+@media (max-width: 600px) {
+    .popupBeat_trackInfoFlex{
+        gap: 14px;
+    }
+    .popupBeat_controls{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+    }
+    .popupBeat_control,
+    .popupBeat_actions{
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 52px;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .popupBeat_actions{
+        display: flex;
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        border-bottom: none;
+    }
+    .popupBeat_actionsLabel{
+        display: block;
+    }
+    .popupBeat_actionIcons{
+        margin-right: -6px;
+    }
 }

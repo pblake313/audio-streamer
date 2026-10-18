@@ -173,28 +173,6 @@ export function createValidEditBeatObject(
         throw new Error("Track title is required.");
     }
 
-    const bpm = Number(obj.bpm);
-
-    if (!Number.isFinite(bpm) || bpm <= 0) {
-        throw new Error(
-            "BPM must be a valid number greater than zero.",
-        );
-    }
-
-    if (
-        typeof obj.key !== "string" ||
-        !validKeys.includes(obj.key as Beat["key"])
-    ) {
-        throw new Error("Invalid track key.");
-    }
-
-    if (
-        typeof obj.mode !== "string" ||
-        !validModes.includes(obj.mode as Beat["mode"])
-    ) {
-        throw new Error("Invalid track mode.");
-    }
-
     if (
         typeof obj.trackType !== "string" ||
         !validTrackTypes.includes(
@@ -202,6 +180,40 @@ export function createValidEditBeatObject(
         )
     ) {
         throw new Error("Invalid track type.");
+    }
+
+    // BPM, key, and mode are required for beats, optional for references.
+    const musicalInfoRequired = obj.trackType === "Beat";
+
+    const rawBpm = optionalString(String(obj.bpm ?? ""));
+    let bpm: number | null = null;
+
+    if (rawBpm !== null || musicalInfoRequired) {
+        bpm = Number(rawBpm);
+
+        if (!Number.isFinite(bpm) || bpm <= 0) {
+            throw new Error(
+                "BPM must be a valid number greater than zero.",
+            );
+        }
+    }
+
+    const key = optionalString(obj.key);
+
+    if (
+        (key !== null || musicalInfoRequired) &&
+        !validKeys.includes(key as Beat["key"])
+    ) {
+        throw new Error("Invalid track key.");
+    }
+
+    const mode = optionalString(obj.mode);
+
+    if (
+        (mode !== null || musicalInfoRequired) &&
+        !validModes.includes(mode as Beat["mode"])
+    ) {
+        throw new Error("Invalid track mode.");
     }
 
 
@@ -221,8 +233,8 @@ export function createValidEditBeatObject(
     return {
         beatTitle,
         bpm,
-        key: obj.key as Beat["key"],
-        mode: obj.mode as Beat["mode"],
+        key: key as Beat["key"],
+        mode: mode as Beat["mode"],
         trackType: obj.trackType as TrackType,
         tagOne: optionalString(obj.tagOne),
         tagTwo: optionalString(obj.tagTwo),

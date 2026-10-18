@@ -1,127 +1,310 @@
-.abf_formContainer {
-    max-width: 1250px;
+/* height of the fixed nav, so the sticky preview sits right under it */
+.abf_page {
+    --abf-nav-height: 68px;
+    /* this form reads better narrower than the rest of the site */
+    --abf-width: 1000px;
+
+    padding-top: calc(var(--abf-nav-height) + 12px);
+}
+
+/* floating preview card pinned under the nav while scrolling */
+.abf_preview {
+    position: sticky;
+    top: calc(var(--abf-nav-height) + 12px);
+    z-index: 50;
+
+    max-width: var(--abf-width);
     margin: auto;
     padding: 0 25px;
-    margin-bottom: 150px;
 }
 
+.abf_formContainer {
+    max-width: var(--abf-width);
+    margin: 44px auto 60px;
+    padding: 0 25px;
+}
+
+/* one column: details, tags, then files */
 .abf_form {
     display: flex;
-    justify-content: space-between;
-    gap: 50px;
-    margin-top: 25px;
-    transition: 0.5s;
+    flex-direction: column;
+    gap: 56px;
 }
 
-.abf_details {
-    width: 50%;
-}
-
-.abf_files {
-    width: 50%;
-}
-
-.abf_trackDetails {
+.abf_main {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 15px;
+    gap: 56px;
+    min-width: 0;
 }
 
-.abf_multiInputFlex {
+/* artwork + mp3 side by side, half the row each
+   (doubled class so it beats the generic .abf_fields column) */
+.abf_fields.abf_filesRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.abf_uploader {
     display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+}
+
+/* drop zone fills the rest of the half so both line up */
+.abf_uploader > [role="button"] {
+    flex: 1 1 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.abf_side {
+    min-width: 0;
+}
+
+/* ========================= */
+/* SECTIONS (no boxes)       */
+/* ========================= */
+
+.abf_cardHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.abf_step {
+    flex: 0 0 auto;
+    padding-top: 3px;
+
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 10pt;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.06em;
+}
+
+.abf_cardTitle {
+    font-size: 15pt;
+    line-height: 1.3;
+}
+
+.abf_cardHint {
+    font-size: 10pt;
+    line-height: 1.4;
+}
+
+/* ========================= */
+/* FIELDS                    */
+/* ========================= */
+
+.abf_fields {
+    display: flex;
+    flex-direction: column;
     gap: 20px;
 }
 
-.abf_bpm {
-    width: 40%;
+/* rows of fields that span the full width */
+.abf_grid {
+    display: grid;
+    gap: 18px;
+    align-items: start;
 }
 
-.abf_key {
-    width: 20%;
+.abf_grid > div {
+    min-width: 0;
 }
 
-.abf_mode {
-    width: 40%;
+.abf_grid_details,
+.abf_grid_custom {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.cTag {
-    width: 60%;
+/* custom tag takes three quarters, its color one */
+.abf_grid_custom > div:first-child {
+    grid-column: span 3;
 }
 
-.customColor {
-    width: 40%;
+.abf_grid_three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.tagHalf {
-    width: 50%;
+/* ========================= */
+/* STICKY SUBMIT BAR         */
+/* ========================= */
+
+/* floating card pinned to the bottom of the screen */
+.abf_submitBar {
+    position: sticky;
+    bottom: 16px;
+    z-index: 50;
+
+    max-width: var(--abf-width);
+    margin: 0 auto 16px;
+    padding: 0 25px;
 }
 
-.abf_wrapFiles {
-    margin-top: 15px;
+/* sit above the bottom audio player when it's showing */
+.abf_submitBar_raised {
+    bottom: 106px;
 }
 
-.wrapFIn {
-    margin-bottom: 15px;
+.abf_submitInner {
+    padding: 12px 12px 12px 22px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    background: rgba(42, 42, 42, 0.9);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.45),
+        0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-.abf_submit {
-    margin-top: 25px;
-}
-.abf_error{
-    margin-top: 20px;
+.abf_submitRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
 }
 
-@media (max-width: 950px) {
-    .abf_form {
-        gap: 25px;
-        flex-direction: column;
-    }
-    .abf_details{
-        width: 100%;
-    }
-    .abf_files{
-        width: 100%;
+.abf_status {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10pt;
+}
+
+.abf_status_ready {
+    color: #7ee2a8;
+}
+
+.abf_submitButton {
+    width: 200px;
+}
+
+/* error card shown above the submit row */
+.abf_error {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    margin-bottom: 12px;
+    padding: 12px 14px;
+
+    border: 1px solid rgba(255, 107, 107, 0.35);
+    border-radius: 12px;
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.abf_errorIcon {
+    display: flex;
+    flex: 0 0 auto;
+    padding-top: 1px;
+}
+
+.abf_errorText {
+    min-width: 0;
+}
+
+.abf_errorTitle {
+    color: #ff8a8a;
+    font-size: 10.5pt;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.abf_errorMessage {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 10pt;
+    line-height: 1.5;
+}
+
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
+
+@media (max-width: 750px) {
+    .abf_fields.abf_filesRow {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 750px) {
-    .abf_multiInputFlex {
-        flex-direction: column;
-        gap: 15px;
+    .abf_grid {
+        gap: 14px;
     }
 
-    .abf_files{
-        margin-top: 25px;
+    .abf_grid_details,
+    .abf_grid_three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .abf_grid_custom {
+        grid-template-columns: 1fr;
+    }
 
-    .abf_bpm,
-    .abf_key,
-    .abf_mode,
-    .cTag,
-    .customColor,
-    .tagHalf {
-        width: 100%;
+    .abf_grid_custom > div:first-child {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 420px) {
+    .abf_grid_details,
+    .abf_grid_three {
+        grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 600px) {
     .abf_formContainer {
-        padding: 0px 15px;
+        margin-top: 28px;
+        padding: 0 15px;
     }
-    
+
+    .abf_main,
+    .abf_form {
+        gap: 44px;
+    }
+
+    .abf_preview,
+    .abf_submitBar {
+        padding: 0 15px;
+    }
+
+    .abf_submitInner {
+        padding: 10px 10px 10px 16px;
+        border-radius: 16px;
+    }
+
+    .abf_submitButton {
+        width: 150px;
+    }
 }
 
-@media (max-width: 575px) {
+/* ========================= */
+/* DELETE (edit page)        */
+/* ========================= */
 
-    .abf_form {
-        flex-direction: column;
-        gap: 0;
-    }
+.abf_deleteConfirm {
+    padding: 16px 18px;
 
-    .abf_details,
-    .abf_files {
-        width: 100%;
-    }
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 12px;
+    background: rgba(255, 107, 107, 0.06);
+}
+
+.abf_deleteQuestion {
+    margin-bottom: 14px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.abf_deleteActions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
 }

@@ -18,7 +18,7 @@
 }
 
 .addTrackPreview_container {
-    max-width: 1250px;
+    max-width: var(--site-width);
     margin: auto;
     padding: 0 25px;
 
@@ -132,5 +132,85 @@
 @media (max-width: 600px) {
     .addTrackPreview_container{
         padding: 0px 15px;
+    }
+}
+/* ========================= */
+/* COMPACT (floating card)   */
+/* ========================= */
+
+.addTrackPreview_compact {
+    padding: 16px 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    /* solid so the form never shows through while scrolling */
+    background: #262626;
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.25);
+    isolation: isolate;
+}
+
+.addTrackPreview_compact .addTrackPreview_backgroundImage {
+    opacity: 0.22;
+}
+
+.addTrackPreview_compact .bottomFader,
+.addTrackPreview_compact .topFader {
+    display: none;
+}
+
+.addTrackPreview_compact .addTrackPreview_container {
+    gap: 20px;
+    padding: 0 16px;
+}
+
+.addTrackPreview_compact .addTrackPreview_artwork {
+    width: 110px;
+}
+
+.addTrackPreview_compact .addTrackPreview_keyBpm {
+    font-size: 9.5pt;
+}
+
+.addTrackPreview_compact .addTrackPreview_title {
+    margin: 2px 0 0;
+    font-size: 22pt;
+    line-height: 1.2;
+}
+
+.addTrackPreview_compact .addTrackPreview_tags {
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+@media (max-width: 720px) {
+    .addTrackPreview_compact.addTrackPreview_wrapper {
+        padding: 12px 0;
+        border-radius: 16px;
+    }
+
+    .addTrackPreview_compact .addTrackPreview_container {
+        flex-direction: row;
+        gap: 14px;
+        padding: 0 12px;
+    }
+
+    .addTrackPreview_compact .addTrackPreview_artwork {
+        width: 76px;
+    }
+
+    .addTrackPreview_compact .addTrackPreview_trackDetails {
+        width: auto;
+    }
+
+    .addTrackPreview_compact .addTrackPreview_title {
+        font-size: 15pt;
+    }
+
+    .addTrackPreview_compact .addTrackPreview_tags {
+        margin-top: 6px;
     }
 }

@@ -3,8 +3,9 @@
     overflow: hidden;
     isolation: isolate;
 
-    padding-top: 165px;
-    padding-bottom: 115px;
+    /* matches the highlighted track's top spacing */
+    padding-top: 105px;
+    padding-bottom: 30px;
 }
 
 .ab_inside {
@@ -16,7 +17,7 @@
     justify-content: center;
     gap: 25px;
 
-    max-width: 1250px;
+    max-width: var(--site-width);
     margin: 0 auto;
     width: calc(100% - 50px);
     padding: 0 25px;
@@ -25,7 +26,6 @@
 .ab_track {
     flex: 1 1 0;
     min-width: 0;
-    max-width: 600px;
 }
 
 /* ========================================= */
@@ -110,18 +110,95 @@
 }
 
 /* ========================================= */
-/* TOGGLER                                   */
+/* CENTER CONTROLS: A | B SWITCH + PLAY      */
 /* ========================================= */
 
 .ab_toggler {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
+    gap: 22px;
 
-    width: 100px;
-    flex: 0 0 100px;
+    flex: 0 0 auto;
     align-self: stretch;
+}
+
+.ab_switch {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    margin: 0;
+    padding: 4px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    cursor: pointer;
+    transition: border-color 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ab_switch:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.ab_switch:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.55);
+    outline-offset: 3px;
+}
+
+/* white thumb that slides to the selected side */
+.ab_switchThumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+
+    width: calc(50% - 4px);
+
+    border-radius: 9px;
+    background: #f7f7f7;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ab_switch_b .ab_switchThumb {
+    transform: translateX(100%);
+}
+
+.ab_switchOption {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 36px;
+
+    color: rgba(255, 255, 255, 0.55);
+    font-family: var(--font-sans);
+    font-size: 13pt;
+    font-weight: 600;
+
+    transition: color 0.3s ease;
+}
+
+.ab_switch:hover .ab_switchOption:not(.ab_switchOption_active) {
+    color: #f7f7f7;
+}
+
+.ab_switchOption_active,
+.ab_switchOption_active:hover {
+    color: #222222;
 }
 
 .ab_error {
@@ -133,18 +210,17 @@
 @media (max-width: 1200px) {
     .ab_inside {
         flex-direction: column;
-        gap: 5px;
+        gap: 12px;
     }
 
     .ab_track {
         width: 100%;
     }
 
-        .ab_toggler {
-        width: fit-content;
-        margin: auto;
-        display: flex;
-        flex-direction: row-reverse;
+    .ab_toggler {
+        flex-direction: row;
+        gap: 28px;
+        margin: 14px auto;
     }
     
 
@@ -163,8 +239,12 @@
         padding-top: 80px;
     }
 
-    .ab_toggler{
-        width: 100%;
-        justify-content: space-evenly;
+    .ab_inside {
+        gap: 10px;
+    }
+
+    .ab_toggler {
+        gap: 22px;
+        margin: 4px auto;
     }
 }

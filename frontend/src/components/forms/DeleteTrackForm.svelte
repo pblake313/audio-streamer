@@ -23,7 +23,7 @@
             console.log(response)
             removeBeatFromArray(beatId)
             pushNotification(`This track was deleted successfully.`, 'Success', false, 2500, `${beat.beatTitle} ` )
-            goto('/portal/manage-beats')
+            goto('/portal')
         } catch (err: any) {
             console.log(err)
             const errorMessage = err.message || 'An unknown error has occurred.'

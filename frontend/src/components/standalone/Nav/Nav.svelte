@@ -76,7 +76,7 @@
             <div class="nav_userFlex">
                 <div class="nav_logoFlex">
                     <a href="/" aria-label="Go to home page">
-                        <Logo color="#f7f7f7" width="120px" />
+                        <Logo color="#f7f7f7" width="145px" />
                     </a>
                 </div>
 
@@ -90,10 +90,6 @@
                         linksTo="/portal/add-beat"
                     />
 
-                    <NavigationLink
-                        linkText="Manage"
-                        linksTo="/portal/manage-beats"
-                    />
                     <NavigationLink
                         linkText="Converter"
                         linksTo="/portal/converter"

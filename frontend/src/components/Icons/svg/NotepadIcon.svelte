@@ -1,24 +1,23 @@
-
 <script lang="ts">
-    import { onMount } from 'svelte';
-
+    // hex without the leading "#"
     export let color: string = 'f7f7f7'
-
-    let uniqueId = '';
-
-    onMount(() => {
-        // Generating a unique ID using timestamp and a random number
-        uniqueId = `custom-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    });
     export let height = '16px'
 </script>
 
-
-
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg id="{uniqueId}" fill="#{color}" {height} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  
-  <g id="Sticky_Note" data-name="Sticky Note">
-    <path  d="M18.44,3.065H5.56a2.507,2.507,0,0,0-2.5,2.5v12.87a2.507,2.507,0,0,0,2.5,2.5h8.68A2.482,2.482,0,0,0,16,20.2l4.21-4.2a2.505,2.505,0,0,0,.73-1.77V5.565A2.5,2.5,0,0,0,18.44,3.065Zm-4.38,13.5v3.37H5.56a1.5,1.5,0,0,1-1.5-1.5V5.565a1.5,1.5,0,0,1,1.5-1.5H18.44a1.5,1.5,0,0,1,1.5,1.5v8.5H16.56A2.507,2.507,0,0,0,14.06,16.565Zm1,3.13v-3.13a1.5,1.5,0,0,1,1.5-1.5h3.13Z"/>
-  </g>
+<!-- note with ruled lines: bold strokes so it reads at small sizes -->
+<svg
+    {height}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#{color}"
+    stroke-width="2.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+>
+    <path d="M14.5 3.5H6.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8.5z" />
+    <path d="M14.5 3.5v5h5" />
+    <path d="M8.5 13h7" />
+    <path d="M8.5 16.5h5" />
 </svg>

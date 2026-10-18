@@ -69,7 +69,7 @@
                         on:click={handleRetryClick}
                     />
                 </div>
-            {:else if $audioPlayerState !== "Playing" && $audioPlayerState !== "Paused" && $audioPlayerState !== "Loading"}
+            {:else if $audioPlayerState !== "Playing" && $audioPlayerState !== "Paused" && $audioPlayerState !== "Loading" && $audioPlayerState !== "Idle"}
                 <p class="aps_text">{$audioPlayerState}</p>
             {/if}
         </div>
@@ -86,6 +86,8 @@
             </div>
         </div>
 
-        <p class="aps_text">{$audioPlayerState}</p>
+        {#if $audioPlayerState !== "Idle"}
+            <p class="aps_text">{$audioPlayerState}</p>
+        {/if}
     </div>
 {/if}

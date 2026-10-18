@@ -55,7 +55,7 @@
     ></textarea>
 
     <div class="remainingCharachters">
-        <p class="remainText">{value.length} / {maxCharachters}</p>
+        <p class="remainText" class:remainText_near={value.length >= maxCharachters * 0.9}>{value.length} / {maxCharachters}</p>
     </div>
 </div>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { formatTrackMeta } from "../../../helpers/formatters";
     import type { Beat } from "../../../lib/types/Beats";
     import {
         audioPlayerState,
@@ -43,7 +44,7 @@
                 <AudioPlayerState />
                 <p>{beat.beatTitle}</p>
             </div>
-            <p>{beat.key} {beat.mode} | {beat.bpm} BPM</p>
+            <p>{formatTrackMeta(beat)}</p>
         </div>
 
         <div class="mnac_iconContainer">

@@ -32,15 +32,18 @@ export function validateAddBeatForm(form: AddBeatFormValues) {
         throw new Error("Invalid track type.");
     }
 
-    if (!form.key) {
+    // references don't need a key, mode, or BPM; beats do
+    const isBeat = form.trackType === "Beat";
+
+    if (isBeat && !form.key) {
         throw new Error("Select a key.");
     }
 
-    if (!form.mode) {
+    if (isBeat && !form.mode) {
         throw new Error("Select a mode.");
     }
 
-    if (!form.bpm || form.bpm < 1 || form.bpm > 199) {
+    if ((isBeat || form.bpm) && (!form.bpm || form.bpm < 1 || form.bpm > 199)) {
         throw new Error("BPM must be between 1 and 199.");
     }
 
@@ -66,9 +69,9 @@ export function buildAddBeatFormData(form: AddBeatFormValues): FormData {
     formData.append("mood", form.mood ?? "");
     formData.append("customTag", form.customTag ?? "");
     formData.append("customTagColor", form.customTagColor ?? "");
-    formData.append("key", form.key!);
-    formData.append("mode", form.mode!);
-    formData.append("bpm", String(form.bpm));
+    formData.append("key", form.key ?? "");
+    formData.append("mode", form.mode ?? "");
+    formData.append("bpm", form.bpm ? String(form.bpm) : "");
     formData.append("trackType", form.trackType);
 
     formData.append("artworkFile", form.artworkFile!);

@@ -49,7 +49,8 @@ export function toggleAudioMode() {
         // Stop the normal streamer so both players do not run together.
         stopTrack();
 
-        const currentBeats = get(beats);
+        // start from the tracks currently visible in the list
+        const currentBeats = get(filteredBeats);
 
         if (currentBeats[0]) {
             trackA.set(currentBeats[0]);
@@ -64,6 +65,12 @@ export function toggleAudioMode() {
     }
 
     audioMode.set(nextMode);
+}
+
+export function setAudioMode(mode: AudioMode) {
+    if (get(audioMode) === mode) return;
+
+    toggleAudioMode();
 }
 
 // streamer stores
@@ -92,6 +99,90 @@ export const inTimeout = writable<boolean>(false);
 
 // Internal helper for accumulating time
 let lastAudioTime = 0;
+
+
+// =========================
+// Shuffle / repeat
+// =========================
+// "all" wraps back to the first track at the end (the original behavior),
+// "off" stops after the last track, "one" repeats the current track.
+export type RepeatMode = "off" | "all" | "one";
+
+const REPEAT_KEY = "audioPlayer.repeatMode";
+const SHUFFLE_KEY = "audioPlayer.shuffle";
+
+function readSetting(key: string): string | null {
+    try {
+        return typeof localStorage !== "undefined" ? localStorage.getItem(key) : null;
+    } catch {
+        return null;
+    }
+}
+
+function writeSetting(key: string, value: string) {
+    try {
+        localStorage.setItem(key, value);
+    } catch {
+        // storage unavailable (private mode etc.) — setting just won't persist
+    }
+}
+
+const storedRepeat = readSetting(REPEAT_KEY);
+
+export const repeatMode = writable<RepeatMode>(
+    storedRepeat === "off" || storedRepeat === "one" ? storedRepeat : "all"
+);
+
+export const shuffleEnabled = writable<boolean>(readSetting(SHUFFLE_KEY) === "true");
+
+repeatMode.subscribe((mode) => writeSetting(REPEAT_KEY, mode));
+shuffleEnabled.subscribe((on) => writeSetting(SHUFFLE_KEY, String(on)));
+
+export function cycleRepeatMode() {
+    repeatMode.update((mode) =>
+        mode === "all" ? "one" : mode === "one" ? "off" : "all"
+    );
+}
+
+/*
+ * Track ids played while shuffling, oldest first. Used to avoid repeats
+ * until every loaded track has played, and to walk back on "previous".
+ */
+let shuffleHistory: string[] = [];
+
+export function toggleShuffle() {
+    shuffleEnabled.update((on) => !on);
+    shuffleHistory = [];
+}
+
+/*
+ * Picks a random loaded track that hasn't played yet this shuffle cycle.
+ * Shuffles across the tracks loaded so far (pagination keeps adding more
+ * as the list is scrolled).
+ */
+function pickShuffleTrack(): Beat | null {
+    const allTracks = get(filteredBeats);
+    const current = get(selectedBeat);
+
+    const others = allTracks.filter((beat) => beat.id !== current?.id);
+    if (others.length === 0) return null;
+
+    let candidates = others.filter((beat) => !shuffleHistory.includes(beat.id));
+
+    // every loaded track has played: start a fresh cycle
+    if (candidates.length === 0) {
+        shuffleHistory = current ? [current.id] : [];
+        candidates = others;
+    }
+
+    return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function rememberShuffled(beat: Beat | null | undefined) {
+    if (!beat) return;
+    shuffleHistory = shuffleHistory.filter((id) => id !== beat.id);
+    shuffleHistory.push(beat.id);
+}
 
 
 // =========================
@@ -176,12 +267,24 @@ function selectPlaylistBeat(
 
 
 async function advanceToNextTrackWithPagination(
-    shouldAutoPlay: boolean = false
+    shouldAutoPlay: boolean = false,
+    fromEnded: boolean = false
 ) {
     let allTracks = get(filteredBeats);
     let current = get(selectedBeat);
 
     if (allTracks.length === 0) return;
+
+    if (get(shuffleEnabled)) {
+        const next = pickShuffleTrack();
+
+        if (next) {
+            rememberShuffled(current);
+            rememberShuffled(next);
+            selectPlaylistBeat(next, shouldAutoPlay);
+            return;
+        }
+    }
 
     if (!current) {
         selectPlaylistBeat(allTracks[0], shouldAutoPlay);
@@ -260,8 +363,14 @@ async function advanceToNextTrackWithPagination(
 
     /*
      * We reached the end and every page for the active playlist is loaded.
-     * Loop back to its first track.
+     * Loop back to its first track, unless repeat is off and the track
+     * finished on its own, in which case playback stops here.
      */
+    if (fromEnded && get(repeatMode) === "off") {
+        audioPlayerState.set("Idle");
+        return;
+    }
+
     allTracks = get(filteredBeats);
 
     if (allTracks.length > 0) {
@@ -275,6 +384,18 @@ function moveToPreviousTrack(shouldAutoPlay: boolean = false) {
     const current = get(selectedBeat);
 
     if (allTracks.length === 0) return;
+
+    if (get(shuffleEnabled)) {
+        // drop the current track, then go back to whatever played before it
+        shuffleHistory = shuffleHistory.filter((id) => id !== current?.id);
+        const previousId = shuffleHistory[shuffleHistory.length - 1];
+        const previous = allTracks.find((beat) => beat.id === previousId);
+
+        if (previous) {
+            selectPlaylistBeat(previous, shouldAutoPlay);
+            return;
+        }
+    }
 
     if (!current) {
         selectPlaylistBeat(allTracks[0], shouldAutoPlay);
@@ -408,7 +529,12 @@ if (audio) {
         audioPlayerState.set("Ended");
         userTapped.set(true);
 
-        await advanceToNextTrackWithPagination(true);
+        if (get(repeatMode) === "one") {
+            restartTrack();
+            return;
+        }
+
+        await advanceToNextTrackWithPagination(true, true);
     });
 
     audio.addEventListener("waiting", () => {

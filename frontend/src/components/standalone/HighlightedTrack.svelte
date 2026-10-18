@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade } from "svelte/transition";
     import "./HighlightedTrack.css";
+    import { formatTrackMeta } from "../../helpers/formatters";
     import { selectedBeat } from "../../stores/AudioPlayer/selectedBeatStore";
     import {
         audioPlayerState,
@@ -13,8 +14,17 @@
     import AudioRange from "../misc/AudioRange.svelte";
     import AudioControlBox from "./AudioPlayerControls.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
+    import { swapIn, swapOut } from "../../helpers/transitions";
     import AudioPlayerState from "./AudioPlayerState.svelte";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
+    import BeatTagsSwiper from "./BeatTagsSwiper.svelte";
+    import PencilIcon from "../Icons/svg/PencilIcon.svelte";
+    import MoreIcon from "../Icons/svg/MoreIcon.svelte";
+    import Modal from "../misc/Modal.svelte";
+    import PopupBeat from "../misc/PopupBeat.svelte";
+    import type { Beat } from "../../lib/types/Beats";
+
+    let moreBeat: Beat | null = null;
 
     // controls the icon ONLY
     let playOrPauseIcon: "play" | "pause" = "play";
@@ -55,10 +65,10 @@
         <div class="ht_topFade"></div>
         <div class="ht_bottomFade"></div>
 
-        {#key $selectedBeat}
+        {#key $selectedBeat.id}
             <img
-                in:fade={{ duration: 600 }}
-                out:fade={{ duration: 600 }}
+                in:fade={{ duration: 900 }}
+                out:fade={{ duration: 900 }}
                 class="ht_background"
                 src={$selectedBeat.artworkUrl}
                 alt={$selectedBeat.beatTitle}
@@ -70,12 +80,19 @@
                 <!-- ARTWORK CLICK = user gesture play/pause -->
 
                 <button class="ht_artworkButton" on:click={handleArtworkClick}>
-                    {#key $selectedBeat}
-                        <AlbumArtwork
-                            width={"100%"}
-                            imageUrl={$selectedBeat.artworkUrl}
-                        />
-                    {/key}
+                    <div class="swapStack">
+                        {#key $selectedBeat.id}
+                            <div
+                                in:fade={{ duration: 500, delay: 80 }}
+                                out:fade={{ duration: 350 }}
+                            >
+                                <AlbumArtwork
+                                    width={"100%"}
+                                    imageUrl={$selectedBeat.artworkUrl}
+                                />
+                            </div>
+                        {/key}
+                    </div>
 
                     <!-- do not show on touch devices. -->
                     <div class="ht_albumOverlay">
@@ -94,18 +111,55 @@
 
             <div class="ht_trackInfo">
                 <div class="ht_details">
-                    <div class="ht_stateAndKey">
-                        <AudioPlayerState />
+                    <div class="ht_topRow">
+                        <div class="ht_stateAndKey">
+                            <AudioPlayerState />
 
-                        <p class="ht_keyAndMode">
-                            {$selectedBeat.key}
-                            {$selectedBeat.mode} - {$selectedBeat.bpm} BPM
-                        </p>
+                            <div class="swapStack ht_keyAndMode">
+                                {#key $selectedBeat.id}
+                                    <p in:swapIn out:swapOut>
+                                        {formatTrackMeta($selectedBeat)}
+                                    </p>
+                                {/key}
+                            </div>
+                        </div>
+
+                        <div class="ht_actions">
+                            <a
+                                class="ht_actionButton ht_editButton"
+                                href="/portal/edit-beat/{$selectedBeat.id}"
+                                aria-label="Edit track"
+                                title="Edit track"
+                            >
+                                <PencilIcon height={"16px"} />
+                            </a>
+
+                            <button
+                                type="button"
+                                class="ht_actionButton"
+                                aria-label="More details"
+                                title="More details"
+                                on:click={() => (moreBeat = $selectedBeat)}
+                            >
+                                <span class="ht_moreIcon">
+                                    <MoreIcon height={"20px"} color={"#f7f7f7"} />
+                                </span>
+                            </button>
+                        </div>
                     </div>
-                    <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
-                </div>
 
-                <!-- <BeatTagsSwiper beat={$selectedBeat}/> -->
+                    <div class="swapStack">
+                        {#key $selectedBeat.id}
+                            <div class="ht_titleTags" in:swapIn out:swapOut>
+                                <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
+
+                                <div class="ht_tags">
+                                    <BeatTagsSwiper beat={$selectedBeat} />
+                                </div>
+                            </div>
+                        {/key}
+                    </div>
+                </div>
 
                 <div class="ht_rangeControls">
 
@@ -132,4 +186,10 @@
             </div>
         </div>
     </div>
+{/if}
+
+{#if moreBeat}
+    <Modal on:closeModal={() => (moreBeat = null)} modalTitle={`More Details`}>
+        <PopupBeat beat={moreBeat} />
+    </Modal>
 {/if}

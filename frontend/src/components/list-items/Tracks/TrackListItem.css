@@ -9,11 +9,13 @@
     border-radius: 10px;
 
     width: 100%;
+    box-sizing: border-box;
     text-align: left;
     position: relative;
 
-    padding: 0;
-    margin-bottom: 12px;
+    /* artwork sits flush with the row edge; only the right side is padded */
+    padding: 0 12px 0 0;
+    margin-bottom: 9px;
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -24,6 +26,11 @@
 .tli_button:active {
     outline: none;
     box-shadow: none;
+}
+
+/* zebra striping: every other row gets a faint light background */
+.evenButton {
+    background-color: rgba(255, 255, 255, 0.018);
 }
 
 .tli_button:hover {
@@ -123,8 +130,9 @@
 }
 
 .tli_notepadContainer {
+    display: flex;
     flex: 0 0 auto;
-    padding-top: 2px;
+    opacity: 0.9;
 }
 
 .tli_title {
@@ -150,17 +158,6 @@
     min-width: 0;
 
     overflow: hidden;
-}
-
-.tli_dot {
-    height: 10px;
-    width: 10px;
-    flex: 0 0 10px;
-
-    border-radius: 50%;
-    background-color: rgba(13, 255, 66, 0.932);
-
-    margin-bottom: 2px;
 }
 
 .tli_reference {
@@ -303,6 +300,28 @@
     background-color: rgba(255, 255, 255, 0.192);
 }
 
+.tli_editLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px;
+    margin-right: 4px;
+
+    border-radius: 4px;
+    opacity: 0.35;
+    transition: 0.3s;
+}
+
+.tli_button:hover .tli_editLink {
+    opacity: 0.6;
+}
+
+.tli_editLink:hover {
+    opacity: 1 !important;
+    background-color: rgba(255, 255, 255, 0.192);
+}
+
 .tli_mobileDestinations {
     display: none;
 }
@@ -322,6 +341,10 @@
     }
 
     .tli_destinations {
+        display: none;
+    }
+
+    .tli_editLink {
         display: none;
     }
 
@@ -399,6 +422,15 @@
     .tli_moreInfoContainer {
         margin-left: auto;
     }
+
+    /* more-options dots sit flush with the right edge */
+    .tli_button {
+        padding-right: 0;
+    }
+
+    .moreIconButton {
+        margin-right: 0;
+    }
 }
 
 /* ========================= */
@@ -411,7 +443,7 @@
     }
 
     .evenButton:hover {
-        background-color: hsla(0, 0%, 89%, 0.02);
+        background-color: rgba(255, 255, 255, 0.018);
     }
 
     .tli_playPauseOverlay {
@@ -433,5 +465,9 @@
 
     .moreIconButton:hover {
         background-color: transparent;
+    }
+
+    .tli_editLink {
+        display: none;
     }
 }

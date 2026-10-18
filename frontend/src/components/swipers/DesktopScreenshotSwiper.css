@@ -6,7 +6,7 @@
 
 .dss_container {
     width: 100%;
-    max-width: 1250px;
+    max-width: var(--site-width);
     margin: auto;
     overflow: hidden;
 }

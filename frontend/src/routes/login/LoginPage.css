@@ -12,15 +12,146 @@
     background: #222;
 }
 
+@property --loginPage-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
 .loginPage_glass {
+    --loginPage-gold: 212, 168, 92;
+
     position: relative;
     z-index: 3;
-    max-width: 500px;
+    max-width: 480px;
     width: 100%;
+    border-radius: 18px;
+    will-change: transform, opacity, filter;
+}
+
+.loginPage_glass .glassSurface_container {
+    border-radius: 18px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+        0 30px 80px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+/* slow-rotating gold sheen traced around the card's edge */
+.loginPage_glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+
+    background: conic-gradient(
+        from var(--loginPage-angle),
+        transparent 0deg,
+        rgba(var(--loginPage-gold), 0.9) 40deg,
+        transparent 110deg,
+        transparent 180deg,
+        rgba(var(--loginPage-gold), 0.45) 220deg,
+        transparent 290deg
+    );
+
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box exclude,
+        linear-gradient(#000 0 0);
+
+    animation: loginPage-spin 8s linear infinite;
+}
+
+/* soft warm glow behind the card */
+.loginPage_glass::after {
+    content: "";
+    position: absolute;
+    inset: 10% 5%;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(
+        closest-side,
+        rgba(var(--loginPage-gold), 0.28),
+        transparent
+    );
+    filter: blur(40px);
+    animation: loginPage-breathe 6s ease-in-out infinite;
 }
 
 .loginPage_wrapForm {
-    padding: 25px 35px;
+    padding: 40px 40px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginPage_badge {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 20px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: rgb(var(--loginPage-gold));
+    background: radial-gradient(
+        circle at 30% 25%,
+        rgba(var(--loginPage-gold), 0.28),
+        rgba(var(--loginPage-gold), 0.06) 70%
+    );
+    border: 1px solid rgba(var(--loginPage-gold), 0.4);
+    box-shadow:
+        0 0 24px rgba(var(--loginPage-gold), 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.loginPage_title {
+    font-size: 26pt;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+}
+
+.loginPage_subtitle {
+    margin: 10px 0 30px;
+    color: var(--font-color-light);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+.loginPage_form {
+    width: 100%;
+}
+
+@keyframes loginPage-spin {
+    to {
+        --loginPage-angle: 360deg;
+    }
+}
+
+@keyframes loginPage-breathe {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(0.95);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loginPage_glass::before,
+    .loginPage_glass::after {
+        animation: none;
+    }
 }
 
 
@@ -81,6 +212,14 @@
     }
 
     .loginPage_wrapForm {
-        padding: 25px 15px;
+        padding: 30px 18px 24px;
+    }
+
+    .loginPage_title {
+        font-size: 22pt;
+    }
+
+    .loginPage_subtitle {
+        margin-bottom: 24px;
     }
 }

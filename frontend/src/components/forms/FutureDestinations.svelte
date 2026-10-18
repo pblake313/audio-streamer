@@ -4,7 +4,6 @@
     import { updateBeatFutureDestinationsInArray, upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import { setPopupError } from "../../stores/PopupBeatStore";
     import AppLogo from "../Icons/Logos/AppLogo.svelte";
-    import Logo from "../Icons/Logos/Logo.svelte";
     import SoundcloudIcon from "../Icons/Socials/SoundcloudIcon.svelte";
     import YoutubeIcon from "../Icons/Socials/YoutubeIcon.svelte";
     import Loader from "../loaders/Loader.svelte";
@@ -63,11 +62,8 @@
                 <Loader height="25px" />
             </div>
         {:else}
-            <div class="fd_pattsway fd_largeLogo">
-                <Logo color={"#f7f7f7"} width={"100px"} />
-            </div>
-            <div class="fd_pattsway fd_appLogo">
-                <AppLogo width={"18px"}/>
+            <div class="fd_pattsway">
+                <AppLogo width={"22px"}/>
             </div>
         {/if}
     </button>

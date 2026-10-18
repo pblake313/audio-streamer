@@ -1,70 +1,113 @@
 .abTrack_container {
-    opacity: 1;
-    transition:
-        opacity 0.5s ease,
-        border-color 0.3s ease;
-
-    display: flex;
-    align-items: stretch;
-    gap: 25px;
-
-    width: 100%;
-    min-width: 0;
-    padding: 15px;
-    box-sizing: border-box;
-
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.09),
-            rgba(255, 255, 255, 0.025)
-        ),
-        rgba(20, 20, 20, 0.48);
-
-    backdrop-filter: blur(18px) saturate(125%);
-    -webkit-backdrop-filter: blur(18px) saturate(125%);
-
-
-    color: inherit;
-    text-align: left;
     position: relative;
     overflow: hidden;
     isolation: isolate;
+
+    display: flex;
+    align-items: stretch;
+    gap: 22px;
+
+    width: 100%;
+    min-width: 0;
+    padding: 18px;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    color: inherit;
+    text-align: left;
     cursor: pointer;
+    opacity: 1;
+
+    transition:
+        opacity 0.5s ease,
+        border-color 0.35s ease,
+        background-color 0.35s ease,
+        box-shadow 0.35s ease;
+
     -webkit-tap-highlight-color: transparent;
 }
 
-.abTrack_container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-
-    background: linear-gradient(
-        120deg,
-        rgba(255, 255, 255, 0.07),
-        transparent 40%
-    );
-
-    pointer-events: none;
+@media (hover: hover) and (pointer: fine) {
+    .abTrack_container:not(.abTrack_empty):not(.abTrack_selected):hover {
+        border-color: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.06);
+    }
 }
 
+.abTrack_container:focus-visible {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* the side you're listening to */
+.abTrack_selected {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* the muted side while playing */
 .abTrack_notActive {
-    opacity: 0.4;
+    opacity: 0.5;
 }
+
+/* ========================= */
+/* ARTWORK + BADGE           */
+/* ========================= */
 
 .abTrack_artwork {
-    width: 150px;
-    min-width: 150px;
-    flex: 0 0 150px;
+    position: relative;
+
+    width: 230px;
+    min-width: 230px;
+    flex: 0 0 230px;
+
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.abTrack_badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 26px;
+    height: 26px;
 
     border-radius: 8px;
-    overflow: hidden;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
+    color: #f7f7f7;
+    font-family: var(--font-sans);
+    font-size: 11pt;
+    font-weight: 600;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
 }
+
+.abTrack_selected .abTrack_badge {
+    background: #f7f7f7;
+    color: #222222;
+}
+
+/* ========================= */
+/* DETAILS                   */
+/* ========================= */
 
 .abTrack_details {
     flex: 1 1 auto;
@@ -73,6 +116,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 12px;
 }
 
 .abTrack_top {
@@ -94,6 +138,11 @@
     white-space: nowrap;
 }
 
+.abTrack_meta {
+    margin-top: 2px;
+    font-size: 10pt;
+}
+
 .abTrack_bottom {
     width: 100%;
     min-width: 0;
@@ -101,9 +150,109 @@
 }
 
 .abTrack_rangeNotActive {
-    opacity: 0.15;
+    opacity: 0.25;
 }
 
-.abTrack_selected {
-    border-color: white;
+/* ========================= */
+/* EMPTY SLOT                */
+/* ========================= */
+
+.abTrack_empty {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: default;
+}
+
+.abTrack_emptyArt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.abTrack_emptyLetter {
+    color: rgba(255, 255, 255, 0.25);
+    font-family: var(--font-sans);
+    font-size: 40pt;
+    font-weight: 500;
+}
+
+.abTrack_emptyDetails {
+    justify-content: center;
+    gap: 4px;
+}
+
+/*
+ * phones: compact header (small artwork + title) with the waveform running
+ * the full width of the card underneath
+ */
+@media (max-width: 600px) {
+    .abTrack_container:not(.abTrack_empty) {
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr);
+        grid-template-areas:
+            "art top"
+            "wave wave";
+        align-items: center;
+        column-gap: 14px;
+        row-gap: 12px;
+
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .abTrack_container:not(.abTrack_empty) .abTrack_details {
+        display: contents;
+    }
+
+    .abTrack_container:not(.abTrack_empty) .abTrack_artwork {
+        grid-area: art;
+    }
+
+    .abTrack_top {
+        grid-area: top;
+    }
+
+    .abTrack_bottom {
+        grid-area: wave;
+    }
+
+    .abTrack_artwork {
+        width: 64px;
+        min-width: 64px;
+        flex: 0 0 64px;
+        border-radius: 8px;
+    }
+
+    .abTrack_badge {
+        top: 4px;
+        left: 4px;
+
+        width: 18px;
+        height: 18px;
+
+        border-radius: 5px;
+        font-size: 8pt;
+    }
+
+    .abTrack_titleFlex h5 {
+        font-size: 13pt;
+    }
+
+    .abTrack_meta {
+        font-size: 9pt;
+    }
+
+    .abTrack_empty {
+        gap: 14px;
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    .abTrack_emptyLetter {
+        font-size: 20pt;
+    }
 }

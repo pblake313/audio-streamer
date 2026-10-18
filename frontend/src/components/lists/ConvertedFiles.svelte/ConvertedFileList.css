@@ -1,14 +1,30 @@
-.cfl_listContainer{
+.cfl_container {
+    width: 100%;
+}
+
+.cfl_listContainer {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
 }
-.cfl_fetchMore{
-    margin: auto;
-    margin-top: 25px;
+
+.cfl_fetchMore {
     width: fit-content;
+    margin: 22px auto 0;
 }
-.cfl_container{
-    margin: auto;
-    max-width: 700px;
+
+.cfl_allFetched {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 10pt;
+}
+
+.cfl_empty {
+    padding: 28px 20px;
+
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 10.5pt;
+    text-align: center;
 }

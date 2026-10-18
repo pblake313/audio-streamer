@@ -17,8 +17,11 @@
     import { get } from "svelte/store";
     import AudioRange from "../misc/AudioRange.svelte";
     import "./AudioStreamer.css";
+    import { formatTrackMeta } from "../../helpers/formatters";
     import SeekButton from "../buttons/music/SeekButton.svelte";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
+    import ShuffleButton from "../buttons/music/ShuffleButton.svelte";
+    import RepeatButton from "../buttons/music/RepeatButton.svelte";
     import { scrolledTwoFifty } from "../../stores/AudioStyleStore";
     import { onMount } from "svelte";
     import { page } from "$app/stores";
@@ -28,6 +31,8 @@
     import { goto } from "$app/navigation";
     import Modal from "../misc/Modal.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
+    import { fade } from "svelte/transition";
+    import { swapIn, swapOut } from "../../helpers/transitions";
     import { showAudioPlayer } from "../../stores/AudioPlayer/BeatsStore";
 
     let lastUrl: string | null = null;
@@ -96,18 +101,32 @@
                     goto("/portal");
                 }}
             >
-                <AlbumArtwork width={"100%"} imageUrl={$selectedBeat.artworkUrl} />
+                <div class="as_swapStack">
+                    {#key $selectedBeat.id}
+                        <div in:fade={{ duration: 500, delay: 80 }} out:fade={{ duration: 350 }}>
+                            <AlbumArtwork width={"100%"} imageUrl={$selectedBeat.artworkUrl} />
+                        </div>
+                    {/key}
+                </div>
             </button>
 
             <div class="streamInfoFlex">
-                <div class="trackInfoStream">
-                    <p class="as_title">{$selectedBeat.beatTitle}</p>
-                    <p class="as_subtitle">
-                        {$selectedBeat.bpm} BPM - {$selectedBeat.key} {$selectedBeat.mode}
-                    </p>
+                <div class="trackInfoStream as_swapStack">
+                    {#key $selectedBeat.id}
+                        <div class="as_trackText" in:swapIn={{ y: 8 }} out:swapOut={{ y: -4 }}>
+                            <p class="as_title">{$selectedBeat.beatTitle}</p>
+                            <p class="as_subtitle">
+                                {formatTrackMeta($selectedBeat)}
+                            </p>
+                        </div>
+                    {/key}
                 </div>
 
                 <div class="streamTrackControls">
+                    <div class="as_modeButton">
+                        <ShuffleButton size={"28px"} iconHeight={"19px"} />
+                    </div>
+
                     <div class="wrapSeeka">
                         <SeekButton
                             iconHeight={"12px"}
@@ -146,6 +165,10 @@
                                 smartNextTrack();
                             }}
                         />
+                    </div>
+
+                    <div class="as_modeButton">
+                        <RepeatButton size={"28px"} iconHeight={"19px"} />
                     </div>
 
                     <div class="closeSplit"></div>

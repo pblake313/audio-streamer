@@ -20,7 +20,7 @@
 
         if (!id) {
             console.log("No beat ID");
-            await goto("/portal/manage-beats");
+            await goto("/portal");
             return;
         }
 

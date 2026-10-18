@@ -24,7 +24,8 @@
 }
 
 /* ---------------------------------------------
-   Anchor
+   Anchor: reserves the trigger's height; the
+   menu floats over the content below/above it
 ---------------------------------------------- */
 
 .selectButtonAnchor {
@@ -32,94 +33,89 @@
     height: 46px;
 }
 
-/* Main wrapper: border wraps button + dropdown */
 .actualSelectButton {
     position: absolute;
-    width: calc(100% - 2px);
-
-    border: 1px solid #81818149;
-    border-radius: 8px;
-
-    background-color: #222222;
+    left: 0;
+    right: 0;
+    top: 0;
 
     display: flex;
     flex-direction: column;
+    gap: 6px;
 
-    max-height: 46px;
-    overflow: hidden;
+    /*
+     * This box is as tall as the (hidden) menu, so it overlaps whatever is
+     * below the select. Let clicks pass through it; only the trigger and
+     * an open menu should catch them.
+     */
+    pointer-events: none;
+}
 
-    transition:
-        max-height 220ms ease,
-        box-shadow 200ms ease,
-        border-color 200ms ease;
+.actualSelectButton .selectedOptionButton {
+    pointer-events: auto;
 }
 
 /* Open upward */
 .actualSelectButton.openUp {
+    top: auto;
     bottom: 0;
     flex-direction: column-reverse;
 }
 
-.actualSelectButton.selopopen {
-    max-height: calc(46px + 30vh);
-    box-shadow: 0px 0px 0px 1px #b8b8b8;
-    border-color: #81818149;
-}
-
-/* Error state */
-.actualSelectButton.hasInError {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d;
-}
-
-.actualSelectButton.hasInError.selopopen {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d;
-}
-
 /* ---------------------------------------------
-   Main button
+   Trigger (matches the text inputs)
 ---------------------------------------------- */
 
 .selectedOptionButton {
+    position: relative;
     display: block;
+    flex-shrink: 0;
+
     width: 100%;
     height: 46px;
+    box-sizing: border-box;
+    padding: 14px 42px 14px 14px;
 
-    border: none;
+    border: 1px solid #81818149;
+    border-radius: 8px;
     outline: none;
 
     background-color: #222222;
     color: #6e7075;
 
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 11pt;
-    text-align: left;
     line-height: 1em;
+    text-align: left;
 
-    padding: 14px;
-    padding-right: 42px;
-
-    border-radius: 8px;
     cursor: pointer;
-
-    position: relative;
-    flex-shrink: 0;
 
     transition:
         background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
         color 0.2s ease;
 }
 
 .selectedOptionButton:hover {
-    background-color: #292929;
+    background-color: #252525;
+    border-color: #81818180;
 }
 
 .selectedOptionButton.hasSelection {
     color: #d1d1d1;
 }
 
-.selectedOptionButton:focus-visible {
-    box-shadow: inset 0px 0px 0px 1px #b8b8b8;
+.selectedOptionButton:focus-visible,
+.selopopen .selectedOptionButton {
+    border-color: #81818149;
+    box-shadow: 0px 0px 0px 1px #b8b8b8;
+}
+
+/* Error state */
+.hasInError .selectedOptionButton {
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red);
 }
 
 .selectedOptionText {
@@ -137,21 +133,24 @@
 
 .selectArrowWrapper {
     position: absolute;
-    height: 20px;
-    width: 20px;
     top: 13px;
-    right: 10px;
-    transition: 0.2s;
+    right: 12px;
+
+    width: 20px;
+    height: 20px;
+
     pointer-events: none;
+    opacity: 0.7;
 }
 
 .arrowContainer {
     position: absolute;
-    padding-top: 3px;
     top: 50%;
     left: 50%;
+    padding-top: 3px;
+
     transform: translate(-50%, -50%) rotate(90deg);
-    transition: 0.2s;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .rotateSelectArrow {
@@ -159,52 +158,60 @@
 }
 
 /* ---------------------------------------------
-   Options list
+   Floating menu
 ---------------------------------------------- */
 
 .mySelOps {
-    width: calc(100% - 2px);
-    margin: 0 auto;
+    box-sizing: border-box;
+    width: 100%;
+    max-height: min(300px, 40vh);
+    padding: 5px;
 
-    background-color: #292929;
-
-    max-height: 0;
-    opacity: 0;
-    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: #2a2a2a;
+    box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.45),
+        0 2px 6px rgba(0, 0, 0, 0.3);
 
     overflow-y: auto;
     overflow-x: hidden;
-
     -webkit-overflow-scrolling: touch;
 
-    transform: translateY(-4px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-4px) scale(0.98);
+    transform-origin: top center;
 
     transition:
-        max-height 220ms ease,
-        opacity 160ms ease,
-        transform 160ms ease;
-
-    border-top: 1px solid #75757523;
+        opacity 0.16s ease,
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0.2s;
 
     scrollbar-width: thin;
     scrollbar-color: rgba(248, 248, 248, 0.25) transparent;
 }
 
 .mySelOps.isOpen {
-    max-height: 30vh;
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
-    transform: translateY(0);
+    transform: none;
+
+    transition:
+        opacity 0.16s ease,
+        transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s;
 }
 
 .mySelOps.slectOpenUp {
-    border-top: none;
-    border-bottom: 1px solid #75757523;
-    transform: translateY(4px);
+    transform: translateY(4px) scale(0.98);
+    transform-origin: bottom center;
 }
 
 .mySelOps.isOpen.slectOpenUp {
-    transform: translateY(0);
+    transform: none;
 }
 
 /* Scrollbar */
@@ -215,12 +222,6 @@
 .mySelOps::-webkit-scrollbar-thumb {
     background-color: rgba(175, 175, 175, 0.35);
     border-radius: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.mySelOps:hover::-webkit-scrollbar-thumb,
-.mySelOps:active::-webkit-scrollbar-thumb {
-    background-color: rgba(175, 175, 175, 0.568);
 }
 
 /* ---------------------------------------------
@@ -228,27 +229,28 @@
 ---------------------------------------------- */
 
 .selSingle {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
     width: 100%;
+    padding: 9px 12px;
 
-    padding: 10px 20px;
-
-    background-color: #222222;
     border: none;
-    border-bottom: 1px solid #75757523;
+    border-radius: 8px;
+    background-color: transparent;
 
     text-align: left;
     cursor: pointer;
 
-    transition: background-color 0.2s ease;
+    transition: background-color 0.12s ease;
 }
 
-.selSingle:hover {
-    background-color: #292929;
-}
-
-.selSingle:last-child {
-    border-bottom: none;
+.selSingle:hover,
+.selSingle:focus-visible {
+    background-color: rgba(255, 255, 255, 0.07);
+    outline: none;
 }
 
 .selSingle p {
@@ -264,20 +266,47 @@
     white-space: nowrap;
 }
 
-.isPicked {
-    background-color: rgba(97, 97, 97, 0.596);
+.selSingle:hover p {
+    color: #f7f7f7;
+}
+
+/* selected option: highlighted row, white text + checkmark */
+.isPicked,
+.isPicked:hover {
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 .isPicked p {
     color: #ffffff;
+    font-weight: 500;
 }
 
-.isPicked:hover {
-    background-color: rgba(97, 97, 97, 0.596);
+.isPicked::after {
+    content: "";
+    flex: 0 0 auto;
+
+    width: 5px;
+    height: 10px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+
+    border-right: 2px solid #f7f7f7;
+    border-bottom: 2px solid #f7f7f7;
+    transform: rotate(45deg);
 }
 
 .opforsel {
     color: #b3b3b3;
+}
+
+/* "None" sits apart from the real options */
+.selClear {
+    margin-bottom: 4px;
+}
+
+.selClear p {
+    font-style: italic;
+    opacity: 0.8;
 }
 
 /* ---------------------------------------------
@@ -335,8 +364,8 @@
 }
 
 .nativeSelect.hasInError {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d;
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red);
 }
 
 .nativeSelect:focus {
@@ -344,8 +373,8 @@
 }
 
 .nativeSelect.hasInError:focus {
-    border-color: #c30d0d;
-    box-shadow: 0px 0px 0px 1px #c30d0d;
+    border-color: var(--color-red);
+    box-shadow: 0px 0px 0px 1px var(--color-red);
 }
 
 /* Old IE/Edge native dropdown arrow */
@@ -358,8 +387,9 @@
     height: 20px;
     width: 20px;
     top: 13px;
-    right: 10px;
+    right: 12px;
     pointer-events: none;
+    opacity: 0.7;
 }
 
 .nativeArrowContainer {

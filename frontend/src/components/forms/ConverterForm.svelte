@@ -18,7 +18,7 @@
     import type { Socket } from "socket.io-client";
     import { upsertConvertedFile } from "../../stores/ConvertedFilesStore";
     import ConfettiAnimation from "../misc/ConfettiAnimation.svelte";
-    import FormError from "../errors/FormError.svelte";
+    import AlertIcon from "../Icons/svg/AlertIcon.svelte";
 
     type ConversionStatus =
         | "queued"
@@ -456,7 +456,9 @@
 
     {#if files.length >= 1}
         <div class="converter-uploader__header">
-            <h5 class="converter-uploader_title"> Selected Files ({files.length})</h5>
+            <p class="converter-uploader_title">
+                {files.length} {files.length === 1 ? "file" : "files"} selected
+            </p>
 
             <div class="conveterUploader_headerButtons">
                 <BoxButton
@@ -480,7 +482,12 @@
 
         <div class="converter-uploader__files">
             {#each files as selectedFile (selectedFile.id)}
-                <div class="converter-uploader__file">
+                <div
+                    class="converter-uploader__file"
+                    class:is-error={selectedFile.status === "error"}
+                >
+                    <span class="cv_badge">WAV</span>
+
                     <div class="converter-uploader__file-info">
                         <p class="converter-uploader_filename">
                             {removeFileExtension(selectedFile.file.name)}
@@ -499,9 +506,7 @@
                                     {getStatusText(selectedFile)}
                                 </p>
 
-                                <p style="font-size: 10pt;">
-                                    {selectedFile.progress}%
-                                </p>
+                                <span>{selectedFile.progress}%</span>
                             </div>
 
                             <div
@@ -537,9 +542,11 @@
             {/each}
         </div>
 
-        <div style="margin-top: 15px;">
+        <div class="converter-uploader__convert">
             <BoxButton
-                buttonText={isConverting ? null : "Convert Files"}
+                buttonText={isConverting
+                    ? null
+                    : `Convert ${files.length} ${files.length === 1 ? "File" : "Files"}`}
                 on:click={convertFiles}
                 fullWidth={true}
                 isDisabled={isConverting}
@@ -548,17 +555,21 @@
         </div>
 
         {#if error}
-            <div bind:this={errorElement}>
-                <FormError
-                    errorMessage={error}
-                    errorTitle={"Conversion Error"}
-                />
+<div class="cv_error" role="alert" bind:this={errorElement}>
+                <span class="cv_errorIcon">
+                    <AlertIcon color={"#ff6b6b"} height={"18px"} />
+                </span>
+                <div>
+                    <p class="cv_errorTitle">Conversion error</p>
+                    <p class="cv_errorMessage">{error}</p>
+                </div>
             </div>
         {/if}
     {:else if isConverting}
-        <Loader />
-
-        <p>Hang tight... converting.</p>
+        <div class="converter-uploader__busy">
+            <Loader />
+            <p>Hang tight… converting.</p>
+        </div>
     {:else}
         <button
             type="button"
@@ -569,18 +580,25 @@
             on:dragover={handleDragOver}
             on:dragleave={handleDragLeave}
         >
-            <AddIcon color={"f7f7f7"} />
+            <span class="converter-uploader__dropIcon">
+                <AddIcon color={"f7f7f7"} height={"20px"} />
+            </span>
 
-            <h5>Select Files</h5>
+            <p class="converter-uploader__dropTitle">Drop WAV files here</p>
 
-            <p>Drag and drop or select your WAV files.</p>
+            <p class="converter-uploader__dropSub">
+                or click to browse · up to 20 files, 50 MB each
+            </p>
         </button>
         {#if error}
-            <div bind:this={errorElement}>
-                <FormError
-                    errorMessage={error}
-                    errorTitle={"Conversion Error"}
-                />
+<div class="cv_error" role="alert" bind:this={errorElement}>
+                <span class="cv_errorIcon">
+                    <AlertIcon color={"#ff6b6b"} height={"18px"} />
+                </span>
+                <div>
+                    <p class="cv_errorTitle">Conversion error</p>
+                    <p class="cv_errorMessage">{error}</p>
+                </div>
             </div>
         {/if}
     {/if}
