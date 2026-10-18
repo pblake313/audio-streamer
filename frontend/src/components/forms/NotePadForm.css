@@ -1,8 +1,12 @@
 
 .notpadForm_textarea{
-    max-height: calc(100vh - 500px);
-    overflow-y: scroll;
-    overflow-x: visible;
+    /*
+     * The popup scrolls now, so this only stops very long notes from
+     * taking over. Never smaller than a few lines, even on short screens.
+     */
+    max-height: max(160px, 45dvh);
+    overflow-y: auto;
+    overflow-x: hidden;
     margin-top: 22px;
 }
 

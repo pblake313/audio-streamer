@@ -7,7 +7,6 @@
         userTapped,
     } from "../../stores/AudioPlayerStore";
     import { formatTime } from "../../helpers/formatters";
-    import AudioLoader from "../loaders/AudioLoader.svelte";
     import SeekableWavForm from "./SeekableWavForm.svelte";
 
     /**
@@ -29,6 +28,8 @@
 
     let currentTime = 0;
     let duration = 0;
+    // end of the downloaded chunk around the playhead (seconds)
+    let bufferedEnd = 0;
     let waveformUrl = "";
 
     let rangeInput: HTMLInputElement;
@@ -47,6 +48,31 @@
         $audioPlayerState === "Loading" &&
         duration <= 0 &&
         !isSeeking;
+
+    // soft shimmer on the rail while loading or buffering mid-track
+    $: showShimmer =
+        showInitialLoader ||
+        ($audioPlayerState === "Buffering" && !isSeeking);
+
+    function updateBuffered() {
+        if (!connectedAudio || duration <= 0) {
+            bufferedEnd = 0;
+            return;
+        }
+
+        const ranges = connectedAudio.buffered;
+        let end = 0;
+
+        for (let i = 0; i < ranges.length; i++) {
+            // the downloaded chunk that contains the playhead
+            if (ranges.start(i) <= currentTime + 0.5 && ranges.end(i) >= currentTime) {
+                end = ranges.end(i);
+                break;
+            }
+        }
+
+        bufferedEnd = end;
+    }
 
     function updateAudioState() {
         if (!connectedAudio) {
@@ -82,6 +108,8 @@
             connectedAudio.currentSrc ||
             connectedAudio.src ||
             "";
+
+        updateBuffered();
     }
 
     function handleLoadStart() {
@@ -99,6 +127,7 @@
         if (!isSeeking) {
             currentTime = 0;
             duration = 0;
+            bufferedEnd = 0;
         }
     }
 
@@ -107,6 +136,7 @@
 
         currentTime = 0;
         duration = 0;
+        bufferedEnd = 0;
         waveformUrl = "";
     }
 
@@ -136,6 +166,11 @@
         connectedAudio.removeEventListener(
             "emptied",
             handleEmptied,
+        );
+
+        connectedAudio.removeEventListener(
+            "progress",
+            updateBuffered,
         );
 
         connectedAudio = null;
@@ -180,6 +215,11 @@
         connectedAudio.addEventListener(
             "emptied",
             handleEmptied,
+        );
+
+        connectedAudio.addEventListener(
+            "progress",
+            updateBuffered,
         );
 
         updateAudioState();
@@ -257,6 +297,16 @@
                 `${percentage}%`,
             );
 
+            const bufferedPercentage =
+                duration > 0
+                    ? Math.min(100, Math.max(percentage, (bufferedEnd / duration) * 100))
+                    : 0;
+
+            rangeInput.style.setProperty(
+                "--buffered",
+                `${bufferedPercentage}%`,
+            );
+
             rangeInput.style.setProperty(
                 "--border-radius",
                 roundedEdges ? "5px" : "0px",
@@ -302,9 +352,19 @@
             -->
             <div
                 class="rangeContent"
-                class:rangeContentHidden={showInitialLoader}
+                class:rangeLoading={showInitialLoader}
             >
                 <div class="rangeWrapper">
+                    {#if showShimmer}
+                        <div
+                            class="rangeShimmer"
+                            class:rangeShimmerSquare={!roundedEdges}
+                            in:fade={{ duration: 200 }}
+                            out:fade={{ duration: 300 }}
+                            aria-hidden="true"
+                        ></div>
+                    {/if}
+
                     <input
                         bind:this={rangeInput}
                         class="audioRangeInput"
@@ -329,20 +389,6 @@
                 {/if}
             </div>
 
-            {#if showInitialLoader}
-                <div
-                    in:fade={{ duration: 150 }}
-                    out:fade={{ duration: 150 }}
-                    class="loaderOverlay"
-                >
-                    <div class="wrapLoaderJ">
-                        <AudioLoader
-                            height="7px"
-                            backgroundColor="transparent"
-                        />
-                    </div>
-                </div>
-            {/if}
         </div>
     </div>
 {:else}
@@ -398,22 +444,72 @@
     }
 
     /*
-     * Hide it visually while loading, but do not destroy it.
+     * Loading a new track: the rail stays, the knob fades out and the
+     * times dim. Nothing is removed, so dragging keeps working.
      */
-    .rangeContentHidden {
-        visibility: hidden;
+    .rangeLoading {
         pointer-events: none;
     }
 
-    .loaderOverlay {
+    .rangeLoading .audioRangeInput::-webkit-slider-thumb {
+        opacity: 0;
+    }
+
+    .rangeLoading .audioRangeInput::-moz-range-thumb {
+        opacity: 0;
+    }
+
+    .rangeLoading .timeFlex p {
+        opacity: 0.25;
+    }
+
+    /* soft light gliding along the rail */
+    .rangeShimmer {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+
+        overflow: hidden;
+        border-radius: 5px;
+        pointer-events: none;
+    }
+
+    .rangeShimmerSquare {
+        border-radius: 0;
+    }
+
+    .rangeShimmer::after {
+        content: "";
         position: absolute;
         top: 0;
+        bottom: 0;
         left: 0;
 
-        width: 100%;
-        height: 100%;
+        width: 40%;
 
-        pointer-events: none;
+        background: linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.35) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+
+        animation: rangeShimmer 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+
+    @keyframes rangeShimmer {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(250%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .rangeShimmer::after {
+            animation-duration: 4s;
+        }
     }
 
     .rangeWrapper {
@@ -448,14 +544,13 @@
     .audioRangeInput::-webkit-slider-runnable-track {
         height: 7px;
 
+        /* played | downloaded | not yet downloaded */
         background: linear-gradient(
             to right,
             var(--accent, #d1d1d1) var(--progress, 0%),
-            var(
-                    --accent-faded,
-                    rgba(196, 196, 196, 0.267)
-                )
-                var(--progress, 0%)
+            rgba(255, 255, 255, 0.32) var(--progress, 0%),
+            rgba(255, 255, 255, 0.32) var(--buffered, 0%),
+            var(--accent-faded, rgba(255, 255, 255, 0.14)) var(--buffered, 0%)
         );
 
         border-radius: var(--border-radius, 5px);
@@ -474,6 +569,15 @@
         margin-top: -3px;
 
         box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+
+        transition:
+            opacity 0.25s ease,
+            transform 0.15s ease;
+    }
+
+    .audioRangeInput:not(:disabled):hover::-webkit-slider-thumb,
+    .audioRangeInput:not(:disabled):active::-webkit-slider-thumb {
+        transform: scale(1.25);
     }
 
     .audioRangeInput::-moz-range-track {
@@ -520,7 +624,4 @@
         font-size: 9pt;
     }
 
-    .wrapLoaderJ {
-        height: 38px;
-    }
 </style>

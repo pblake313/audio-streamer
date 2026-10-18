@@ -10,14 +10,14 @@
         margin: auto;
                 margin-top: 25px;
         margin-bottom: 15px;
-        width: 330px;
+        width: 250px;
     }
     
 }
 @media (max-width: 500px) {
     .apc_container {
-        width: 100%;
-        max-width: 330px;
+        width: 70%;
+        max-width: 250px;
         margin-top: 0px;
     }
     
@@ -37,8 +37,9 @@
     margin-right: 0;
 }
 
+/* phones: just previous / play / next */
 @media (max-width: 850px) {
     .apc_mode {
-        margin: 0;
+        display: none;
     }
 }

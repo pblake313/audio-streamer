@@ -35,7 +35,7 @@ export async function downloadConvertedFile(
 
         const fileDoc = fileDocSnapshot.data() as ConvertedFileDoc;
 
-        if (!fileDoc.storagePath) {
+        if (!fileDoc.storagePath) { 
             throw new Error(
                 "Converted file storage path is missing.",
             );
