@@ -104,12 +104,10 @@ let lastAudioTime = 0;
 // =========================
 // Shuffle / repeat
 // =========================
-// "all" wraps back to the first track at the end (the original behavior),
-// "off" stops after the last track, "one" repeats the current track.
-export type RepeatMode = "off" | "all" | "one";
-
-const REPEAT_KEY = "audioPlayer.repeatMode";
-const SHUFFLE_KEY = "audioPlayer.shuffle";
+// The playlist always wraps back to the first track at the end.
+// Loop on repeats the current track over and over instead.
+const LOOP_KEY = "audioPlayer.loopTrack";
+const OLD_REPEAT_KEY = "audioPlayer.repeatMode"; // earlier 3-way setting
 
 function readSetting(key: string): string | null {
     try {
@@ -127,21 +125,22 @@ function writeSetting(key: string, value: string) {
     }
 }
 
-const storedRepeat = readSetting(REPEAT_KEY);
+const storedLoop = readSetting(LOOP_KEY);
 
-export const repeatMode = writable<RepeatMode>(
-    storedRepeat === "off" || storedRepeat === "one" ? storedRepeat : "all"
+// carry over an old "repeat one" choice; off by default
+export const loopTrack = writable<boolean>(
+    storedLoop !== null
+        ? storedLoop === "true"
+        : readSetting(OLD_REPEAT_KEY) === "one"
 );
 
-export const shuffleEnabled = writable<boolean>(readSetting(SHUFFLE_KEY) === "true");
+// always starts off; not remembered between visits
+export const shuffleEnabled = writable<boolean>(false);
 
-repeatMode.subscribe((mode) => writeSetting(REPEAT_KEY, mode));
-shuffleEnabled.subscribe((on) => writeSetting(SHUFFLE_KEY, String(on)));
+loopTrack.subscribe((on) => writeSetting(LOOP_KEY, String(on)));
 
-export function cycleRepeatMode() {
-    repeatMode.update((mode) =>
-        mode === "all" ? "one" : mode === "one" ? "off" : "all"
-    );
+export function toggleLoopTrack() {
+    loopTrack.update((on) => !on);
 }
 
 /*
@@ -267,8 +266,7 @@ function selectPlaylistBeat(
 
 
 async function advanceToNextTrackWithPagination(
-    shouldAutoPlay: boolean = false,
-    fromEnded: boolean = false
+    shouldAutoPlay: boolean = false
 ) {
     let allTracks = get(filteredBeats);
     let current = get(selectedBeat);
@@ -363,14 +361,8 @@ async function advanceToNextTrackWithPagination(
 
     /*
      * We reached the end and every page for the active playlist is loaded.
-     * Loop back to its first track, unless repeat is off and the track
-     * finished on its own, in which case playback stops here.
+     * Loop back to its first track.
      */
-    if (fromEnded && get(repeatMode) === "off") {
-        audioPlayerState.set("Idle");
-        return;
-    }
-
     allTracks = get(filteredBeats);
 
     if (allTracks.length > 0) {
@@ -529,12 +521,12 @@ if (audio) {
         audioPlayerState.set("Ended");
         userTapped.set(true);
 
-        if (get(repeatMode) === "one") {
+        if (get(loopTrack)) {
             restartTrack();
             return;
         }
 
-        await advanceToNextTrackWithPagination(true, true);
+        await advanceToNextTrackWithPagination(true);
     });
 
     audio.addEventListener("waiting", () => {

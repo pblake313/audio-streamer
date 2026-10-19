@@ -272,6 +272,18 @@
     align-items: center;
 }
 
+/* track length, just left of the more button */
+.tli_duration {
+    width: 44px;
+    margin-right: 16px;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-family: var(--font-sans);
+    font-size: 9.5pt;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
 .moreIconButton {
     border: none;
 
@@ -421,6 +433,11 @@
 
     .tli_moreInfoContainer {
         margin-left: auto;
+    }
+
+    /* no track time on phones */
+    .tli_duration {
+        display: none;
     }
 
     /* more-options dots sit flush with the right edge */

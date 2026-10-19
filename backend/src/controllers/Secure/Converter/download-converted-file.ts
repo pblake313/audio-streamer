@@ -29,7 +29,7 @@ export async function downloadConvertedFile(
             .doc(fileDocId)
             .get();
 
-        if (!fileDocSnapshot.exists) {
+        if (!fileDocSnapshot.exists) { 
             throw new Error("Converted file document not found.");
         } 
 

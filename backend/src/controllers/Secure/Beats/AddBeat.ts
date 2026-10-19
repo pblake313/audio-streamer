@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import admin from 'firebase-admin';
-import { uploadBeatArtwork, uploadBeatMp3 } from "../../../helpers/BeatFileUploads";
+import { getMp3DurationSeconds, uploadBeatArtwork, uploadBeatMp3 } from "../../../helpers/BeatFileUploads";
 import { validateAddBeatRequest } from "../../../helpers/AddBeatHelpers";
 import { Beat } from "../../../types/Beat";
 import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
@@ -47,6 +47,7 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
             id: beatId,
             artworkUrl,
             mp3Url,
+            durationSeconds: await getMp3DurationSeconds(mp3File),
             createdAt: new Date(),
             updatedAt: new Date(),
         };

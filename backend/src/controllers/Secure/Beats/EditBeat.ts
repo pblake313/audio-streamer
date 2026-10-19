@@ -4,6 +4,7 @@ import { getBeatById } from "../../../helpers/GetBeatById";
 import {
     uploadBeatArtwork,
     uploadBeatMp3,
+    getMp3DurationSeconds,
 } from "../../../helpers/BeatFileUploads";
 import { Beat, TrackType } from "../../../types/Beat";
 import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
@@ -28,7 +29,7 @@ type EditableBeatFields = Pick<
 >;
 
 type BeatUpdateFields = EditableBeatFields &
-    Pick<Beat, "artworkUrl" | "mp3Url">;
+    Pick<Beat, "artworkUrl" | "mp3Url" | "durationSeconds">;
 
 export async function editBeat(
     req: Request,
@@ -92,6 +93,9 @@ export async function editBeat(
                 file: newMp3File,
                 beatId,
             });
+
+            beatUpdate.durationSeconds =
+                await getMp3DurationSeconds(newMp3File);
         }
 
         const updatedAt = new Date();

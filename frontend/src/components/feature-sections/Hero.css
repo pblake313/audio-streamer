@@ -167,45 +167,6 @@
 }
 
 /* ========================= */
-/* SCROLL CUE                */
-/* ========================= */
-
-.hero_scrollCue {
-    position: absolute;
-    left: 50%;
-    bottom: 40px;
-    z-index: 2;
-
-    transform: translateX(-50%);
-    opacity: 0.6;
-}
-
-.hero_scrollCue:hover {
-    opacity: 1;
-}
-
-.hero_scrollMouse {
-    display: block;
-    width: 22px;
-    height: 34px;
-    box-sizing: border-box;
-
-    border: 1.5px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-}
-
-.hero_scrollWheel {
-    display: block;
-    width: 3px;
-    height: 7px;
-    margin: 6px auto 0;
-
-    border-radius: 2px;
-    background: #f7f7f7;
-    animation: hero_scroll 1.8s ease-in-out infinite;
-}
-
-/* ========================= */
 /* VIDEO + FADES             */
 /* ========================= */
 
@@ -281,16 +242,9 @@
     100% { box-shadow: 0 0 0 0 rgba(126, 226, 168, 0); }
 }
 
-@keyframes hero_scroll {
-    0%   { transform: translateY(0); opacity: 1; }
-    70%  { transform: translateY(9px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 0; }
-}
-
 @media (prefers-reduced-motion: reduce) {
     .hero_orb,
-    .hero_eyebrowDot,
-    .hero_scrollWheel {
+    .hero_eyebrowDot {
         animation: none;
     }
 }

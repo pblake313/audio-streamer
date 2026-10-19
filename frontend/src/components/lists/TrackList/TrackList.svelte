@@ -19,6 +19,7 @@
         showTrash,
         tagFilter,
         trackTypeView,
+        noTrackTypes,
         type TrackTypeView,
     } from "../../../stores/AudioPlayer/BeatsStore";
     import AddTrackPointer from "../../page-components/AddTrackPointer.svelte";
@@ -31,6 +32,14 @@
         setAudioMode,
     } from "../../../stores/AudioPlayerStore";
 
+    // switching Stream / A | B swaps the player at the top, so jump up to it
+    function switchMode(mode: "streamer" | "abTester") {
+        if ($audioMode === mode) return;
+
+        setAudioMode(mode);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     // one multi-select drives both the track type view and trash visibility
     const viewOptions = [
         { value: "Beat", label: "Beats" },
@@ -38,8 +47,8 @@
         { value: "Trash", label: "Trash" },
     ];
 
-    $: showsBeats = $trackTypeView !== "Reference";
-    $: showsReferences = $trackTypeView !== "Beat";
+    $: showsBeats = !$noTrackTypes && $trackTypeView !== "Reference";
+    $: showsReferences = !$noTrackTypes && $trackTypeView !== "Beat";
 
     $: viewValues = [
         ...(showsBeats ? ["Beat"] : []),
@@ -47,17 +56,16 @@
         ...($showTrash ? ["Trash"] : []),
     ];
 
-    // at least one of Beats / References has to stay checked
-    $: lockedViewValues = $trackTypeView === "All" ? [] : [$trackTypeView];
-
     $: viewLabel =
-        viewValues.length === viewOptions.length
-            ? "All tracks"
-            : viewOptions
-                  .filter((option) => viewValues.includes(option.value))
-                  .map((option) => option.label)
-                  .join(", ");
+        viewValues.length === 0 ? "Nothing selected"
+        : viewValues.length === 1 && $showTrash ? "Trash only"
+        : viewValues.length === viewOptions.length ? "All tracks"
+        : viewOptions
+              .filter((option) => viewValues.includes(option.value))
+              .map((option) => option.label)
+              .join(", ");
 
+    // every option toggles freely, in any order
     function handleViewToggle(value: string) {
         if (value === "Trash") {
             showTrash.update((current) => !current);
@@ -66,6 +74,15 @@
 
         const beats = value === "Beat" ? !showsBeats : showsBeats;
         const references = value === "Reference" ? !showsReferences : showsReferences;
+
+        // neither type: trashed tracks only (or nothing, if trash is off)
+        if (!beats && !references) {
+            noTrackTypes.set(true);
+            setTrackTypeView("All");
+            return;
+        }
+
+        noTrackTypes.set(false);
 
         const view: TrackTypeView =
             beats && references ? "All"
@@ -76,7 +93,8 @@
     }
 
     $: viewNoun =
-        $trackTypeView === "Reference" ? "references"
+        $noTrackTypes ? "trashed tracks"
+        : $trackTypeView === "Reference" ? "references"
         : $trackTypeView === "Beat" ? "beats"
         : "tracks";
 
@@ -106,7 +124,10 @@
      * Errors pause it; the filtered error clears itself after a few
      * seconds, which acts as a retry.
      */
-    $: if (sentinelVisible && !isFetchingMore && !allPagesFetched && !activeFetchError) {
+    // nothing selected: the list is empty on purpose, so don't keep paging
+    $: nothingSelected = $noTrackTypes && !$showTrash;
+
+    $: if (sentinelVisible && !nothingSelected && !isFetchingMore && !allPagesFetched && !activeFetchError) {
         loadMore();
     }
 
@@ -148,7 +169,6 @@
                     label={viewLabel}
                     options={viewOptions}
                     values={viewValues}
-                    lockedValues={lockedViewValues}
                     tone={$showTrash ? "danger" : "default"}
                     onToggle={handleViewToggle}
                 />
@@ -165,7 +185,7 @@
                         class="trackList_typeOption"
                         class:trackList_typeOption_active={$audioMode === "streamer"}
                         aria-pressed={$audioMode === "streamer"}
-                        on:click={() => setAudioMode("streamer")}
+                        on:click={() => switchMode("streamer")}
                     >
                         Stream
                     </button>
@@ -174,7 +194,7 @@
                         class="trackList_typeOption"
                         class:trackList_typeOption_active={$audioMode === "abTester"}
                         aria-pressed={$audioMode === "abTester"}
-                        on:click={() => setAudioMode("abTester")}
+                        on:click={() => switchMode("abTester")}
                     >
                         A | B
                     </button>
@@ -188,7 +208,9 @@
             {/each}
         {:else if !isFetchingMore}
             <p class="trackList_empty">
-                {#if $moodFilter.length >= 1 || $tagFilter.length >= 1 || $artistFilter.length >= 1}
+                {#if $noTrackTypes && !$showTrash}
+                    Nothing selected. Pick Beats, References, or Trash.
+                {:else if $moodFilter.length >= 1 || $tagFilter.length >= 1 || $artistFilter.length >= 1}
                     No {viewNoun} match these filters.
                 {:else}
                     No {viewNoun} yet.

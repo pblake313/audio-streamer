@@ -1,0 +1,121 @@
+.sc_controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    width: 100%;
+    max-width: 520px;
+    margin: 22px auto 0;
+}
+
+/* ARROWS */
+
+.sc_arrow {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+    padding: 0;
+
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.85);
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease,
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.sc_arrowPrev svg {
+    transform: rotate(180deg);
+}
+
+.sc_arrow:hover:not(:disabled) {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: var(--font-color-dark);
+}
+
+.sc_arrow:active:not(:disabled) {
+    transform: scale(0.94);
+}
+
+.sc_arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.sc_arrow:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}
+
+/* COUNTER */
+
+.sc_count {
+    flex: 0 0 auto;
+
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.sc_countCurrent {
+    color: #ffffff;
+}
+
+.sc_countDivider {
+    margin: 0 4px;
+}
+
+/* PROGRESS */
+
+.sc_track {
+    flex: 1 1 auto;
+
+    height: 3px;
+    overflow: hidden;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sc_fill {
+    height: 100%;
+    min-width: 8%;
+
+    border-radius: inherit;
+    background: #ffffff;
+
+    transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 600px) {
+    .sc_controls {
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .sc_arrow {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (hover: none) {
+    .sc_arrow:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.85);
+    }
+}
