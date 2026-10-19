@@ -8,7 +8,17 @@
     height: 90px;
 
     overflow: visible;
-    transition: 0.5s;
+
+    /*
+        iOS Safari can leave fixed bars stranded mid-screen when its
+        toolbar collapses, the keyboard closes, or a scroll lock lifts.
+        Its own compositing layer keeps it pinned to the bottom, and
+        only height animates (not every property).
+    */
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: height 0.5s;
 }
 
 .innerAudio {
@@ -199,7 +209,7 @@
 .hideStreamPlayer {
     height: 0px;
     overflow: hidden;
-    transition: 0.5s;
+    transition: height 0.5s;
 }
 /* old + new track info overlap in place while they crossfade */
 .as_swapStack {

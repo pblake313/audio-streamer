@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { browser } from "$app/environment";
+    import { page } from "$app/stores";
 
     import AudioStreamer from "../../components/standalone/AudioStreamer.svelte";
     import Nav from "../../components/standalone/Nav/Nav.svelte";
@@ -8,6 +9,7 @@
 
     import { user } from "../../stores/UserStore";
     import { autoLoginAttempted } from "../../helpers/Auth/authFunctions";
+    import { pageIn } from "../../helpers/transitions";
 
     let redirected = false;
 
@@ -28,6 +30,12 @@
     <Loader loaderStyle="loader_full" />
 {:else if $user}
     <Nav />
-    <slot />
+
+    <!-- each portal page eases in when you move between them; the nav stays put -->
+    {#key $page.url.pathname}
+        <div in:pageIn|global>
+            <slot />
+        </div>
+    {/key}
 {/if}
 

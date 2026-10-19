@@ -24,6 +24,15 @@
     import PopupBeat from "../misc/PopupBeat.svelte";
     import type { Beat } from "../../lib/types/Beats";
 
+    /*
+        Stacked (mobile) layout: crossfade in place on track change
+        instead of drifting vertically. Checked when each transition
+        starts, so it follows the current window size.
+    */
+    const isStacked = () =>
+        typeof window !== "undefined" &&
+        window.matchMedia("(max-width: 850px)").matches;
+
     let moreBeat: Beat | null = null;
 
     // controls the icon ONLY
@@ -117,7 +126,10 @@
 
                             <div class="swapStack ht_keyAndMode">
                                 {#key $selectedBeat.id}
-                                    <p in:swapIn out:swapOut>
+                                    <p
+                                        in:swapIn={{ y: isStacked() ? 0 : 10 }}
+                                        out:swapOut={{ y: isStacked() ? 0 : -6 }}
+                                    >
                                         {formatTrackMeta($selectedBeat)}
                                     </p>
                                 {/key}
@@ -150,7 +162,11 @@
 
                     <div class="swapStack">
                         {#key $selectedBeat.id}
-                            <div class="ht_titleTags" in:swapIn out:swapOut>
+                            <div
+                                class="ht_titleTags"
+                                in:swapIn={{ y: isStacked() ? 0 : 10 }}
+                                out:swapOut={{ y: isStacked() ? 0 : -6 }}
+                            >
                                 <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
 
                                 <div class="ht_tags">
