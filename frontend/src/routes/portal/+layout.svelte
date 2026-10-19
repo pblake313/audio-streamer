@@ -19,6 +19,11 @@
     }
 </script>
 
+<!-- private: keep every portal page out of search results (pages set their own titles) -->
+<svelte:head>
+    <meta name="robots" content="noindex, nofollow" />
+</svelte:head>
+
 {#if !$autoLoginAttempted}
     <Loader loaderStyle="loader_full" />
 {:else if $user}
