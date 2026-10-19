@@ -99,6 +99,38 @@ async function validateMp3File(
 }
 
 /* ---------------------------------------------
+   Duration
+---------------------------------------------- */
+
+// Length of an MP3 in seconds, or null if it can't be read.
+export async function getMp3DurationSeconds(
+    file: Express.Multer.File,
+): Promise<number | null> {
+    try {
+        const metadata = await parseBuffer(
+            file.buffer,
+            {
+                mimeType: "audio/mpeg",
+                size: file.size,
+                path: file.originalname,
+            },
+            {
+                duration: true,
+                skipCovers: true,
+            },
+        );
+
+        const seconds = metadata.format.duration;
+
+        return typeof seconds === "number" && Number.isFinite(seconds) && seconds > 0
+            ? Math.round(seconds * 10) / 10
+            : null;
+    } catch {
+        return null;
+    }
+}
+
+/* ---------------------------------------------
    Storage URL
 ---------------------------------------------- */
 

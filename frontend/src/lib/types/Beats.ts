@@ -17,7 +17,9 @@ export type Beat = {
     mp3Url: string,
     id: string,
     rating: 0 | 1 | 2 | 3 | 4 | 5,
-    notepad: string | null
+    notepad: string | null,
+    // track length in seconds, saved when the MP3 is uploaded (older tracks may not have it)
+    durationSeconds?: number | null
 
 }
 export type TrackType = 'Beat' | 'Reference'

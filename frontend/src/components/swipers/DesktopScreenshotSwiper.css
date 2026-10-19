@@ -8,91 +8,114 @@
     width: 100%;
     max-width: var(--site-width);
     margin: auto;
-    overflow: hidden;
-}
-
-/* THUMBNAIL PICKER */
-
-.dss_slidePicker {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(13, 1fr);
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    margin-bottom: 25px;
-}
-
-.dss_slidePickerButton {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    padding: 0;
-    cursor: pointer;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid rgba(220, 220, 220, 0.65);
-    background: transparent;
-    opacity: 0.65;
-    transition:
-        border-color 0.25s ease,
-        opacity 0.25s ease,
-        transform 0.25s ease;
-}
-
-.dss_slidePickerButton:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-.dss_slidePickerButtonActive {
-    border-color: white;
-    opacity: 1;
-}
-
-.dss_slidePickerButton img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    object-position: center;
 }
 
 /* MAIN SWIPER */
-
-.dss_megaSwipeWrap {
-    width: 100%;
-}
-
-.swiper.dss_swiper,
-.swiper.dss_swiper .swiper-wrapper,
-.swiper.dss_swiper .swiper-slide {
-    box-sizing: border-box;
-}
 
 .swiper.dss_swiper {
     overflow: visible !important;
 }
 
-.dss_singleSwiperSlide {
-    display: flex;
-    overflow: hidden;
-
-    font-size: 18px;
-    cursor: grab;
-    user-select: none;
-
-    border-radius: 10px;
-    border: 1px solid rgba(92, 92, 92, 0.5);
+/*
+    The window frame is its title bar plus a 1250x700 screenshot.
+    --dss-reserve is the vertical space kept free for the controls
+    and breathing room, so the frame always fits the viewport.
+*/
+.dss_container {
+    --dss-bar: 34px;
+    --dss-reserve: 240px;
+    --dss-base-width: 100%;
 }
 
-.dss_singleSwiperSlide:active {
-    cursor: grabbing;
+.swiper-slide.dss_slide {
+    width: min(
+        var(--dss-base-width),
+        (100vh - var(--dss-reserve) - var(--dss-bar)) * 1250 / 700
+    );
+    width: min(
+        var(--dss-base-width),
+        (100svh - var(--dss-reserve) - var(--dss-bar)) * 1250 / 700
+    );
+}
+
+.dss_slide {
+    box-sizing: border-box;
+    user-select: none;
+
+    opacity: 0.35;
+    transform: scale(0.94);
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dss_slide.swiper-slide-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* BROWSER WINDOW FRAME */
+
+.dss_window {
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.07),
+        rgba(255, 255, 255, 0.02)
+    );
+
+    box-shadow:
+        0 30px 60px -20px rgba(0, 0, 0, 0.6),
+        0 12px 24px -12px rgba(0, 0, 0, 0.4);
+
+    transition: border-color 0.3s ease;
+}
+
+.dss_slide.swiper-slide-active .dss_window:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.dss_window:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
 }
 
 .dss_imageContainer {
-    width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
+    display: block;
+}
+
+.dss_windowBar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    height: 34px;
+    padding: 0 14px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dss_windowDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.dss_imageContainer {
+    aspect-ratio: 1250 / 700;
+    background: rgba(0, 0, 0, 0.25);
 }
 
 .dss_imageContainer img {
@@ -101,144 +124,53 @@
     display: block;
 
     object-fit: cover;
-    object-position: center;
+    object-position: top center;
 
     pointer-events: none;
 }
 
-/* BOTTOM DOT NAVIGATION */
-
-.dss_swiperLocation {
-    width: 100%;
-    min-height: 42px;
-    margin-top: 15px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dss_innerLocationGrid {
-    width: fit-content;
-    max-width: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    gap: 5px;
-}
-
-.dss_swiperNavButton {
-    flex: 0 0 auto;
-
-    width: 18px;
-    height: 6px;
-    padding: 0;
-
-    cursor: pointer;
-    border: none;
-    border-radius: 999px;
-
-    background: rgba(255, 255, 255, 0.35);
-    opacity: 0.7;
-
-    transition:
-        width 0.25s ease,
-        background-color 0.25s ease,
-        opacity 0.25s ease,
-        transform 0.25s ease;
-}
-
-.dss_swiperNavButton:hover {
-    opacity: 1;
-    transform: scaleY(1.15);
-}
-
-.dss_swiperNavButton.dss_active {
-    width: 28px;
-    background: #ffffff;
-    opacity: 1;
-}
-
-.dss_swiperNavButton.dss_active:hover {
-    opacity: 1;
-}
-
 /* RESPONSIVE */
 
-@media (max-width: 1300px) {
-    .dss_container{
-        padding: 0px 25px;
-        width: calc(100% - 50px);
+/* below 1200px, leave part of the next slide visible */
+@media (max-width: 1199px) {
+    .dss_container {
+        --dss-base-width: 91%;
     }
-    .dss_megaContainer{
-        padding: 0px;
-    }
-
-
 }
 
-@media (max-width: 800px) {
-    .dss_slidePicker {
-        display: none;
+@media (max-width: 899px) {
+    .dss_container {
+        --dss-base-width: 93%;
     }
 }
 
 @media (max-width: 600px) {
     .dss_container {
+        --dss-bar: 22px;
+    }
+
+    .dss_megaContainer {
         padding: 0 15px;
     }
 
-    .dss_swiperLocation {
-        min-height: 36px;
-        margin-top: 12px;
+    .dss_window {
+        border-radius: 10px;
     }
 
-    .dss_innerLocationGrid {
-        gap: 4px;
+    .dss_windowBar {
+        height: 22px;
+        gap: 5px;
+        padding: 0 10px;
     }
 
-    .dss_swiperNavButton {
-        width: 14px;
-        height: 5px;
-    }
-
-    .dss_swiperNavButton.dss_active {
-        width: 24px;
+    .dss_windowDot {
+        width: 6px;
+        height: 6px;
     }
 }
 
-@media (max-width: 400px) {
-    .dss_innerLocationGrid {
-        gap: 3px;
-    }
-
-    .dss_swiperNavButton {
-        width: 12px;
-    }
-
-    .dss_swiperNavButton.dss_active {
-        width: 20px;
-    }
-}
-
-@media (hover: none) {
-    .dss_slidePickerButton:hover {
-        opacity: 0.65;
-        transform: none;
-    }
-
-    .dss_slidePickerButtonActive:hover {
-        opacity: 1;
-    }
-
-    .dss_swiperNavButton:hover {
-        opacity: 0.7;
-        transform: none;
-    }
-
-    .dss_swiperNavButton.dss_active:hover {
-        opacity: 1;
+@media (prefers-reduced-motion: reduce) {
+    .dss_slide {
+        transition: none;
     }
 }

@@ -1,24 +1,23 @@
 <script lang="ts">
-    import { cycleRepeatMode, repeatMode } from "../../../stores/AudioPlayerStore";
+    import { loopTrack, toggleLoopTrack } from "../../../stores/AudioPlayerStore";
     import "./PlaybackModeButton.css";
 
     export let size = "36px";
     export let iconHeight = "22px";
 
-    $: label =
-        $repeatMode === "one" ? "Repeat one"
-        : $repeatMode === "all" ? "Repeat all"
-        : "Repeat off";
+    // on: repeat this track. off: keep playing through the list.
+    $: label = $loopTrack ? "Loop this track: on" : "Loop this track: off";
 </script>
 
 <button
     type="button"
     class="pmb_button"
-    class:pmb_active={$repeatMode !== "off"}
+    class:pmb_active={$loopTrack}
     style="width: calc({size} * 1.2); height: {size};"
-    aria-label="Repeat: {label}"
+    aria-label="Loop this track"
+    aria-pressed={$loopTrack}
     title={label}
-    on:click={cycleRepeatMode}
+    on:click={toggleLoopTrack}
 >
     <svg
         height={iconHeight}
@@ -36,7 +35,4 @@
         <path d="M21 13v1a4 4 0 0 1-4 4H3" />
     </svg>
 
-    {#if $repeatMode === "one"}
-        <span class="pmb_badge">1</span>
-    {/if}
 </button>

@@ -1,17 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import SwiperCore from "swiper";
-    import { Navigation } from "swiper/modules";
+    import { Keyboard } from "swiper/modules";
     import { fade } from "svelte/transition";
 
-
+    import SwiperControls from "./SwiperControls.svelte";
+    import ScreenshotLightbox from "./ScreenshotLightbox.svelte";
 
     // ALL IMAGES ARE CAPTURED AT 1250PX BY 700
 
     // @ts-ignore: CSS side-effect import for Swiper
     import "swiper/css";
-    // @ts-ignore: CSS side-effect import for Swiper navigation
-    import "swiper/css/navigation";
 
     import "./DesktopScreenshotSwiper.css";
 
@@ -35,107 +34,90 @@
     let swiper: SwiperCore | null = null;
 
     /*
-        activeIndex controls the thumbnail picker.
-
-        activeDot controls the bottom navigation dots because Swiper
-        can have fewer snap points than images when slidesPerView
-        is greater than 1.
+        The counter uses snapIndex and snapGrid because Swiper can
+        have fewer snap points than images when more than one slide
+        fits in view.
     */
-    let activeIndex = 0;
-    let activeDot = 0;
-    let dotCount = 0;
+    let snapIndex = 0;
+    let snapCount = 0;
+    let isBeginning = true;
+    let isEnd = false;
 
     function updateNavigationState(sw: SwiperCore) {
-        activeIndex = sw.realIndex;
-        activeDot = sw.snapIndex;
-        dotCount = sw.snapGrid.length;
+        snapIndex = sw.snapIndex;
+        snapCount = sw.snapGrid.length;
+        isBeginning = sw.isBeginning;
+        isEnd = sw.isEnd;
     }
 
-    function goToSlide(index: number) {
-        if (!swiper) return;
+    // ---------------------------------------------
+    // lightbox
+    // Swiper cancels the click after a drag, so only
+    // a real click/tap on a slide opens it.
+    // ---------------------------------------------
+    let lightboxIndex: number | null = null;
 
-        swiper.slideTo(index);
+    function openLightbox(index: number) {
+        lightboxIndex = index;
+
+        // the lightbox handles the arrow keys while it's open
+        swiper?.keyboard.disable();
     }
 
-    function goToDot(index: number) {
-        if (!swiper) return;
+    function closeLightbox(index: number) {
+        lightboxIndex = null;
 
-        swiper.slideTo(index);
+        swiper?.keyboard.enable();
+        swiper?.slideTo(index);
     }
 
     onMount(() => {
         swiper = new SwiperCore(swiperContainer, {
-            modules: [Navigation],
+            modules: [Keyboard],
 
-            slidesPerView: 1,
-            slidesPerGroup: 1,
-            spaceBetween: 15,
+            // slide widths come from CSS so they can be capped by the viewport height
+            slidesPerView: "auto",
+            spaceBetween: 12,
             loop: false,
-            speed: 300,
-            centeredSlides: false,
-            centeredSlidesBounds: false,
+            speed: 500,
             roundLengths: true,
+            grabCursor: true,
+            keyboard: { enabled: true, onlyInViewport: true },
 
             breakpoints: {
-                1600: {
-                    slidesPerView: 1,
-                },
-
                 1200: {
-                    slidesPerView: 1,
+                    spaceBetween: 28,
                 },
 
                 900: {
-                    slidesPerView: 1.2,
+                    spaceBetween: 22,
                 },
 
                 650: {
-                    slidesPerView: 1.1,
-                },
-
-                0: {
-                    slidesPerView: 1.1,
-                    spaceBetween: 15,
-                    centeredSlides: false,
+                    spaceBetween: 16,
                 },
             },
 
             on: {
-                init(sw) {
-                    updateNavigationState(sw);
-                },
-
-                slideChange(sw) {
-                    updateNavigationState(sw);
-                },
-
-                reachBeginning(sw) {
-                    updateNavigationState(sw);
-                },
-
-                reachEnd(sw) {
-                    updateNavigationState(sw);
-                },
-
-                fromEdge(sw) {
-                    updateNavigationState(sw);
-                },
-
-                resize(sw) {
-                    updateNavigationState(sw);
-                },
-
-                breakpoint(sw) {
-                    updateNavigationState(sw);
-                },
-
-                update(sw) {
-                    updateNavigationState(sw);
-                },
+                init: updateNavigationState,
+                slideChange: updateNavigationState,
+                reachBeginning: updateNavigationState,
+                reachEnd: updateNavigationState,
+                fromEdge: updateNavigationState,
+                breakpoint: updateNavigationState,
+                update: updateNavigationState,
             },
         });
 
+        /*
+            Swiper only watches the container's width, so a height-only
+            resize would leave stale slide sizes. Re-measure on window resize.
+        */
+        const handleResize = () => swiper?.update();
+        window.addEventListener("resize", handleResize);
+
         return () => {
+            window.removeEventListener("resize", handleResize);
             swiper?.destroy(true, true);
             swiper = null;
         };
@@ -148,66 +130,54 @@
         in:fade={{ delay: 500, duration: 500 }}
         out:fade={{ duration: 500 }}
     >
-        <div
-            class="dss_slidePicker"
-            aria-label="Screenshot picker"
-        >
-            {#each images as img, index}
-                <button
-                    type="button"
-                    class="dss_slidePickerButton {index === activeIndex
-                        ? 'dss_slidePickerButtonActive'
-                        : ''}"
-                    on:click={() => goToSlide(index)}
-                    aria-label={`View screenshot ${index + 1}`}
-                    aria-pressed={index === activeIndex}
-                >
-                    <img
-                        src={img}
-                        alt={`Screenshot thumbnail ${index + 1}`}
-                        loading="lazy"
-                    />
-                </button>
-            {/each}
-        </div>
+        <div class="swiper dss_swiper" bind:this={swiperContainer}>
+            <div class="swiper-wrapper">
+                {#each images as img, index}
+                    <div class="swiper-slide dss_slide">
+                        <button
+                            type="button"
+                            class="dss_window"
+                            on:click={() => openLightbox(index)}
+                            aria-label={`Enlarge desktop screenshot ${index + 1}`}
+                        >
+                            <span class="dss_windowBar" aria-hidden="true">
+                                <span class="dss_windowDot" />
+                                <span class="dss_windowDot" />
+                                <span class="dss_windowDot" />
+                            </span>
 
-        <div class="dss_megaSwipeWrap">
-            <div
-                class="swiper dss_swiper"
-                bind:this={swiperContainer}
-            >
-                <div class="swiper-wrapper dss_swiperWrapper">
-                    {#each images as img, index}
-                        <div class="swiper-slide dss_singleSwiperSlide">
-                            <div class="dss_imageContainer">
+                            <span class="dss_imageContainer">
                                 <img
                                     src={img}
-                                    alt={`Screenshot ${index + 1}`}
-                                    loading="lazy"
+                                    alt={`Desktop screenshot ${index + 1} of ${images.length}`}
+                                    width="1250"
+                                    height="700"
+                                    loading={index < 2 ? "eager" : "lazy"}
+                                    draggable="false"
                                 />
-                            </div>
-                        </div>
-                    {/each}
-                </div>
-            </div>
-        </div>
-
-        <div class="dss_swiperLocation">
-            <div
-                class="dss_innerLocationGrid"
-                aria-label="Screenshot navigation"
-            >
-                {#each Array(dotCount) as _, index}
-                    <button
-                        type="button"
-                        class:dss_active={index === activeDot}
-                        class="dss_swiperNavButton"
-                        on:click={() => goToDot(index)}
-                        aria-label={`Go to screenshot position ${index + 1}`}
-                        aria-pressed={index === activeDot}
-                    />
+                            </span>
+                        </button>
+                    </div>
                 {/each}
             </div>
         </div>
+
+        <SwiperControls
+            current={snapIndex}
+            total={snapCount}
+            {isBeginning}
+            {isEnd}
+            onPrev={() => swiper?.slidePrev()}
+            onNext={() => swiper?.slideNext()}
+        />
     </div>
 </div>
+
+{#if lightboxIndex !== null}
+    <ScreenshotLightbox
+        {images}
+        index={lightboxIndex}
+        label="Desktop screenshot"
+        onClose={closeLightbox}
+    />
+{/if}

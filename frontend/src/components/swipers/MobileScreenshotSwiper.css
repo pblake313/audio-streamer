@@ -1,251 +1,171 @@
-.mobileScreenshotMegaContainer {
+.mss_megaContainer {
+    padding: 0 25px;
     margin-top: 15px;
     overflow: hidden;
 }
 
-.mobileScreenshotWrapper {
+.mss_container {
+    width: 100%;
     max-width: var(--site-width);
     margin: auto;
-    overflow: hidden;
-    padding: 0px 25px;
-}
-
-.mobileScreenshotMegaWrap{
-    overflow-x: hidden;
-}
-/* THUMBNAIL PICKER */
-
-.mobileScreenshotPicker {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(11, 1fr);
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    margin-bottom: 25px;
-}
-
-.mobileScreenshotPickerButton {
-    width: 100%;
-    aspect-ratio: 9 / 16;
-    padding: 0;
-    cursor: pointer;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid rgba(220, 220, 220, 0.65);
-    background: transparent;
-    opacity: 0.65;
-    transition:
-        border-color 0.25s ease,
-        opacity 0.25s ease,
-        transform 0.25s ease;
-}
-
-.mobileScreenshotPickerButton:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-.mobileScreenshotPickerButtonActive {
-    border-color: white;
-    opacity: 1;
-}
-
-.mobileScreenshotPickerButton img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    object-position: top center;
 }
 
 /* MAIN SWIPER */
 
-.mobileScreenshotMegaWrap {
-    width: 100%;
-}
-
-.mobileScreenshotSwiperInstance,
-.mobileScreenshotSwiperInstance .swiper-wrapper,
-.mobileScreenshotSwiperInstance .swiper-slide {
-    box-sizing: border-box;
-}
-
-.mobileScreenshotSwiperInstance {
+.swiper.mss_swiper {
     overflow: visible !important;
+    /* room for the hover lift and shadows */
+    padding: 8px 0 24px;
 }
 
-.mobileScreenshotSlide {
-    display: flex;
-    overflow: hidden;
+/*
+    Slide width is the smaller of:
+    - the old slides-per-view width: (100% - (perView - 1) * gap) / perView
+    - the width at which the phone frame (390x800 screen plus 16px of
+      bezel and border) fits the viewport, keeping --mss-reserve free
+      for the controls and breathing room.
+    Keep --mss-gap in sync with spaceBetween in the component.
+*/
+.mss_container {
+    --mss-per-view: 1.4;
+    --mss-gap: 14px;
+    --mss-bezel: 16px;
+    --mss-reserve: 270px;
+}
 
-    font-size: 18px;
-    cursor: grab;
+.swiper-slide.mss_slide {
+    width: min(
+        (100% - (var(--mss-per-view) - 1) * var(--mss-gap)) / var(--mss-per-view),
+        (100vh - var(--mss-reserve) - var(--mss-bezel)) * 390 / 800 + var(--mss-bezel)
+    );
+    width: min(
+        (100% - (var(--mss-per-view) - 1) * var(--mss-gap)) / var(--mss-per-view),
+        (100svh - var(--mss-reserve) - var(--mss-bezel)) * 390 / 800 + var(--mss-bezel)
+    );
+}
+
+.mss_slide {
+    box-sizing: border-box;
     user-select: none;
-
-    border-radius: 10px;
-    border: 1px solid rgba(92, 92, 92, 0.5);
 }
 
-.mobileScreenshotSlide:active {
-    cursor: grabbing;
-}
+/* PHONE FRAME */
 
-.mobileScreenshotImageContainer {
+.mss_phone {
+    display: block;
     width: 100%;
-    border-radius: 10px;
-    overflow: hidden;
+    box-sizing: border-box;
+    padding: 7px;
+
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.03)
+    );
+
+    box-shadow:
+        0 24px 48px -18px rgba(0, 0, 0, 0.65),
+        0 10px 20px -10px rgba(0, 0, 0, 0.4);
+
+    transition:
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 0.4s ease;
 }
 
-.mobileScreenshotImageContainer img {
+.mss_slide:hover .mss_phone {
+    transform: translateY(-6px);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.mss_phone:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
+}
+
+.mss_screen {
+    display: block;
+    aspect-ratio: 390 / 800;
+    overflow: hidden;
+
+    border-radius: 23px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.mss_screen img {
     width: 100%;
     height: 100%;
     display: block;
 
     object-fit: cover;
-    object-position: center;
+    object-position: top center;
 
     pointer-events: none;
 }
 
-/* BOTTOM DOT NAVIGATION */
+/* RESPONSIVE (matches the component's Swiper breakpoints) */
 
-.mobileScreenshotLocation {
-    width: 100%;
-    min-height: 42px;
-    margin-top: 15px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mobileScreenshotDots {
-    width: fit-content;
-    max-width: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    gap: 5px;
-}
-
-.mobileScreenshotDot {
-    flex: 0 0 auto;
-
-    width: 18px;
-    height: 6px;
-    padding: 0;
-
-    cursor: pointer;
-    border: none;
-    border-radius: 999px;
-
-    background: rgba(255, 255, 255, 0.35);
-    opacity: 0.7;
-
-    transition:
-        width 0.25s ease,
-        background-color 0.25s ease,
-        opacity 0.25s ease,
-        transform 0.25s ease;
-}
-
-.mobileScreenshotDot:hover {
-    opacity: 1;
-    transform: scaleY(1.15);
-}
-
-.mobileScreenshotDot.active {
-    width: 28px;
-    background: #ffffff;
-    opacity: 1;
-}
-
-.mobileScreenshotDot.active:hover {
-    opacity: 1;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1300px) {
-    .mobileScreenshotMegaContainer {
-        padding: 0;
-    }
-
-    .mobileScreenshotWrapper {
-        padding: 0 25px;
-    }
-    .mobileScreenshotWrapper{
-        overflow: visible;
-    }
-    .mobileScreenshotMegaWrap{
-        overflow: visible;
+@media (min-width: 450px) {
+    .mss_container {
+        --mss-per-view: 1.9;
     }
 }
 
-@media (max-width: 800px) {
-    .mobileScreenshotPicker {
-        display: none;
+@media (min-width: 600px) {
+    .mss_container {
+        --mss-per-view: 2.7;
+        --mss-gap: 18px;
+    }
+}
+
+@media (min-width: 900px) {
+    .mss_container {
+        --mss-per-view: 4.3;
+        --mss-gap: 20px;
+    }
+}
+
+@media (min-width: 1300px) {
+    .mss_container {
+        --mss-per-view: 5;
+        --mss-gap: 22px;
     }
 }
 
 @media (max-width: 600px) {
-    .mobileScreenshotWrapper {
+    .mss_container {
+        --mss-bezel: 14px;
+    }
+
+    .mss_megaContainer {
         padding: 0 15px;
-        width: calc(100% - 30px);
     }
 
-    .mobileScreenshotLocation {
-        min-height: 36px;
-        margin-top: 12px;
+    .mss_phone {
+        padding: 6px;
+        border-radius: 26px;
     }
 
-    .mobileScreenshotDots {
-        gap: 4px;
-    }
-
-    .mobileScreenshotDot {
-        width: 14px;
-        height: 5px;
-    }
-
-    .mobileScreenshotDot.active {
-        width: 24px;
-    }
-}
-
-@media (max-width: 400px) {
-    .mobileScreenshotDots {
-        gap: 3px;
-    }
-
-    .mobileScreenshotDot {
-        width: 12px;
-    }
-
-    .mobileScreenshotDot.active {
-        width: 20px;
+    .mss_screen {
+        border-radius: 20px;
     }
 }
 
 @media (hover: none) {
-    .mobileScreenshotPickerButton:hover {
-        opacity: 0.65;
+    .mss_slide:hover .mss_phone {
         transform: none;
+        border-color: rgba(255, 255, 255, 0.12);
     }
+}
 
-    .mobileScreenshotPickerButtonActive:hover {
-        opacity: 1;
-    }
-
-    .mobileScreenshotDot:hover {
-        opacity: 0.7;
-        transform: none;
-    }
-
-    .mobileScreenshotDot.active:hover {
-        opacity: 1;
+@media (prefers-reduced-motion: reduce) {
+    .mss_phone {
+        transition: none;
     }
 }

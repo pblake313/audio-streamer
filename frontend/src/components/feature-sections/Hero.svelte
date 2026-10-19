@@ -72,15 +72,6 @@
                 <GitHubLink />
             </div>
         </div>
-
-        <a
-            class="hero_scrollCue"
-            href="#summary"
-            aria-label="Scroll to summary"
-            in:fade={{ duration: 800, delay: 1300 }}
-        >
-            <span class="hero_scrollMouse"><span class="hero_scrollWheel"></span></span>
-        </a>
     {/if}
 
     <div class="hero_topFade"></div>

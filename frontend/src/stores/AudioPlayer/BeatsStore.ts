@@ -398,6 +398,13 @@ export function toggleShowTrash() {
     showTrash.update((current) => !current);
 }
 
+/*
+ * Neither Beats nor References is selected. With trash showing that means
+ * "trash only" (trashed tracks of any type); without it, nothing is shown.
+ * Used with the track type view on "All".
+ */
+export const noTrackTypes = writable<boolean>(false);
+
 export function isTrashBeat(beat: Beat): boolean {
     return beat.customTag === "Trash" && beat.customTagColor === "ff1a1a";
 }
@@ -436,6 +443,7 @@ export const filteredBeats = derived(
         artistFilter,
         beatTypeFilter,
         showTrash,
+        noTrackTypes,
     ],
     ([
         $beats,
@@ -444,12 +452,16 @@ export const filteredBeats = derived(
         $artistFilter,
         $beatTypeFilter,
         $showTrash,
+        $noTrackTypes,
     ]) => {
         /*
-         * Trash is hidden unless the toggle is on, or the user is
-         * explicitly filtering by the Trash tag.
+         * No track types: trash only when trash is showing, otherwise
+         * nothing. Otherwise trash is hidden unless the toggle is on, or
+         * the user is explicitly filtering by the Trash tag.
          */
-        if (!$showTrash && !$tagFilter.includes("Trash")) {
+        if ($noTrackTypes) {
+            $beats = $showTrash ? $beats.filter((beat) => isTrashBeat(beat)) : [];
+        } else if (!$showTrash && !$tagFilter.includes("Trash")) {
             $beats = $beats.filter((beat) => !isTrashBeat(beat));
         }
 

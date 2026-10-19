@@ -1,6 +1,7 @@
 <script lang="ts">
     import "./TrackListItem.css";
-    import { formatTrackMeta } from "../../../helpers/formatters";
+    import { formatTime, formatTrackMeta } from "../../../helpers/formatters";
+    import { requestTrackDuration, trackDurations } from "../../../stores/TrackDurationStore";
     import SoundPlaying from "../../Icons/svg/SoundPlaying.svelte";
     import {
         selectedBeat,
@@ -35,6 +36,31 @@
     export let isEven: boolean = false;
     export let beat: Beat;
     export let selectedMoreBeat: Beat | null = null;
+
+    // saved length, or one looked up from the file for older tracks
+    $: durationSeconds = beat.durationSeconds ?? $trackDurations[beat.id] ?? null;
+
+    // look up the length only once the row scrolls near the screen
+    function loadDurationWhenVisible(node: HTMLElement) {
+        if (beat.durationSeconds) return {};
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (!entry.isIntersecting) return;
+                requestTrackDuration(beat);
+                observer.disconnect();
+            },
+            { rootMargin: "200px 0px" },
+        );
+
+        observer.observe(node);
+
+        return {
+            destroy() {
+                observer.disconnect();
+            },
+        };
+    }
 
     export function selectTrack() {
 
@@ -234,6 +260,10 @@
         </div>
 
         <div class="tli_moreInfoContainer">
+            <span class="tli_duration" use:loadDurationWhenVisible>
+                {durationSeconds ? formatTime(durationSeconds) : ""}
+            </span>
+
             <a
                 class="tli_editLink"
                 href="/portal/edit-beat/{beat.id}"

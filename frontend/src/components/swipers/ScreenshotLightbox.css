@@ -1,0 +1,202 @@
+/*
+    Space kept around the image for the top bar and arrows.
+    The image is sized from the viewport directly, so it always fits.
+*/
+.slb_overlay {
+    --slb-space-x: 176px;
+    --slb-space-y: 136px;
+
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    touch-action: pan-y;
+}
+
+.slb_backdrop {
+    position: absolute;
+    inset: 0;
+
+    padding: 0;
+    border: none;
+    cursor: pointer;
+
+    background: rgba(12, 12, 12, 0.92);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* IMAGE */
+
+.slb_stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+
+    /* let clicks around the image fall through to the backdrop */
+    pointer-events: none;
+}
+
+.slb_image {
+    grid-area: 1 / 1;
+    display: block;
+
+    width: auto;
+    height: auto;
+    max-width: calc(100vw - var(--slb-space-x));
+    max-height: calc(100vh - var(--slb-space-y));
+    max-height: calc(100svh - var(--slb-space-y));
+    object-fit: contain;
+
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 40px 80px -24px rgba(0, 0, 0, 0.8);
+
+    pointer-events: auto;
+    user-select: none;
+}
+
+/* TOP BAR */
+
+.slb_topBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 24px;
+    pointer-events: none;
+}
+
+.slb_topBar > * {
+    pointer-events: auto;
+}
+
+.slb_count {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.slb_countCurrent {
+    color: #ffffff;
+}
+
+.slb_countDivider {
+    margin: 0 4px;
+}
+
+/* BUTTONS */
+
+.slb_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+    padding: 0;
+
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease,
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+.slb_button:hover:not(:disabled) {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: var(--font-color-dark);
+}
+
+.slb_button:active:not(:disabled) {
+    transform: scale(0.94);
+}
+
+.slb_button:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+.slb_button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+}
+
+/* the close button gets focus when the lightbox opens; don't ring it */
+.slb_close:focus,
+.slb_close:focus-visible {
+    outline: none;
+}
+
+.slb_nav {
+    position: absolute;
+    top: 50%;
+    margin-top: -22px;
+}
+
+.slb_navPrev {
+    left: 24px;
+}
+
+.slb_navPrev svg {
+    transform: rotate(180deg);
+}
+
+.slb_navNext {
+    right: 24px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 800px) {
+    /* arrows sit under the image here, so trade width for height */
+    .slb_overlay {
+        --slb-space-x: 30px;
+        --slb-space-y: 190px;
+    }
+
+    /* arrows move under the image on small screens */
+    .slb_nav {
+        top: auto;
+        bottom: 28px;
+        margin-top: 0;
+    }
+
+    .slb_navPrev {
+        left: calc(50% - 56px);
+    }
+
+    .slb_navNext {
+        right: calc(50% - 56px);
+    }
+
+    .slb_topBar {
+        padding: 16px 15px;
+    }
+}
+
+@media (hover: none) {
+    .slb_button:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.14);
+        color: rgba(255, 255, 255, 0.9);
+    }
+}

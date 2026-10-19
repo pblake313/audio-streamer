@@ -48,25 +48,3 @@
     }
 }
 
-/* "1" for repeat-one */
-.pmb_badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-
-    min-width: 12px;
-    height: 12px;
-    padding: 0 2px;
-    box-sizing: border-box;
-
-    border-radius: 6px;
-    background: #222222;
-    color: #f7f7f7;
-    box-shadow: 0 0 0 1.5px #f7f7f7;
-
-    font-family: var(--font-sans);
-    font-size: 7.5pt;
-    font-weight: 600;
-    line-height: 12px;
-    text-align: center;
-}
