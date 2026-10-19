@@ -8,6 +8,7 @@
     import { user } from "../../stores/UserStore";
     import { goto } from "$app/navigation";
     import PinForm from "../../components/forms/PinForm.svelte";
+    import Seo from "../../components/misc/Seo.svelte";
 
     let showVideo = false;
 
@@ -19,6 +20,12 @@
         showVideo = true;
     });
 </script>
+
+<Seo
+    title="Log In"
+    description="Enter your PIN to open your private Audio Streamer library."
+    noindex
+/>
 
 <div class="loginPage_container">
     <div class="loginPage_topFade"></div>

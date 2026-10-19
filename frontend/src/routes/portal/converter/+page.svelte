@@ -6,6 +6,10 @@ import './ConverterPage.css'
 
 </script>
 
+<svelte:head>
+    <title>File Converter</title>
+</svelte:head>
+
 
 <div class="converterPage_container">
     <header class="converter_topper">

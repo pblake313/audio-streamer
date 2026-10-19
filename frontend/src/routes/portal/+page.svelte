@@ -22,6 +22,15 @@
     import Loader from "../../components/loaders/Loader.svelte";
     import PageHeading from "../../components/page-components/PageHeading.svelte";
     import ABTester from "../../components/standalone/ABTester.svelte";
+    import { trackA, trackB } from "../../stores/ABTestStore";
+
+    // stream: the playing track. A | B: the two tracks being compared.
+    $: pageTitle =
+        $audioMode === "abTester"
+            ? $trackA && $trackB
+                ? `${$trackA.beatTitle} vs ${$trackB.beatTitle}`
+                : "A | B Tester"
+            : $selectedBeat?.beatTitle || "Listen";
 
     // This reactive block runs every time $selectedBeat changes.
     $: if (
@@ -67,7 +76,7 @@
 </script>
 
 <svelte:head>
-    <title>{$selectedBeat?.beatTitle || "Listen"}</title>
+    <title>{pageTitle}</title>
 </svelte:head>
 
 {#if $isFetchingBeats && !$oneBeatFetchSuccessfull}

@@ -4,13 +4,12 @@
     import ProjectDetails from "../components/feature-sections/ProjectDetails.svelte";
     import Footer from "../components/standalone/Nav/Footer.svelte";
     import AudioStreamer from '../components/standalone/AudioStreamer.svelte';
+    import Seo from '../components/misc/Seo.svelte';
 
 </script>
 
 
-<svelte:head>
-    <title>Audio Streamer - PATTSWAY</title>
-</svelte:head>
+<Seo />
 
 
 

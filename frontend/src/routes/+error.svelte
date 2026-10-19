@@ -2,15 +2,13 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import BoxButton from "../components/buttons/BoxButton.svelte";
+    import Seo from "../components/misc/Seo.svelte";
 </script>
 
-<svelte:head>
-    <title>
-        {page.status === 404
-            ? "Page Not Found"
-            : "Something Went Wrong"}
-    </title>
-</svelte:head>
+<Seo
+    title={page.status === 404 ? "Page Not Found" : "Something Went Wrong"}
+    noindex
+/>
 
 <main class="errorPage">
     <div class="errorPage_content">

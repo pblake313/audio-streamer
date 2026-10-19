@@ -29,6 +29,10 @@
 
 </script>
 
+<svelte:head>
+    <title>{$beatToEdit?.beatTitle ? `Edit · ${$beatToEdit.beatTitle}` : "Edit Track"}</title>
+</svelte:head>
+
 
 
 {#if $isFetchingBeatToEdit}
