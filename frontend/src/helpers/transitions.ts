@@ -24,6 +24,28 @@ export function rise(
 }
 
 /*
+ * Page entrance for route changes: a short, soft version of rise.
+ * Kept quick so moving between pages never feels slow.
+ */
+export function pageIn(
+    node: HTMLElement,
+    { delay = 0, duration = 520, y = 14, blur = 4, easing = quintOut } = {}
+) {
+    if (prefersReducedMotion()) return { duration: 0 };
+
+    return {
+        delay,
+        duration,
+        easing,
+        css: (t: number, u: number) => `
+            opacity: ${t};
+            transform: translateY(${u * y}px);
+            filter: blur(${u * blur}px);
+        `,
+    };
+}
+
+/*
  * Scroll reveal: fades/rises an element in the first time it scrolls into
  * view. Styles live in routes/styles.css (.reveal / .reveal_visible).
  * Without JS (SSR) or with reduced motion the element simply stays visible.

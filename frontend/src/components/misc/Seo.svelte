@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { page } from "$app/state";
+    // $app/stores (not $app/state): $app/state is only reactive on Svelte 5
+    import { page } from "$app/stores";
 
     /*
         Title, description, and link-preview tags (Open Graph + Twitter)
@@ -27,7 +28,7 @@
     export let noindex = false;
 
     $: fullTitle = title === SITE_NAME ? title : `${title} · PATTSWAY`;
-    $: url = `${SITE_URL}${page.url.pathname}`;
+    $: url = `${SITE_URL}${$page.url.pathname}`;
     $: imageUrl = image.startsWith("http") ? image : `${SITE_URL}${image}`;
 </script>
 

@@ -3,6 +3,7 @@
     import { page } from "$app/state";
     import BoxButton from "../components/buttons/BoxButton.svelte";
     import Seo from "../components/misc/Seo.svelte";
+    import { pageIn } from "../helpers/transitions";
 </script>
 
 <Seo
@@ -10,7 +11,7 @@
     noindex
 />
 
-<main class="errorPage">
+<main class="errorPage" in:pageIn|global>
     <div class="errorPage_content">
         <h1 class="errorPage_status">
             {page.status}
