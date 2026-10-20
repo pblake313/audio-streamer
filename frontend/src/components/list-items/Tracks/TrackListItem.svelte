@@ -32,10 +32,14 @@
     import PencilIcon from "../../Icons/svg/PencilIcon.svelte";
     import ReferenceBadge from "../../misc/ReferenceBadge.svelte";
     import { selectABTrack } from "../../../stores/ABTestStore";
+    import { getAvailableFormats } from "../../../stores/AudioFormatStore";
 
     export let isEven: boolean = false;
     export let beat: Beat;
     export let selectedMoreBeat: Beat | null = null;
+
+    // which audio files this track has: WAV, MP3, or both
+    $: audioFormats = getAvailableFormats(beat);
 
     // saved length, or one looked up from the file for older tracks
     $: durationSeconds = beat.durationSeconds ?? $trackDurations[beat.id] ?? null;
@@ -260,6 +264,15 @@
         </div>
 
         <div class="tli_moreInfoContainer">
+            <span
+                class="tli_formats"
+                title={`Audio: ${audioFormats.map((f) => f.toUpperCase()).join(" + ")}`}
+            >
+                {#each audioFormats as format}
+                    <span class="tli_format">{format}</span>
+                {/each}
+            </span>
+
             <span class="tli_duration" use:loadDurationWhenVisible>
                 {durationSeconds ? formatTime(durationSeconds) : ""}
             </span>

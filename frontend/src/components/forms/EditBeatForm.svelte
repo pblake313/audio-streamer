@@ -30,8 +30,46 @@
     import { showAudioPlayer, upsertBeat } from "../../stores/AudioPlayer/BeatsStore";
     import { goto } from "$app/navigation";
     import { pushNotification } from "../../stores/NotificationStore";
+    import DownloadArrowIcon from "../Icons/svg/DownloadArrowIcon.svelte";
+    import { downloadBeatFile, type BeatFileKind } from "../../helpers/downloadBeatFile";
 
     export let beat: Beat;
+
+    // ---------------------------------------------
+    // downloads of the files saved on this track
+    // (not anything picked in the form but not saved yet)
+    // ---------------------------------------------
+    $: downloads = [
+        { kind: "artwork", label: "Artwork", saved: !!beat.artworkUrl },
+        { kind: "wav", label: "WAV", saved: !!beat.wavUrl },
+        { kind: "mp3", label: "MP3", saved: !!beat.mp3Url },
+        { kind: "stems", label: "Stems", saved: !!beat.stemsUrl },
+    ] as { kind: BeatFileKind; label: string; saved: boolean }[];
+
+    // the track always has artwork and audio, so there's always something to zip
+    $: anythingSaved = downloads.some((file) => file.saved);
+
+    let downloading: BeatFileKind | null = null;
+
+    async function download(kind: BeatFileKind, label: string) {
+        if (downloading) return;
+
+        downloading = kind;
+
+        try {
+            await downloadBeatFile(beat, kind);
+        } catch (err: any) {
+            pushNotification(
+                err?.message || "An unknown error has occurred.",
+                "Error",
+                false,
+                4000,
+                `Couldn't download ${label}`,
+            );
+        } finally {
+            downloading = null;
+        }
+    }
 
     let isUpdatingBeat: boolean = false;
     let formSubmitted: boolean = false;
@@ -41,15 +79,19 @@
     let newArtworkFile: File | null = null;
     let newMp3File: File | null = null;
     let newWavFile: File | null = null;
+    let newStemsFile: File | null = null;
 
     // initial file values
     let artworkUrl: string | null = beat.artworkUrl;
     let mp3Url: string | null = beat.mp3Url;
     let wavUrl: string | null = beat.wavUrl ?? null;
+    // set while a stems zip (saved or newly picked) is in the form
+    let stemsUrl: string | null = beat.stemsUrl ?? null;
 
     // a saved file was cleared and not replaced: tell the backend to drop it
     $: removeMp3 = !!beat.mp3Url && !mp3Url && !newMp3File;
     $: removeWav = !!beat.wavUrl && !wavUrl && !newWavFile;
+    $: removeStems = !!beat.stemsUrl && !stemsUrl && !newStemsFile;
 
     // a track keeps a WAV, an MP3, or both
     $: missingAudio = !mp3Url && !newMp3File && !wavUrl && !newWavFile;
@@ -95,8 +137,10 @@
         !!newArtworkFile ||
         !!newMp3File ||
         !!newWavFile ||
+        !!newStemsFile ||
         removeMp3 ||
         removeWav ||
+        removeStems ||
         (form.title ?? "") !== (beat.beatTitle ?? "") ||
         (form.tagOne ?? null) !== (beat.tagOne ?? null) ||
         (form.tagTwo ?? null) !== (beat.tagTwo ?? null) ||
@@ -142,6 +186,14 @@
 
             if (removeWav) {
                 validObj.append("removeWav", "true");
+            }
+
+            if (newStemsFile) {
+                validObj.append("newStemsFile", newStemsFile);
+            }
+
+            if (removeStems) {
+                validObj.append("removeStems", "true");
             }
 
             editBeatFormError.set(null);
@@ -201,7 +253,7 @@
                     <span class="abf_step">01</span>
                     <div>
                         <h5 class="abf_cardTitle">Files</h5>
-                        <p class="abf_cardHint">Replace or remove the artwork and audio. Keep a WAV, an MP3, or both.</p>
+                        <p class="abf_cardHint">Replace or remove the artwork, audio, and stems. Keep a WAV, an MP3, or both.</p>
                     </div>
                 </header>
 
@@ -222,6 +274,27 @@
                             inputError={!artworkUrl && !newArtworkFile && formSubmitted
                                 ? "Please upload an artwork image."
                                 : null}
+                        />
+                    </div>
+
+                    <div class="abf_uploader">
+                        <Mp3Uploader
+                            format="zip"
+                            label="Stems (ZIP, optional)"
+                            dropzoneLabel="Add stems"
+                            maxFileSizeMB={200}
+                            mp3Url={stemsUrl}
+                            fileName={newStemsFile?.name ??
+                                (stemsUrl ? beat.stemsFileName || "Current stems" : null)}
+                            fileSize={newStemsFile ? null : beat.stemsBytes ?? null}
+                            mp3Uploaded={({ mp3Url: newUrl, file }) => {
+                                stemsUrl = newUrl;
+                                newStemsFile = file;
+                            }}
+                            clearInput={() => {
+                                stemsUrl = null;
+                                newStemsFile = null;
+                            }}
                         />
                     </div>
 
@@ -264,6 +337,40 @@
                                 ? "Upload a WAV, an MP3, or both."
                                 : null}
                         />
+                    </div>
+                </div>
+
+                <!-- download what's saved on this track -->
+                <div class="abf_downloads">
+                    <p class="abf_downloadsLabel">Download saved files</p>
+
+                    <div class="abf_downloadButtons">
+                        <!-- every saved file in one zip -->
+                        <button
+                            type="button"
+                            class="abf_downloadButton abf_downloadButton_all"
+                            disabled={!anythingSaved || !!downloading}
+                            title="Download every saved file in one ZIP"
+                            on:click={() => download("all", "all files")}
+                        >
+                            <DownloadArrowIcon height="15px" />
+                            {downloading === "all" ? "Zipping…" : "Download all"}
+                        </button>
+
+                        {#each downloads as file}
+                            <button
+                                type="button"
+                                class="abf_downloadButton"
+                                disabled={!file.saved || !!downloading}
+                                title={file.saved
+                                    ? `Download the ${file.label.toLowerCase()}`
+                                    : `No ${file.label.toLowerCase()} saved on this track`}
+                                on:click={() => download(file.kind, file.label)}
+                            >
+                                <DownloadArrowIcon height="15px" />
+                                {downloading === file.kind ? "Downloading…" : file.label}
+                            </button>
+                        {/each}
                     </div>
                 </div>
             </section>

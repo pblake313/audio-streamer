@@ -16,6 +16,8 @@ export type AddBeatFormValues = {
     // a WAV, an MP3, or both
     mp3File: File | null;
     wavFile: File | null;
+    // optional stems zip
+    stemsFile: File | null;
     trackType: TrackType;
 };
 
@@ -84,6 +86,10 @@ export function buildAddBeatFormData(form: AddBeatFormValues): FormData {
 
     if (form.wavFile) {
         formData.append("wavFile", form.wavFile);
+    }
+
+    if (form.stemsFile) {
+        formData.append("stemsFile", form.stemsFile);
     }
 
     return formData;

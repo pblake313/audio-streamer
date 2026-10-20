@@ -1,25 +1,27 @@
 import { getStorage } from 'firebase-admin/storage';
 
+// Path of a file inside the bucket, from a stored "https://storage.googleapis.com/<bucket>/<path>" URL.
+export function getStoragePathFromUrl(fileUrl: string): string {
+    const bucketName = getStorage().bucket().name;
+
+    // Parse the file path from the URL (drop any ?v= cache buster)
+    const filePath = fileUrl.split(`${bucketName}/`)[1]?.split('?')[0];
+
+    if (!filePath) {
+        throw new Error("Invalid file URL format. Could not extract file path.");
+    }
+
+    // Decode the file path to handle encoded characters like `%2F`
+    return decodeURIComponent(filePath);
+}
+
 export async function signFirestoreUrl(fileUrl: string, expirationMinutes: number, expirationHours: number): Promise<string> {
     try {
         // Initialize Firebase Storage bucket
         const bucket = getStorage().bucket();
 
-        // Extract the bucket name
-        const bucketName = bucket.name;
-
-        // Parse the file path from the URL
-        const filePath = fileUrl.split(`${bucketName}/`)[1]?.split('?')[0]; // Adjusted to match the actual URL structure
-
-        if (!filePath) {
-            throw new Error("Invalid file URL format. Could not extract file path.");
-        }
-
-        // Decode the file path to handle encoded characters like `%2F`
-        const decodedFilePath = decodeURIComponent(filePath);
-
         // Get the file reference
-        const file = bucket.file(decodedFilePath);
+        const file = bucket.file(getStoragePathFromUrl(fileUrl));
 
         // Convert expiration hours and minutes to milliseconds
         const expiresInMs = (expirationHours * 60 * 60 * 1000) + (expirationMinutes * 60 * 1000);
