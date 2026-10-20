@@ -38,17 +38,13 @@
     min-width: 0;
 }
 
-/* artwork across the first line, then WAV and MP3 side by side
+/* two per line: artwork + stems, then WAV + MP3
    (doubled class so it beats the generic .abf_fields column) */
 .abf_fields.abf_filesRow {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
     align-items: stretch;
-}
-
-.abf_fields.abf_filesRow > .abf_uploader:first-child {
-    grid-column: 1 / -1;
 }
 
 .abf_uploader {
@@ -285,6 +281,84 @@
 
     .abf_submitButton {
         width: 150px;
+    }
+}
+
+/* ========================= */
+/* DOWNLOADS (edit page)     */
+/* ========================= */
+
+.abf_downloads {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.abf_downloadsLabel {
+    margin-bottom: 12px;
+    font-size: 10pt;
+}
+
+.abf_downloadButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.abf_downloadButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    height: 32px;
+    padding: 0 14px 0 11px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #f7f7f7;
+
+    font-family: var(--font-sans);
+    font-size: 10pt;
+
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.abf_downloadButton:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* "Download all" stands out: filled */
+.abf_downloadButton.abf_downloadButton_all {
+    background: #f7f7f7;
+    border-color: #f7f7f7;
+    color: var(--font-color-dark);
+}
+
+.abf_downloadButton.abf_downloadButton_all:hover:not(:disabled) {
+    background: #ffffff;
+    border-color: #ffffff;
+}
+
+.abf_downloadButton:focus-visible {
+    outline: 2px solid #f7f7f7;
+    outline-offset: 2px;
+}
+
+.abf_downloadButton:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+@media (hover: none) {
+    .abf_downloadButton:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: rgba(255, 255, 255, 0.12);
     }
 }
 

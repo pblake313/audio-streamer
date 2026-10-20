@@ -17,6 +17,10 @@ export type Beat = {
     // a track has an MP3, a WAV, or both (older tracks only have an MP3)
     mp3Url: string | null,
     wavUrl?: string | null,
+    // optional stems zip (private; not signed or downloadable yet)
+    stemsUrl?: string | null,
+    stemsFileName?: string | null,
+    stemsBytes?: number | null,
     id: string,
     rating: 0 | 1 | 2 | 3 | 4 | 5,
     notepad: string | null,

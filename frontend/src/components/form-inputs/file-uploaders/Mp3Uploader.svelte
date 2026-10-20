@@ -16,13 +16,15 @@
     export let label: string = `Enter 'label'`;
     export let maxFileSizeMB: number = 10;
     export let file: File | null = null;
+    // size of an already-saved file (when there is no File object)
+    export let fileSize: number | null = null;
     export let id: string | null = null;
     export let dropZoneClass: string = "";
     export let showInputError: boolean = true;
     export let dropzoneLabel: string = "Add MP3";
 
-    // handles WAV uploads too
-    export let format: "mp3" | "wav" = "mp3";
+    // handles WAV uploads and stems ZIPs too
+    export let format: "mp3" | "wav" | "zip" = "mp3";
 
     const formatInfo = {
         mp3: {
@@ -35,9 +37,17 @@
             extension: ".wav",
             types: ["audio/wav", "audio/x-wav", "audio/wave", "audio/vnd.wave"],
         },
+        zip: {
+            label: "ZIP",
+            extension: ".zip",
+            types: ["application/zip", "application/x-zip-compressed", "application/x-zip", "multipart/x-zip"],
+        },
     };
 
     $: info = formatInfo[format];
+
+    // only audio gets the waveform preview
+    $: isAudio = format !== "zip";
 
     export let mp3Uploaded:
         | ((payload: { mp3Url: string; file: File }) => void)
@@ -223,6 +233,10 @@
             return "MP3";
         }
 
+        if (type.includes("zip")) {
+            return "ZIP";
+        }
+
         if (type.includes("wav")) {
             return "WAV";
         }
@@ -264,13 +278,13 @@
     {#if fileName}
         <div class="mp3Up-selectedCard">
             <div class="mp3Up-selectedInfo">
-                <p class="mp3Up-selectedEyebrow">Selected audio</p>
+                <p class="mp3Up-selectedEyebrow">{isAudio ? "Selected audio" : "Selected file"}</p>
 
                 <p class="mp3Up-fileName">{fileName}</p>
 
                 <div class="mp3Up-fileMeta">
-                    {#if formatFileSize(file?.size)}
-                        <span>{formatFileSize(file?.size)}</span>
+                    {#if formatFileSize(file?.size ?? fileSize)}
+                        <span>{formatFileSize(file?.size ?? fileSize)}</span>
                     {/if}
 
                     <span>{formatFileType(file?.type)}</span>
@@ -290,7 +304,7 @@
             </div>
         </div>
 
-        {#if mp3Url}
+        {#if mp3Url && isAudio}
             {#key mp3Url}
                 <div
                     class="mp3Up-noOpen mp3Up-visualizerWrap"

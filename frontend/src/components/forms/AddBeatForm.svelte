@@ -41,6 +41,7 @@
         artworkFile: File | null;
         mp3File: File | null;
         wavFile: File | null;
+        stemsFile: File | null;
         trackType: TrackType;
     } = {
         title: null,
@@ -55,6 +56,7 @@
         artworkFile: null,
         mp3File: null,
         wavFile: null,
+        stemsFile: null,
         trackType: "Beat",
     };
 
@@ -65,6 +67,7 @@
     let temporaryArtUrl: string | null = null;
     let temporaryMp3Url: string | null = null;
     let temporaryWavUrl: string | null = null;
+    let temporaryStemsUrl: string | null = null;
 
     // a WAV, an MP3, or both
     $: missingAudio = !form.mp3File && !form.wavFile;
@@ -171,7 +174,7 @@
                     <span class="abf_step">01</span>
                     <div>
                         <h5 class="abf_cardTitle">Files</h5>
-                        <p class="abf_cardHint">Artwork, plus a WAV, an MP3, or both. WAVs play first.</p>
+                        <p class="abf_cardHint">Artwork, plus a WAV, an MP3, or both. WAVs play first. Stems are optional.</p>
                     </div>
                 </header>
 
@@ -192,6 +195,25 @@
                                 : null}
                             label={"Artwork"}
                             fileName={form.artworkFile?.name}
+                        />
+                    </div>
+
+                    <div class="abf_uploader">
+                        <Mp3Uploader
+                            format="zip"
+                            label={"Stems (ZIP, optional)"}
+                            dropzoneLabel="Add stems"
+                            maxFileSizeMB={200}
+                            mp3Url={temporaryStemsUrl}
+                            fileName={form.stemsFile?.name}
+                            mp3Uploaded={(v) => {
+                                form.stemsFile = v.file;
+                                temporaryStemsUrl = v.mp3Url;
+                            }}
+                            clearInput={() => {
+                                form.stemsFile = null;
+                                temporaryStemsUrl = null;
+                            }}
                         />
                     </div>
 

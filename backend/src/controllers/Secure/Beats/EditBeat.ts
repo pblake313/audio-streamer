@@ -5,8 +5,10 @@ import {
     uploadBeatArtwork,
     uploadBeatMp3,
     uploadBeatWav,
+    uploadBeatStems,
     getAudioDurationSeconds,
     MAX_MP3_BYTES,
+    MAX_STEMS_BYTES,
     MAX_WAV_BYTES,
 } from "../../../helpers/BeatFileUploads";
 import { Beat, TrackType } from "../../../types/Beat";
@@ -16,6 +18,7 @@ type EditBeatFiles = {
     newArtwork?: Express.Multer.File[];
     newMp3File?: Express.Multer.File[];
     newWavFile?: Express.Multer.File[];
+    newStemsFile?: Express.Multer.File[];
 };
 
 type EditableBeatFields = Pick<
@@ -33,7 +36,16 @@ type EditableBeatFields = Pick<
 >;
 
 type BeatUpdateFields = EditableBeatFields &
-    Pick<Beat, "artworkUrl" | "mp3Url" | "wavUrl" | "durationSeconds">;
+    Pick<
+        Beat,
+        | "artworkUrl"
+        | "mp3Url"
+        | "wavUrl"
+        | "durationSeconds"
+        | "stemsUrl"
+        | "stemsFileName"
+        | "stemsBytes"
+    >;
 
 export async function editBeat(
     req: Request,
@@ -63,9 +75,13 @@ export async function editBeat(
         const newWavFile =
             files?.newWavFile?.[0] ?? null;
 
+        const newStemsFile =
+            files?.newStemsFile?.[0] ?? null;
+
         // the form sends these when an existing file was removed
         const removeMp3 = req.body.removeMp3 === "true";
         const removeWav = req.body.removeWav === "true";
+        const removeStems = req.body.removeStems === "true";
 
         // Throws if the beat does not exist.
         const originalBeat = await getBeatById(beatId);
@@ -76,7 +92,16 @@ export async function editBeat(
             artworkUrl: originalBeat.artworkUrl,
             mp3Url: removeMp3 ? null : originalBeat.mp3Url ?? null,
             wavUrl: removeWav ? null : originalBeat.wavUrl ?? null,
+            stemsUrl: removeStems ? null : originalBeat.stemsUrl ?? null,
+            stemsFileName: removeStems ? null : originalBeat.stemsFileName ?? null,
+            stemsBytes: removeStems ? null : originalBeat.stemsBytes ?? null,
         };
+
+        if (newStemsFile && newStemsFile.size > MAX_STEMS_BYTES) {
+            throw new Error(
+                "Stems file is too large. Please upload a ZIP under 200 MB.",
+            );
+        }
 
         if (newMp3File && newMp3File.size > MAX_MP3_BYTES) {
             throw new Error(
@@ -114,6 +139,16 @@ export async function editBeat(
                     file: newArtwork,
                     beatId,
                 });
+        }
+
+        if (newStemsFile) {
+            beatUpdate.stemsUrl = await uploadBeatStems({
+                file: newStemsFile,
+                beatId,
+            });
+
+            beatUpdate.stemsFileName = newStemsFile.originalname;
+            beatUpdate.stemsBytes = newStemsFile.size;
         }
 
         if (newMp3File) {

@@ -299,11 +299,11 @@ export async function uploadBeatArtwork({
 }
 
 /* ---------------------------------------------
-   Upload audio (MP3 / WAV)
+   Upload audio (MP3 / WAV) and stems (ZIP)
 ---------------------------------------------- */
 
-// Stores audio privately; it's only played through signed URLs.
-function uploadPrivateAudio(
+// Stores a file privately; it's only reachable through signed URLs.
+function uploadPrivateFile(
     file: Express.Multer.File,
     fileName: string,
     contentType: string,
@@ -373,7 +373,7 @@ export async function uploadBeatMp3({
         `Beats/${beatId}/MP3Preview/` +
         `${beatId}-${Date.now()}.mp3`;
 
-    return uploadPrivateAudio(file, fileName, "audio/mpeg", "MP3");
+    return uploadPrivateFile(file, fileName, "audio/mpeg", "MP3");
 }
 
 export async function uploadBeatWav({
@@ -386,7 +386,31 @@ export async function uploadBeatWav({
         `Beats/${beatId}/WAV/` +
         `${beatId}-${Date.now()}.wav`;
 
-    return uploadPrivateAudio(file, fileName, "audio/wav", "WAV");
+    return uploadPrivateFile(file, fileName, "audio/wav", "WAV");
+}
+
+// a zip starts with "PK" plus a local-file or end-of-archive signature
+function isZipFile(buffer: Buffer): boolean {
+    if (buffer.length < 4) return false;
+
+    const signature = buffer.readUInt32LE(0);
+
+    return signature === 0x04034b50 || signature === 0x06054b50;
+}
+
+export async function uploadBeatStems({
+    file,
+    beatId,
+}: UploadBeatParams): Promise<string> {
+    if (!file?.buffer?.length || !isZipFile(file.buffer)) {
+        throw new Error("Stems must be a valid ZIP file.");
+    }
+
+    const fileName =
+        `Beats/${beatId}/Stems/` +
+        `${beatId}-${Date.now()}.zip`;
+
+    return uploadPrivateFile(file, fileName, "application/zip", "Stems");
 }
 
 /* ---------------------------------------------
@@ -395,3 +419,4 @@ export async function uploadBeatWav({
 
 export const MAX_MP3_BYTES = 10 * 1024 * 1024;
 export const MAX_WAV_BYTES = 100 * 1024 * 1024;
+export const MAX_STEMS_BYTES = 200 * 1024 * 1024;

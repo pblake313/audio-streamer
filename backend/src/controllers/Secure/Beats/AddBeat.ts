@@ -3,9 +3,11 @@ import admin from 'firebase-admin';
 import {
     getAudioDurationSeconds,
     MAX_MP3_BYTES,
+    MAX_STEMS_BYTES,
     MAX_WAV_BYTES,
     uploadBeatArtwork,
     uploadBeatMp3,
+    uploadBeatStems,
     uploadBeatWav,
 } from "../../../helpers/BeatFileUploads";
 import { validateAddBeatRequest } from "../../../helpers/AddBeatHelpers";
@@ -38,6 +40,10 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
         if (mp3File && mp3File.size > MAX_MP3_BYTES) throw new Error('MP3 file is too large. Please upload a file under 10 MB.');
         if (wavFile && wavFile.size > MAX_WAV_BYTES) throw new Error('WAV file is too large. Please upload a file under 100 MB.');
 
+        // optional stems zip
+        const stemsFile = files.stemsFile?.[0] ?? null;
+        if (stemsFile && stemsFile.size > MAX_STEMS_BYTES) throw new Error('Stems file is too large. Please upload a ZIP under 200 MB.');
+
         // create the beat id.
         const beatId = crypto.randomUUID()
 
@@ -58,6 +64,12 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
             ? await uploadBeatWav({ file: wavFile, beatId })
             : null;
 
+        // ---- UPLOAD STEMS ----
+
+        const stemsUrl = stemsFile
+            ? await uploadBeatStems({ file: stemsFile, beatId })
+            : null;
+
         const durationSeconds = mp3File
             ? await getAudioDurationSeconds(mp3File, "mp3")
             : await getAudioDurationSeconds(wavFile!, "wav");
@@ -68,6 +80,9 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
             artworkUrl,
             mp3Url,
             wavUrl,
+            stemsUrl,
+            stemsFileName: stemsFile?.originalname ?? null,
+            stemsBytes: stemsFile?.size ?? null,
             durationSeconds,
             createdAt: new Date(),
             updatedAt: new Date(),
