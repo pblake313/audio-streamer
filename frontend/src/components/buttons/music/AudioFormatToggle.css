@@ -1,0 +1,89 @@
+/* WAV | MP3 switch; sized to sit beside the round 34px action buttons.
+   The whole pill is one button: clicking anywhere flips the format. */
+.aft_toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+
+    height: 34px;
+    padding: 3px;
+    margin: 0;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+
+    font-family: var(--font-sans);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.aft_toggle:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.aft_toggle:focus-visible {
+    outline: 2px solid #f7f7f7;
+    outline-offset: 2px;
+}
+
+.aft_option {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
+    padding: 0 11px;
+
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.55);
+
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.aft_toggle:hover .aft_option:not(.aft_active) {
+    color: #f7f7f7;
+}
+
+.aft_option.aft_active {
+    background: #f7f7f7;
+    color: var(--font-color-dark);
+}
+
+/* only one file: a plain label, not a control */
+.aft_single {
+    display: inline-flex;
+    align-items: center;
+
+    height: 34px;
+    padding: 0 13px;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.7);
+
+    font-family: var(--font-sans);
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+@media (hover: none) {
+    .aft_toggle:hover {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .aft_toggle:hover .aft_option:not(.aft_active) {
+        color: rgba(255, 255, 255, 0.55);
+    }
+}

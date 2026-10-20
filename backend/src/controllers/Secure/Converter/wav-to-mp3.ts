@@ -460,10 +460,23 @@ function convertWavBufferToMp3(
                         "0:a:0",
                         "-vn",
 
+                        // highest MP3 bitrate
                         "-codec:a",
                         "libmp3lame",
                         "-b:a",
                         "320k",
+
+                        // LAME's slowest, most accurate encoding (-q 0)
+                        "-compression_level",
+                        "0",
+
+                        // high-precision resampling, used when a WAV is
+                        // above 48 kHz (MP3's maximum) and must be lowered
+                        // (this ffmpeg build has no soxr, so tune the default)
+                        "-filter_size",
+                        "256",
+                        "-phase_shift",
+                        "14",
 
                         "-f",
                         "mp3",

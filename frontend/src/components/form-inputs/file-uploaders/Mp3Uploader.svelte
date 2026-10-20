@@ -21,6 +21,24 @@
     export let showInputError: boolean = true;
     export let dropzoneLabel: string = "Add MP3";
 
+    // handles WAV uploads too
+    export let format: "mp3" | "wav" = "mp3";
+
+    const formatInfo = {
+        mp3: {
+            label: "MP3",
+            extension: ".mp3",
+            types: ["audio/mpeg", "audio/mp3", "audio/x-mpeg"],
+        },
+        wav: {
+            label: "WAV",
+            extension: ".wav",
+            types: ["audio/wav", "audio/x-wav", "audio/wave", "audio/vnd.wave"],
+        },
+    };
+
+    $: info = formatInfo[format];
+
     export let mp3Uploaded:
         | ((payload: { mp3Url: string; file: File }) => void)
         | undefined;
@@ -47,12 +65,6 @@
     $: if (id && id !== inputId) {
         inputId = id;
     }
-
-    const acceptedTypes = [
-        "audio/mpeg",
-        "audio/mp3",
-        "audio/x-mpeg",
-    ];
 
     function setTemporaryError(message: string) {
         internalError = message;
@@ -87,8 +99,8 @@
         clearInput?.();
     }
 
-    function isValidMp3(picked: File) {
-        return acceptedTypes.includes(picked.type) || picked.name.toLowerCase().endsWith(".mp3");
+    function isValidAudio(picked: File) {
+        return info.types.includes(picked.type) || picked.name.toLowerCase().endsWith(info.extension);
     }
 
     function handleFiles(files: FileList | File[]) {
@@ -97,8 +109,8 @@
 
         internalError = null;
 
-        if (!isValidMp3(picked)) {
-            setTemporaryError("Please upload an MP3 file.");
+        if (!isValidAudio(picked)) {
+            setTemporaryError(`Please upload a ${info.label} file.`);
             return;
         }
 
@@ -205,10 +217,14 @@
     }
 
     function formatFileType(type: string | null | undefined) {
-        if (!type) return "MP3";
+        if (!type) return info.label;
 
         if (type.includes("mpeg") || type.includes("mp3")) {
             return "MP3";
+        }
+
+        if (type.includes("wav")) {
+            return "WAV";
         }
 
         return type.replace("audio/", "").toUpperCase();
@@ -296,7 +312,7 @@
 
             <p class="mp3Up-emptyTitle">{dropzoneLabel}</p>
 
-            <p class="mp3Up-fileTypes">Accepted: MP3</p>
+            <p class="mp3Up-fileTypes">Accepted: {info.label}</p>
         </div>
     {/if}
 </div>
@@ -305,7 +321,7 @@
     id={inputId}
     type="file"
     bind:this={fileInput}
-    accept=".mp3,audio/mpeg,audio/mp3,audio/x-mpeg"
+    accept={[info.extension, ...info.types].join(",")}
     on:change={handleFileChange}
     aria-invalid={!!combinedError}
     style="display: none"

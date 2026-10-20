@@ -1,6 +1,12 @@
+import { tick } from "svelte";
 import { get, writable } from "svelte/store";
 import type { Beat } from "../lib/types/Beats";
 import { pushNotification } from "./NotificationStore";
+import {
+    getBeatAudioSource,
+    preferredAudioFormat,
+    type AudioFormat,
+} from "./AudioFormatStore";
 
 export const trackA = writable<Beat | null>(null);
 export const trackB = writable<Beat | null>(null);
@@ -218,6 +224,80 @@ export async function abHandlePlayPause() {
     abAudioPlayerState.set(
         startedPlaying ? "playing" : "paused",
     );
+}
+
+// =========================
+// WAV / MP3 switching
+// =========================
+// Resolves once the new file's length is known (or it failed / took too long).
+function waitForMetadata(audio: HTMLAudioElement): Promise<void> {
+    return new Promise((resolve) => {
+        const done = () => {
+            clearTimeout(timer);
+            audio.removeEventListener("loadedmetadata", done);
+            audio.removeEventListener("error", done);
+            resolve();
+        };
+
+        const timer = setTimeout(done, 15000);
+
+        audio.addEventListener("loadedmetadata", done);
+        audio.addEventListener("error", done);
+    });
+}
+
+/*
+ * Switches both tracks to WAV or MP3 together. Each track's <audio> src
+ * follows the preferred format, so: pause, switch, wait for the sides that
+ * changed file to load, line both up at the same spot, and keep playing
+ * if they were.
+ */
+export async function abSetAudioFormat(format: AudioFormat) {
+    const current = get(preferredAudioFormat);
+    if (current === format) return;
+
+    const audioA = get(trackAAudioElement);
+    const audioB = get(trackBAudioElement);
+
+    const selectedAudio =
+        get(selectedAB) === "A" ? audioA ?? audioB : audioB ?? audioA;
+
+    const time = selectedAudio?.currentTime ?? 0;
+    const wasPlaying = get(abAudioPlayerState) === "playing";
+
+    // only sides whose file actually changes need to reload
+    const reloading = (
+        [
+            [audioA, get(trackA)],
+            [audioB, get(trackB)],
+        ] as const
+    )
+        .filter(
+            ([audio, track]) =>
+                audio &&
+                track &&
+                getBeatAudioSource(track, format)?.url !==
+                    getBeatAudioSource(track, current)?.url,
+        )
+        .map(([audio]) => audio as HTMLAudioElement);
+
+    audioA?.pause();
+    audioB?.pause();
+    abAudioPlayerState.set("paused");
+
+    // listen before the new src lands so the event can't be missed
+    const loaded = Promise.all(reloading.map(waitForMetadata));
+
+    preferredAudioFormat.set(format);
+    await tick();
+    await loaded;
+
+    if (audioA) audioA.currentTime = time;
+    if (audioB) audioB.currentTime = time;
+
+    if (wasPlaying) {
+        await abHandlePlayPause();
+    }
 }
 
 export function toggleAB() {

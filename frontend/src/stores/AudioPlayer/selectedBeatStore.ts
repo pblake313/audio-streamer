@@ -4,6 +4,7 @@ import type { Beat } from "../../lib/types/Beats";
 import { audioPlayerUrl } from "../AudioPlayerStore";
 import { getAuthenticatedUser } from "../../helpers/Auth/authFunctions";
 import { beats } from "./BeatsStore";
+import { getBeatAudioSource, preferredAudioFormat } from "../AudioFormatStore";
 
 const selectedBeat = writable<Beat | null>(null);
 
@@ -79,7 +80,8 @@ async function preloadBeat(beat: Beat | null) {
         try {
             await getAuthenticatedUser(); // refresh token/cookie before hitting the stream
 
-            const url = beat.mp3Url;
+            // warm the file that will actually play (WAV or MP3)
+            const url = getBeatAudioSource(beat, get(preferredAudioFormat))?.url;
             if (!url) return;
 
             const end = PRELOAD_RANGE_BYTES - 1;
@@ -165,7 +167,7 @@ function selectNewBeat(beat: Beat) {
 
 export async function setAudioUrl(beat: Beat) {
     try {
-        audioPlayerUrl.set(beat.mp3Url);
+        audioPlayerUrl.set(getBeatAudioSource(beat, get(preferredAudioFormat))?.url ?? null);
     } catch (err) {
         audioPlayerUrl.set(null);
     }

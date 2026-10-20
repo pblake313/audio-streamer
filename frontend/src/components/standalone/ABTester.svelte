@@ -10,10 +10,19 @@
         abError,
         selectAB,
         toggleAB,
+        abSetAudioFormat,
     } from "../../stores/ABTestStore";
     import PlayPauseButton from "../buttons/music/PlayPauseButton.svelte";
+    import AudioFormatToggle from "../buttons/music/AudioFormatToggle.svelte";
+    import { getAvailableFormats, preferredAudioFormat } from "../../stores/AudioFormatStore";
     import "./ABTester.css";
     import ABTrack from "./ABTrack.svelte";
+
+    // the WAV | MP3 switch only matters if at least one track has both files
+    $: canSwitchFormat = [$trackA, $trackB].some(
+        (track) => getAvailableFormats(track).length > 1,
+    );
+
 </script>
 
 <div class="ab_container">
@@ -95,6 +104,15 @@
                 color={"#f7f7f7"}
                 height={"65px"}
             />
+
+            <!-- switches both tracks; each track shows the file it's playing -->
+            {#if canSwitchFormat}
+                <AudioFormatToggle
+                    available={["wav", "mp3"]}
+                    active={$preferredAudioFormat}
+                    onSelect={abSetAudioFormat}
+                />
+            {/if}
         </div>
 
         <div class="ab_track">

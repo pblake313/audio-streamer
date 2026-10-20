@@ -9,8 +9,14 @@
         pauseTrack,
         playTrack,
         resetTrackTimer,
+        setAudioFormat,
         userTapped,
     } from "../../stores/AudioPlayerStore";
+    import {
+        getAvailableFormats,
+        getBeatAudioSource,
+        preferredAudioFormat,
+    } from "../../stores/AudioFormatStore";
     import AudioRange from "../misc/AudioRange.svelte";
     import AudioControlBox from "./AudioPlayerControls.svelte";
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
@@ -23,6 +29,11 @@
     import Modal from "../misc/Modal.svelte";
     import PopupBeat from "../misc/PopupBeat.svelte";
     import type { Beat } from "../../lib/types/Beats";
+    import AudioFormatToggle from "../buttons/music/AudioFormatToggle.svelte";
+
+    // which file is playing (WAV / MP3) and which ones the track has
+    $: availableFormats = getAvailableFormats($selectedBeat);
+    $: playingFormat = getBeatAudioSource($selectedBeat, $preferredAudioFormat)?.format ?? null;
 
     /*
         Stacked (mobile) layout: crossfade in place on track change
@@ -137,6 +148,13 @@
                         </div>
 
                         <div class="ht_actions">
+                            <!-- which file is playing (WAV / MP3), with a switch when there are both -->
+                            <AudioFormatToggle
+                                available={availableFormats}
+                                active={playingFormat}
+                                onSelect={setAudioFormat}
+                            />
+
                             <a
                                 class="ht_actionButton ht_editButton"
                                 href="/portal/edit-beat/{$selectedBeat.id}"

@@ -40,10 +40,19 @@
     // files
     let newArtworkFile: File | null = null;
     let newMp3File: File | null = null;
+    let newWavFile: File | null = null;
 
     // initial file values
     let artworkUrl: string | null = beat.artworkUrl;
     let mp3Url: string | null = beat.mp3Url;
+    let wavUrl: string | null = beat.wavUrl ?? null;
+
+    // a saved file was cleared and not replaced: tell the backend to drop it
+    $: removeMp3 = !!beat.mp3Url && !mp3Url && !newMp3File;
+    $: removeWav = !!beat.wavUrl && !wavUrl && !newWavFile;
+
+    // a track keeps a WAV, an MP3, or both
+    $: missingAudio = !mp3Url && !newMp3File && !wavUrl && !newWavFile;
 
     let form: {
         title: string | null;
@@ -78,13 +87,16 @@
         !isReference && !form.key,
         !isReference && !form.mode,
         !artworkUrl && !newArtworkFile,
-        !mp3Url && !newMp3File,
+        missingAudio,
     ].filter(Boolean).length;
 
     // anything different from the saved track?
     $: hasChanges =
         !!newArtworkFile ||
         !!newMp3File ||
+        !!newWavFile ||
+        removeMp3 ||
+        removeWav ||
         (form.title ?? "") !== (beat.beatTitle ?? "") ||
         (form.tagOne ?? null) !== (beat.tagOne ?? null) ||
         (form.tagTwo ?? null) !== (beat.tagTwo ?? null) ||
@@ -112,12 +124,24 @@
                 validObj.append("newArtwork", newArtworkFile);
             }
 
-            if (!mp3Url && !newMp3File) {
-                throw new Error("Please select an audio file.");
+            if (missingAudio) {
+                throw new Error("Upload a WAV file, an MP3 file, or both.");
             }
 
             if (newMp3File) {
                 validObj.append("newMp3File", newMp3File);
+            }
+
+            if (newWavFile) {
+                validObj.append("newWavFile", newWavFile);
+            }
+
+            if (removeMp3) {
+                validObj.append("removeMp3", "true");
+            }
+
+            if (removeWav) {
+                validObj.append("removeWav", "true");
             }
 
             editBeatFormError.set(null);
@@ -171,11 +195,84 @@
 
     <div class="abf_formContainer">
         <div class="abf_form">
+            <!-- files -->
+            <section class="abf_card">
+                <header class="abf_cardHeader">
+                    <span class="abf_step">01</span>
+                    <div>
+                        <h5 class="abf_cardTitle">Files</h5>
+                        <p class="abf_cardHint">Replace or remove the artwork and audio. Keep a WAV, an MP3, or both.</p>
+                    </div>
+                </header>
+
+                <div class="abf_fields abf_filesRow">
+                    <div class="abf_uploader">
+                        <ImageUploader
+                            label="Artwork"
+                            imageUrl={artworkUrl}
+                            fileName={newArtworkFile?.name ?? (artworkUrl ? "Current artwork" : null)}
+                            fileUploaded={({ imageUrl: newUrl, file }) => {
+                                artworkUrl = newUrl;
+                                newArtworkFile = file;
+                            }}
+                            clearInput={() => {
+                                artworkUrl = null;
+                                newArtworkFile = null;
+                            }}
+                            inputError={!artworkUrl && !newArtworkFile && formSubmitted
+                                ? "Please upload an artwork image."
+                                : null}
+                        />
+                    </div>
+
+                    <div class="abf_uploader">
+                        <Mp3Uploader
+                            format="wav"
+                            label="Audio (WAV)"
+                            dropzoneLabel="Add WAV"
+                            maxFileSizeMB={100}
+                            mp3Url={wavUrl}
+                            fileName={newWavFile?.name ?? (wavUrl ? "Current WAV" : null)}
+                            mp3Uploaded={({ mp3Url: newUrl, file }) => {
+                                wavUrl = newUrl;
+                                newWavFile = file;
+                            }}
+                            clearInput={() => {
+                                wavUrl = null;
+                                newWavFile = null;
+                            }}
+                            inputError={missingAudio && formSubmitted
+                                ? "Upload a WAV, an MP3, or both."
+                                : null}
+                        />
+                    </div>
+
+                    <div class="abf_uploader">
+                        <Mp3Uploader
+                            label="Audio (MP3)"
+                            {mp3Url}
+                            fileName={newMp3File?.name ?? (mp3Url ? "Current MP3" : null)}
+                            mp3Uploaded={({ mp3Url: newUrl, file }) => {
+                                mp3Url = newUrl;
+                                newMp3File = file;
+                            }}
+                            clearInput={() => {
+                                mp3Url = null;
+                                newMp3File = null;
+                            }}
+                            inputError={missingAudio && formSubmitted
+                                ? "Upload a WAV, an MP3, or both."
+                                : null}
+                        />
+                    </div>
+                </div>
+            </section>
+
             <div class="abf_main">
                 <!-- details -->
                 <section class="abf_card">
                     <header class="abf_cardHeader">
-                        <span class="abf_step">01</span>
+                        <span class="abf_step">02</span>
                         <div>
                             <h5 class="abf_cardTitle">Track details</h5>
                             <p class="abf_cardHint">The basics shown on every track.</p>
@@ -258,7 +355,7 @@
                 <!-- tags -->
                 <section class="abf_card">
                     <header class="abf_cardHeader">
-                        <span class="abf_step">02</span>
+                        <span class="abf_step">03</span>
                         <div>
                             <h5 class="abf_cardTitle">Tags</h5>
                             <p class="abf_cardHint">Used for filtering the track list. All optional.</p>
@@ -328,56 +425,6 @@
                 </section>
             </div>
 
-            <!-- files -->
-            <section class="abf_card">
-                <header class="abf_cardHeader">
-                    <span class="abf_step">03</span>
-                    <div>
-                        <h5 class="abf_cardTitle">Files</h5>
-                        <p class="abf_cardHint">Replace the artwork or the MP3, or keep the current ones.</p>
-                    </div>
-                </header>
-
-                <div class="abf_fields abf_filesRow">
-                    <div class="abf_uploader">
-                        <ImageUploader
-                            label="Artwork"
-                            imageUrl={artworkUrl}
-                            fileName={newArtworkFile?.name ?? (artworkUrl ? "Current artwork" : null)}
-                            fileUploaded={({ imageUrl: newUrl, file }) => {
-                                artworkUrl = newUrl;
-                                newArtworkFile = file;
-                            }}
-                            clearInput={() => {
-                                artworkUrl = null;
-                                newArtworkFile = null;
-                            }}
-                            inputError={!artworkUrl && !newArtworkFile && formSubmitted
-                                ? "Please upload an artwork image."
-                                : null}
-                        />
-                    </div>
-
-                    <div class="abf_uploader">
-                        <Mp3Uploader
-                            label="File Preview (MP3)"
-                            {mp3Url}
-                            fileName={newMp3File?.name ?? (mp3Url ? "Current audio" : null)}
-                            mp3Uploaded={({ mp3Url: newUrl, file }) => {
-                                mp3Url = newUrl;
-                                newMp3File = file;
-                            }}
-                            clearInput={() => {
-                                mp3Url = null;
-                                newMp3File = null;
-                            }}
-                            inputError={!mp3Url && !newMp3File && formSubmitted
-                                ? "Upload track audio file."
-                                : null}
-                        />
-                    </div>
-                </div>
-            </section>
 
             <!-- delete -->
             <section class="abf_card">

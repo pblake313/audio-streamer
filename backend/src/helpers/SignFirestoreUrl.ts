@@ -36,3 +36,15 @@ export async function signFirestoreUrl(fileUrl: string, expirationMinutes: numbe
         throw error;
     }
 }
+
+// Signs whichever audio files a beat has (MP3, WAV, or both) for an hour.
+export async function signBeatAudioUrls<
+    T extends { mp3Url?: string | null; wavUrl?: string | null },
+>(beat: T): Promise<T> {
+    const [mp3Url, wavUrl] = await Promise.all([
+        beat.mp3Url ? signFirestoreUrl(beat.mp3Url, 0, 1) : null,
+        beat.wavUrl ? signFirestoreUrl(beat.wavUrl, 0, 1) : null,
+    ]);
+
+    return { ...beat, mp3Url, wavUrl };
+}

@@ -19,10 +19,12 @@ const storage = multer.memoryStorage();
 const addBeatFiles = multer({ storage }).fields([
   { name: 'artworkFile', maxCount: 1 },
   { name: 'mp3File', maxCount: 1 },
+  { name: 'wavFile', maxCount: 1 },
 ]);
 const editBeatFiles = multer({ storage }).fields([
     { name: 'newArtwork', maxCount: 1 },
     { name: 'newMp3File', maxCount: 1},
+    { name: 'newWavFile', maxCount: 1},
 ])
 
 

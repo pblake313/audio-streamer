@@ -1,9 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import admin from 'firebase-admin';
-import { getMp3DurationSeconds, uploadBeatArtwork, uploadBeatMp3 } from "../../../helpers/BeatFileUploads";
+import {
+    getAudioDurationSeconds,
+    MAX_MP3_BYTES,
+    MAX_WAV_BYTES,
+    uploadBeatArtwork,
+    uploadBeatMp3,
+    uploadBeatWav,
+} from "../../../helpers/BeatFileUploads";
 import { validateAddBeatRequest } from "../../../helpers/AddBeatHelpers";
 import { Beat } from "../../../types/Beat";
-import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
+import { signBeatAudioUrls } from "../../../helpers/SignFirestoreUrl";
 
 
 
@@ -23,10 +30,14 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
         if (!artworkFile) throw new Error('An artwork file is required.');
         if (artworkFile.size > 5 * 1024 * 1024) throw new Error('Artwork file is too large. Please upload a file under 5 MB.');
 
-        const mp3File = files.mp3File?.[0];
-        if (!mp3File) throw new Error('An MP3 file is required.');
-        if (mp3File.size > 10 * 1024 * 1024) throw new Error('MP3 file is too large. Please upload a file under 10 MB.');
-        
+        // a WAV, an MP3, or both
+        const mp3File = files.mp3File?.[0] ?? null;
+        const wavFile = files.wavFile?.[0] ?? null;
+
+        if (!mp3File && !wavFile) throw new Error('Upload a WAV file, an MP3 file, or both.');
+        if (mp3File && mp3File.size > MAX_MP3_BYTES) throw new Error('MP3 file is too large. Please upload a file under 10 MB.');
+        if (wavFile && wavFile.size > MAX_WAV_BYTES) throw new Error('WAV file is too large. Please upload a file under 100 MB.');
+
         // create the beat id.
         const beatId = crypto.randomUUID()
 
@@ -37,28 +48,38 @@ export async function addBeat(req: Request, res: Response, next: NextFunction) {
             beatId: beatId,
         });
 
-        const mp3Url = await uploadBeatMp3({
-            file: mp3File,
-            beatId: beatId,
-        });
+        // ---- UPLOAD AUDIO ----
+
+        const mp3Url = mp3File
+            ? await uploadBeatMp3({ file: mp3File, beatId })
+            : null;
+
+        const wavUrl = wavFile
+            ? await uploadBeatWav({ file: wavFile, beatId })
+            : null;
+
+        const durationSeconds = mp3File
+            ? await getAudioDurationSeconds(mp3File, "mp3")
+            : await getAudioDurationSeconds(wavFile!, "wav");
 
         const beatToStore: Beat = {
             ...validatedObject,
             id: beatId,
             artworkUrl,
             mp3Url,
-            durationSeconds: await getMp3DurationSeconds(mp3File),
+            wavUrl,
+            durationSeconds,
             createdAt: new Date(),
             updatedAt: new Date(),
         };
 
-        // set in firestore 
+        // set in firestore
         await db.collection("Beats").doc(beatId).set(beatToStore);
 
-        // sign mp3 url
-        beatToStore.mp3Url = await signFirestoreUrl(beatToStore.mp3Url, 0, 1)
+        // sign audio urls
+        const createdBeat = await signBeatAudioUrls(beatToStore);
 
-        return res.status(200).send({ createdBeat: beatToStore});
+        return res.status(200).send({ createdBeat });
 
     } catch (error) {
         next(error)

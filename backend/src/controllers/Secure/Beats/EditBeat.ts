@@ -4,14 +4,18 @@ import { getBeatById } from "../../../helpers/GetBeatById";
 import {
     uploadBeatArtwork,
     uploadBeatMp3,
-    getMp3DurationSeconds,
+    uploadBeatWav,
+    getAudioDurationSeconds,
+    MAX_MP3_BYTES,
+    MAX_WAV_BYTES,
 } from "../../../helpers/BeatFileUploads";
 import { Beat, TrackType } from "../../../types/Beat";
-import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
+import { signBeatAudioUrls } from "../../../helpers/SignFirestoreUrl";
 
 type EditBeatFiles = {
     newArtwork?: Express.Multer.File[];
     newMp3File?: Express.Multer.File[];
+    newWavFile?: Express.Multer.File[];
 };
 
 type EditableBeatFields = Pick<
@@ -29,7 +33,7 @@ type EditableBeatFields = Pick<
 >;
 
 type BeatUpdateFields = EditableBeatFields &
-    Pick<Beat, "artworkUrl" | "mp3Url" | "durationSeconds">;
+    Pick<Beat, "artworkUrl" | "mp3Url" | "wavUrl" | "durationSeconds">;
 
 export async function editBeat(
     req: Request,
@@ -56,15 +60,45 @@ export async function editBeat(
         const newMp3File =
             files?.newMp3File?.[0] ?? null;
 
+        const newWavFile =
+            files?.newWavFile?.[0] ?? null;
+
+        // the form sends these when an existing file was removed
+        const removeMp3 = req.body.removeMp3 === "true";
+        const removeWav = req.body.removeWav === "true";
+
         // Throws if the beat does not exist.
         const originalBeat = await getBeatById(beatId);
 
-        // Preserve the existing URLs unless a new file is uploaded.
+        // Preserve the existing URLs unless a file is replaced or removed.
         const beatUpdate: BeatUpdateFields = {
             ...validEditBeatRequest,
             artworkUrl: originalBeat.artworkUrl,
-            mp3Url: originalBeat.mp3Url,
+            mp3Url: removeMp3 ? null : originalBeat.mp3Url ?? null,
+            wavUrl: removeWav ? null : originalBeat.wavUrl ?? null,
         };
+
+        if (newMp3File && newMp3File.size > MAX_MP3_BYTES) {
+            throw new Error(
+                "MP3 file is too large. Please upload a file under 10 MB.",
+            );
+        }
+
+        if (newWavFile && newWavFile.size > MAX_WAV_BYTES) {
+            throw new Error(
+                "WAV file is too large. Please upload a file under 100 MB.",
+            );
+        }
+
+        // a track always keeps at least one audio file
+        if (
+            !newMp3File && !newWavFile &&
+            !beatUpdate.mp3Url && !beatUpdate.wavUrl
+        ) {
+            throw new Error(
+                "A track needs a WAV file, an MP3 file, or both.",
+            );
+        }
 
         if (newArtwork) {
 
@@ -83,19 +117,23 @@ export async function editBeat(
         }
 
         if (newMp3File) {
-            if (newMp3File.size > 10 * 1024 * 1024) {
-                throw new Error(
-                    "MP3 file is too large. Please upload a file under 10 MB.",
-                );
-            }
-
             beatUpdate.mp3Url = await uploadBeatMp3({
                 file: newMp3File,
                 beatId,
             });
 
             beatUpdate.durationSeconds =
-                await getMp3DurationSeconds(newMp3File);
+                await getAudioDurationSeconds(newMp3File, "mp3");
+        }
+
+        if (newWavFile) {
+            beatUpdate.wavUrl = await uploadBeatWav({
+                file: newWavFile,
+                beatId,
+            });
+
+            beatUpdate.durationSeconds =
+                await getAudioDurationSeconds(newWavFile, "wav");
         }
 
         const updatedAt = new Date();
@@ -109,13 +147,11 @@ export async function editBeat(
                 updatedAt,
             });
 
-        const updatedBeat: Beat = {
+        const updatedBeat: Beat = await signBeatAudioUrls({
             ...originalBeat,
             ...beatUpdate,
             updatedAt,
-        };
-
-        updatedBeat.mp3Url = await signFirestoreUrl(updatedBeat.mp3Url, 0, 1)
+        });
 
         return res.status(200).send({updatedBeat});
     } catch (error: any) {

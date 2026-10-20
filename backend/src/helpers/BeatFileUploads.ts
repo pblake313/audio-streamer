@@ -98,14 +98,86 @@ async function validateMp3File(
     }
 }
 
+/*
+ * WAV files are read directly instead of through music-metadata: the
+ * installed version's RIFF parser fails to recognise WAV headers.
+ *
+ * Layout: "RIFF" <size> "WAVE", then chunks of <4-char id> <size> <data>.
+ * "fmt " holds the byte rate; "data" holds the audio, so
+ * duration = data size / byte rate.
+ */
+type WavInfo = {
+    byteRate: number;
+    dataBytes: number;
+};
+
+function readWavInfo(buffer: Buffer): WavInfo | null {
+    if (buffer.length < 12) return null;
+    if (buffer.toString("ascii", 0, 4) !== "RIFF") return null;
+    if (buffer.toString("ascii", 8, 12) !== "WAVE") return null;
+
+    let byteRate = 0;
+    let dataBytes = 0;
+    let offset = 12;
+
+    while (offset + 8 <= buffer.length) {
+        const chunkId = buffer.toString("ascii", offset, offset + 4);
+        const chunkSize = buffer.readUInt32LE(offset + 4);
+        const body = offset + 8;
+
+        if (chunkId === "fmt " && body + 12 <= buffer.length) {
+            byteRate = buffer.readUInt32LE(body + 8);
+        }
+
+        if (chunkId === "data") {
+            // some encoders write a placeholder size; trust what's actually there
+            dataBytes = Math.min(chunkSize, buffer.length - body);
+            break;
+        }
+
+        // chunks are padded to an even number of bytes
+        offset = body + chunkSize + (chunkSize % 2);
+    }
+
+    if (!byteRate || !dataBytes) return null;
+
+    return { byteRate, dataBytes };
+}
+
+async function validateWavFile(
+    file: Express.Multer.File,
+): Promise<void> {
+    if (!file?.buffer?.length) {
+        throw new Error("WAV file is missing or empty.");
+    }
+
+    if (!readWavInfo(file.buffer)) {
+        throw new Error(
+            "Audio file must be a valid WAV file.",
+        );
+    }
+}
+
 /* ---------------------------------------------
    Duration
 ---------------------------------------------- */
 
-// Length of an MP3 in seconds, or null if it can't be read.
-export async function getMp3DurationSeconds(
+function roundDuration(seconds: number | undefined): number | null {
+    return typeof seconds === "number" && Number.isFinite(seconds) && seconds > 0
+        ? Math.round(seconds * 10) / 10
+        : null;
+}
+
+// Length of an MP3 or WAV in seconds, or null if it can't be read.
+export async function getAudioDurationSeconds(
     file: Express.Multer.File,
+    format: "mp3" | "wav",
 ): Promise<number | null> {
+    if (format === "wav") {
+        const info = readWavInfo(file.buffer);
+        return info ? roundDuration(info.dataBytes / info.byteRate) : null;
+    }
+
     try {
         const metadata = await parseBuffer(
             file.buffer,
@@ -120,11 +192,7 @@ export async function getMp3DurationSeconds(
             },
         );
 
-        const seconds = metadata.format.duration;
-
-        return typeof seconds === "number" && Number.isFinite(seconds) && seconds > 0
-            ? Math.round(seconds * 10) / 10
-            : null;
+        return roundDuration(metadata.format.duration);
     } catch {
         return null;
     }
@@ -231,32 +299,24 @@ export async function uploadBeatArtwork({
 }
 
 /* ---------------------------------------------
-   Upload MP3
+   Upload audio (MP3 / WAV)
 ---------------------------------------------- */
 
-export async function uploadBeatMp3({
-    file,
-    beatId,
-}: UploadBeatParams): Promise<string> {
-    await validateMp3File(file);
-
+// Stores audio privately; it's only played through signed URLs.
+function uploadPrivateAudio(
+    file: Express.Multer.File,
+    fileName: string,
+    contentType: string,
+    label: string,
+): Promise<string> {
     const bucket = admin.storage().bucket();
-    const uploadVersion = Date.now();
-
-    // Use a new object name for each upload so the raw private
-    // URL genuinely changes and the audio element cannot reuse
-    // the previous MP3.
-    const fileName =
-        `Beats/${beatId}/MP3Preview/` +
-        `${beatId}-${uploadVersion}.mp3`;
-
     const fileUpload = bucket.file(fileName);
 
     return new Promise((resolve, reject) => {
         const blobStream = fileUpload.createWriteStream({
             resumable: false,
             metadata: {
-                contentType: "audio/mpeg",
+                contentType,
                 cacheControl:
                     "private, no-store, max-age=0, no-transform",
             },
@@ -267,7 +327,7 @@ export async function uploadBeatMp3({
             reject(
                 new Error(
                     error.message ||
-                        "Unable to upload MP3 file.",
+                        `Unable to upload ${label} file.`,
                 ),
             );
         });
@@ -288,7 +348,7 @@ export async function uploadBeatMp3({
                 reject(
                     new Error(
                         error?.message ||
-                            "MP3 uploaded, but failed to keep it private.",
+                            `${label} uploaded, but failed to keep it private.`,
                     ),
                 );
             }
@@ -297,3 +357,41 @@ export async function uploadBeatMp3({
         blobStream.end(file.buffer);
     });
 }
+
+/*
+ * Each upload gets a new object name so the raw private URL genuinely
+ * changes and the audio element cannot reuse the previous file.
+ */
+
+export async function uploadBeatMp3({
+    file,
+    beatId,
+}: UploadBeatParams): Promise<string> {
+    await validateMp3File(file);
+
+    const fileName =
+        `Beats/${beatId}/MP3Preview/` +
+        `${beatId}-${Date.now()}.mp3`;
+
+    return uploadPrivateAudio(file, fileName, "audio/mpeg", "MP3");
+}
+
+export async function uploadBeatWav({
+    file,
+    beatId,
+}: UploadBeatParams): Promise<string> {
+    await validateWavFile(file);
+
+    const fileName =
+        `Beats/${beatId}/WAV/` +
+        `${beatId}-${Date.now()}.wav`;
+
+    return uploadPrivateAudio(file, fileName, "audio/wav", "WAV");
+}
+
+/* ---------------------------------------------
+   Size limits
+---------------------------------------------- */
+
+export const MAX_MP3_BYTES = 10 * 1024 * 1024;
+export const MAX_WAV_BYTES = 100 * 1024 * 1024;

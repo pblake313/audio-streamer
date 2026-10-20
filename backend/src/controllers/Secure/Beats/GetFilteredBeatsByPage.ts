@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as admin from "firebase-admin";
-import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
+import { signBeatAudioUrls } from "../../../helpers/SignFirestoreUrl";
 import { Beat } from "../../../types/Beat";
 
 const db = admin.firestore();
@@ -132,16 +132,7 @@ export async function getFilteredBeatsByPage(
                         ...doc.data(),
                     } as Beat;
 
-                    const signedMp3Url = await signFirestoreUrl(
-                        beat.mp3Url,
-                        0,
-                        1
-                    );
-
-                    return {
-                        ...beat,
-                        mp3Url: signedMp3Url, 
-                    };
+                    return signBeatAudioUrls(beat);
                 })
         );
 
