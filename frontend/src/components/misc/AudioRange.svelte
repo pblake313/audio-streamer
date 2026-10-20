@@ -335,6 +335,8 @@
     <SeekableWavForm
         audio={audio}
         audioUrl={waveformUrl}
+        fetchTimeoutMs={60000}
+        decodeTimeoutMs={30000}
         playedColor={waveformPlayedColor}
         baseColor={waveformBaseColor}
         height={waveHeight}

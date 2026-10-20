@@ -8,8 +8,13 @@
     import AlbumArtwork from "../UI/AlbumArtwork.svelte";
     import "./ABTrack.css";
     import { formatTrackMeta } from "../../helpers/formatters";
+    import { getBeatAudioSource, preferredAudioFormat } from "../../stores/AudioFormatStore";
 
     export let track: Beat | null;
+
+    // WAV when the track has one (or MP3, if that's the preference)
+    $: audioSource = getBeatAudioSource(track, $preferredAudioFormat);
+    $: audioSrc = audioSource?.url ?? "";
     export let notActive: boolean = false;
     export let selected: boolean = false;
     export let emptyTitle: string = "Select Track";
@@ -74,7 +79,7 @@
 {#if track}
     <audio
         bind:this={audioElement}
-        src={track.mp3Url}
+        src={audioSrc}
         preload="metadata"
         style="display: none;"
         loop
@@ -114,6 +119,10 @@
                 </div>
 
                 <p class="abTrack_meta">
+                    {#if audioSource}
+                        <!-- which file this side is playing -->
+                        <span class="abTrack_format">{audioSource.format}</span>
+                    {/if}
                     {formatTrackMeta(track)}
                 </p>
             </div>

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import * as admin from "firebase-admin";
 import { Beat } from "../../../types/Beat";
-import { signFirestoreUrl } from "../../../helpers/SignFirestoreUrl";
+import { signBeatAudioUrls } from "../../../helpers/SignFirestoreUrl";
 
 const db = admin.firestore();
 
@@ -36,17 +36,10 @@ export async function getLiveBeatsByPage(
             snapshot.docs.map(async (doc) => {
                 const data = doc.data() as Beat;
 
-                let signedMp3Url = data.mp3Url;
-
-                if (data.mp3Url) {
-                    signedMp3Url = await signFirestoreUrl(data.mp3Url, 0, 1);
-                }
-
-                return {
+                return signBeatAudioUrls({
                     ...data,
                     id: doc.id,
-                    mp3Url: signedMp3Url,
-                } as Beat;
+                } as Beat);
             })
         );
 

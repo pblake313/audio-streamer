@@ -40,6 +40,7 @@
         bpm: number;
         artworkFile: File | null;
         mp3File: File | null;
+        wavFile: File | null;
         trackType: TrackType;
     } = {
         title: null,
@@ -53,6 +54,7 @@
         bpm: 0,
         artworkFile: null,
         mp3File: null,
+        wavFile: null,
         trackType: "Beat",
     };
 
@@ -62,6 +64,10 @@
 
     let temporaryArtUrl: string | null = null;
     let temporaryMp3Url: string | null = null;
+    let temporaryWavUrl: string | null = null;
+
+    // a WAV, an MP3, or both
+    $: missingAudio = !form.mp3File && !form.wavFile;
 
     // required fields still empty, shown next to the sticky submit button
     // references don't need a key, mode, or BPM
@@ -73,7 +79,7 @@
         !isReference && !form.key,
         !isReference && !form.mode,
         !form.artworkFile,
-        !form.mp3File,
+        missingAudio,
     ].filter(Boolean).length;
 
     function setTrackType(value: string | null) {
@@ -158,11 +164,87 @@
 
 <div class="abf_formContainer">
     <div class="abf_form">
+        <!-- files -->
+        <aside class="abf_side">
+            <section class="abf_card">
+                <header class="abf_cardHeader">
+                    <span class="abf_step">01</span>
+                    <div>
+                        <h5 class="abf_cardTitle">Files</h5>
+                        <p class="abf_cardHint">Artwork, plus a WAV, an MP3, or both. WAVs play first.</p>
+                    </div>
+                </header>
+
+                <div class="abf_fields abf_filesRow">
+                    <!-- each uploader renders several top-level elements; keep them together -->
+                    <div class="abf_uploader">
+                        <ImageUploader
+                            fileUploaded={(v) => {
+                                form.artworkFile = v.file;
+                                temporaryArtUrl = v.imageUrl;
+                            }}
+                            clearInput={() => {
+                                form.artworkFile = null;
+                                temporaryArtUrl = null;
+                            }}
+                            inputError={formSubmitted && !form.artworkFile
+                                ? "Please upload an artwork image."
+                                : null}
+                            label={"Artwork"}
+                            fileName={form.artworkFile?.name}
+                        />
+                    </div>
+
+                    <div class="abf_uploader">
+                        <Mp3Uploader
+                            format="wav"
+                            label={"Audio (WAV)"}
+                            dropzoneLabel="Add WAV"
+                            maxFileSizeMB={100}
+                            mp3Url={temporaryWavUrl}
+                            fileName={form.wavFile?.name}
+                            inputError={formSubmitted && missingAudio
+                                ? "Upload a WAV, an MP3, or both."
+                                : ""}
+                            mp3Uploaded={(v) => {
+                                form.wavFile = v.file;
+                                temporaryWavUrl = v.mp3Url;
+                            }}
+                            clearInput={() => {
+                                form.wavFile = null;
+                                temporaryWavUrl = null;
+                            }}
+                        />
+                    </div>
+
+                    <div class="abf_uploader">
+                        <Mp3Uploader
+                            label={"Audio (MP3)"}
+                            mp3Url={temporaryMp3Url}
+                            fileName={form.mp3File?.name}
+                            inputError={formSubmitted && missingAudio
+                                ? "Upload a WAV, an MP3, or both."
+                                : ""}
+                            mp3Uploaded={(v) => {
+                                form.mp3File = v.file;
+                                temporaryMp3Url = v.mp3Url;
+                            }}
+                            clearInput={() => {
+                                form.mp3File = null;
+                                temporaryMp3Url = null;
+                            }}
+                        />
+                    </div>
+                </div>
+
+            </section>
+        </aside>
+
         <div class="abf_main">
             <!-- details -->
             <section class="abf_card">
                 <header class="abf_cardHeader">
-                    <span class="abf_step">01</span>
+                    <span class="abf_step">02</span>
                     <div>
                         <h5 class="abf_cardTitle">Track details</h5>
                         <p class="abf_cardHint">The basics shown on every track.</p>
@@ -237,7 +319,7 @@
             <!-- tags -->
             <section class="abf_card">
                 <header class="abf_cardHeader">
-                    <span class="abf_step">02</span>
+                    <span class="abf_step">03</span>
                     <div>
                         <h5 class="abf_cardTitle">Tags</h5>
                         <p class="abf_cardHint">Used for filtering the track list. All optional.</p>
@@ -299,59 +381,6 @@
             </section>
         </div>
 
-        <!-- files + submit -->
-        <aside class="abf_side">
-            <section class="abf_card">
-                <header class="abf_cardHeader">
-                    <span class="abf_step">03</span>
-                    <div>
-                        <h5 class="abf_cardTitle">Files</h5>
-                        <p class="abf_cardHint">Artwork image and an MP3 for streaming.</p>
-                    </div>
-                </header>
-
-                <div class="abf_fields abf_filesRow">
-                    <!-- each uploader renders several top-level elements; keep them together -->
-                    <div class="abf_uploader">
-                        <ImageUploader
-                            fileUploaded={(v) => {
-                                form.artworkFile = v.file;
-                                temporaryArtUrl = v.imageUrl;
-                            }}
-                            clearInput={() => {
-                                form.artworkFile = null;
-                                temporaryArtUrl = null;
-                            }}
-                            inputError={formSubmitted && !form.artworkFile
-                                ? "Please upload an artwork image."
-                                : null}
-                            label={"Artwork"}
-                            fileName={form.artworkFile?.name}
-                        />
-                    </div>
-
-                    <div class="abf_uploader">
-                        <Mp3Uploader
-                            label={"File Preview (MP3)"}
-                            mp3Url={temporaryMp3Url}
-                            fileName={form.mp3File?.name}
-                            inputError={formSubmitted && !form.mp3File
-                                ? "Upload track audio file."
-                                : ""}
-                            mp3Uploaded={(v) => {
-                                form.mp3File = v.file;
-                                temporaryMp3Url = v.mp3Url;
-                            }}
-                            clearInput={() => {
-                                form.mp3File = null;
-                                temporaryMp3Url = null;
-                            }}
-                        />
-                    </div>
-                </div>
-
-            </section>
-        </aside>
     </div>
 </div>
 

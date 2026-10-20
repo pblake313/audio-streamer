@@ -13,7 +13,9 @@ export type AddBeatFormValues = {
     mode: string | null;
     bpm: number | null;
     artworkFile: File | null;
+    // a WAV, an MP3, or both
     mp3File: File | null;
+    wavFile: File | null;
     trackType: TrackType;
 };
 
@@ -51,8 +53,8 @@ export function validateAddBeatForm(form: AddBeatFormValues) {
         throw new Error("Please upload an artwork image.");
     }
 
-    if (!form.mp3File) {
-        throw new Error("Please upload an MP3 preview.");
+    if (!form.mp3File && !form.wavFile) {
+        throw new Error("Upload a WAV file, an MP3 file, or both.");
     }
 
     return true;
@@ -75,7 +77,14 @@ export function buildAddBeatFormData(form: AddBeatFormValues): FormData {
     formData.append("trackType", form.trackType);
 
     formData.append("artworkFile", form.artworkFile!);
-    formData.append("mp3File", form.mp3File!);
+
+    if (form.mp3File) {
+        formData.append("mp3File", form.mp3File);
+    }
+
+    if (form.wavFile) {
+        formData.append("wavFile", form.wavFile);
+    }
 
     return formData;
 }

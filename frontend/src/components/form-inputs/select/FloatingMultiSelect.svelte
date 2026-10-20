@@ -40,7 +40,8 @@
         positionMenu();
         await tick();
         positionMenu();
-        menuEl?.focus();
+        // don't let focusing the menu scroll the page (scrolling closes it)
+        menuEl?.focus({ preventScroll: true });
     }
 
     function close(refocus = false) {
@@ -89,6 +90,13 @@
         if (isOpen) positionMenu();
     }
 
+    // scrolling the page (or anything outside the menu) closes it
+    function handleScroll(event: Event) {
+        if (!isOpen) return;
+        if (event.target instanceof Node && menuEl?.contains(event.target)) return;
+        close();
+    }
+
     function pop(node: HTMLElement, { duration = 160 } = {}) {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
             return { duration: 0 };
@@ -107,7 +115,7 @@
 <svelte:window
     on:pointerdown={handleWindowPointerDown}
     on:resize={handleViewportChange}
-    on:scroll|capture={handleViewportChange}
+    on:scroll|capture={handleScroll}
 />
 
 <div class="floatingMultiSelect">

@@ -6,7 +6,7 @@ import { isValidBpm } from "../validators/BpmValidator";
 
 export type ValidatedAddBeatRequest = Omit<
     Beat,
-    "id" | "createdAt" | "updatedAt" | "artworkUrl" | "mp3Url"
+    "id" | "createdAt" | "updatedAt" | "artworkUrl" | "mp3Url" | "wavUrl"
 >;
 
 const validTrackTypes: TrackType[] = ["Beat", "Reference"];

@@ -19,6 +19,11 @@ import {
     hasActiveBeatFilters,
 } from "./AudioPlayer/BeatsStore";
 import { resetABTester, trackA, trackB } from "./ABTestStore";
+import {
+    getBeatAudioSource,
+    preferredAudioFormat,
+    type AudioFormat,
+} from "./AudioFormatStore";
 
 // How many seconds before we show the "Still Listening?" popup
 const LISTEN_TIMEOUT_SECONDS = 60 * 30;
@@ -92,6 +97,36 @@ export const audioPlayerState = writable<
 export const audioPlayerErrorMessage = writable<string | null>(null);
 
 export const userTapped = writable<boolean>(false);
+
+// =========================
+// WAV / MP3 switching
+// =========================
+/*
+ * Switching formats mid-track loads the other file, then jumps back to
+ * the same spot (and keeps playing if it was) once it's ready. The URL
+ * is stored with the resume point so a different track loading in the
+ * meantime doesn't inherit it.
+ */
+let pendingResume: { url: string; time: number; play: boolean } | null = null;
+
+export function setAudioFormat(format: AudioFormat) {
+    preferredAudioFormat.set(format);
+
+    const beat = get(selectedBeat);
+    const a = get(audioStore);
+    if (!beat || !a) return;
+
+    const source = getBeatAudioSource(beat, format);
+    if (!source || source.url === get(audioPlayerUrl)) return;
+
+    pendingResume = {
+        url: source.url,
+        time: a.currentTime || 0,
+        play: !a.paused && !a.ended,
+    };
+
+    audioPlayerUrl.set(source.url);
+}
 
 // Timeout-related stores
 export const trackTimer = writable<number>(0);
@@ -481,6 +516,27 @@ if (audio) {
         audioPlayerState.set("Loading");
     });
 
+    // finish a WAV / MP3 switch: same spot, same play state
+    audio.addEventListener("loadedmetadata", () => {
+        if (!audio || !pendingResume) return;
+
+        const resume = pendingResume;
+        pendingResume = null;
+
+        // a different track was picked before this one finished loading
+        if (get(audioPlayerUrl) !== resume.url) return;
+
+        if (resume.time > 0) {
+            audio.currentTime = Number.isFinite(audio.duration)
+                ? Math.min(resume.time, audio.duration)
+                : resume.time;
+        }
+
+        if (resume.play) {
+            autoPlayTrack();
+        }
+    });
+
     audio.addEventListener("canplay", () => {
         clearAudioPlayerErrorMessage();
 
@@ -490,7 +546,8 @@ if (audio) {
         // Do not force Idle if audio is already playing.
         if (!audio?.paused) return;
 
-        audioPlayerState.set("Idle");
+        // paused mid-track (e.g. after a WAV / MP3 switch) is Paused, not Idle
+        audioPlayerState.set(audio.currentTime > 0 ? "Paused" : "Idle");
     });
 
     audio.addEventListener("playing", () => {

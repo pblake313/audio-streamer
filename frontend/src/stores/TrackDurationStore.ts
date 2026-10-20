@@ -45,11 +45,12 @@ function runNext() {
 
     audio.addEventListener("error", done, { once: true });
 
-    audio.src = beat.mp3Url;
+    // either file has the same length; the MP3's header is the lighter read
+    audio.src = (beat.mp3Url ?? beat.wavUrl)!;
 }
 
 export function requestTrackDuration(beat: Beat) {
-    if (beat.durationSeconds || !beat.mp3Url || requested.has(beat.id)) return;
+    if (beat.durationSeconds || (!beat.mp3Url && !beat.wavUrl) || requested.has(beat.id)) return;
 
     requested.add(beat.id);
     queue.push(beat);

@@ -24,7 +24,7 @@
     padding: 0 25px;
 }
 
-/* one column: details, tags, then files */
+/* one column: files, details, then tags */
 .abf_form {
     display: flex;
     flex-direction: column;
@@ -38,13 +38,17 @@
     min-width: 0;
 }
 
-/* artwork + mp3 side by side, half the row each
+/* artwork across the first line, then WAV and MP3 side by side
    (doubled class so it beats the generic .abf_fields column) */
 .abf_fields.abf_filesRow {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
     align-items: stretch;
+}
+
+.abf_fields.abf_filesRow > .abf_uploader:first-child {
+    grid-column: 1 / -1;
 }
 
 .abf_uploader {
@@ -225,6 +229,7 @@
 /* RESPONSIVE                */
 /* ========================= */
 
+/* too narrow for side by side: stack them */
 @media (max-width: 750px) {
     .abf_fields.abf_filesRow {
         grid-template-columns: 1fr;
