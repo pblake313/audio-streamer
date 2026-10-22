@@ -405,7 +405,16 @@
                             <div>
                                 <SelectButton
                                     onSelect={(v) => {
-                                        if (v) form.trackType = v;
+                                        if (!v) return;
+
+                                        // switching to a reference clears BPM, key, and mode
+                                        if (v === "Reference" && form.trackType !== "Reference") {
+                                            form.bpm = 0;
+                                            form.key = null;
+                                            form.mode = null;
+                                        }
+
+                                        form.trackType = v;
                                     }}
                                     label={"Track Type"}
                                     selectedOption={form.trackType}
@@ -500,6 +509,7 @@
                                     label={"Tag One"}
                                     selectedOption={form.tagOne}
                                     options={tagOptions}
+                                    clearable={true}
                                     onSelect={(v) => {
                                         form.tagOne = v;
                                     }}
@@ -511,6 +521,7 @@
                                     label={"Tag Two"}
                                     selectedOption={form.tagTwo}
                                     options={tagOptions}
+                                    clearable={true}
                                     onSelect={(v) => {
                                         form.tagTwo = v;
                                     }}
@@ -525,6 +536,7 @@
                                         form.mood = v;
                                     }}
                                     options={beatMoodOptions}
+                                    clearable={true}
                                 />
                             </div>
                         </div>

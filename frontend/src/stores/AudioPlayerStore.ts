@@ -17,6 +17,7 @@ import {
     getNextBeatPageToFetch,
     getNextFilteredBeatPageToFetch,
     hasActiveBeatFilters,
+    searchActive,
 } from "./AudioPlayer/BeatsStore";
 import { resetABTester, trackA, trackB } from "./ABTestStore";
 import {
@@ -223,6 +224,11 @@ function rememberShuffled(beat: Beat | null | undefined) {
 // Active playlist helpers
 // =========================
 function activePlaylistIsFullyFetched(): boolean {
+    // search results are all loaded at once, so the playlist is complete
+    if (get(searchActive)) {
+        return true;
+    }
+
     if (get(hasActiveBeatFilters)) {
         return get(allFilteredBeatPagesFetched);
     }

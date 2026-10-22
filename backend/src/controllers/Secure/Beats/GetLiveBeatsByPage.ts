@@ -27,7 +27,7 @@ export async function getLiveBeatsByPage(
 
         const snapshot = await db
             .collection("Beats")
-            .orderBy("createdAt", "desc")
+            .orderBy("updatedAt", "desc") // most recently changed first
             .offset(offset)
             .limit(limit)
             .get();

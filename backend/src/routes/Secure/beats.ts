@@ -11,6 +11,7 @@ import { updateBeatRating } from "../../controllers/Secure/Beats/UpdateRating";
 import { markBeatAsTrash } from "../../controllers/Secure/Beats/MarkTrash";
 import { getFilteredBeatsByPage } from "../../controllers/Secure/Beats/GetFilteredBeatsByPage";
 import { downloadAllBeatFiles, downloadBeatFile } from "../../controllers/Secure/Beats/DownloadBeatFile";
+import { searchBeats } from "../../controllers/Secure/Beats/SearchBeats";
 const router = Router()
 
 const storage = multer.memoryStorage();
@@ -52,6 +53,9 @@ router.get('/get-beat/:beatId', getSingleBeat)
 router.get('/get-live-beats/:page', getLiveBeatsByPage);  
 
 router.post('/get-filtered-beats/:page', getFilteredBeatsByPage)
+
+// text search across every track: /secure/beats/search?q=...
+router.get('/search', searchBeats)
 
 // a track's files, streamed back as downloads
 router.get('/download-artwork/:beatId', downloadBeatFile('artwork'))

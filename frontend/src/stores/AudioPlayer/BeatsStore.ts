@@ -202,8 +202,13 @@ export function updateBeatFutureDestinationsInArray(
 }
 
 
-function getDateCreatedTime(beat: Beat): number {
-    const dateCreated = beat.createdAt as any;
+// last-updated time in ms (the list is sorted by this, newest first)
+function getUpdatedTime(beat: Beat): number {
+    return toMillis(beat.updatedAt ?? beat.createdAt);
+}
+
+function toMillis(value: unknown): number {
+    const dateCreated = value as any;
 
     if (!dateCreated) return 0;
 
@@ -253,10 +258,10 @@ export function upsertBeat(newBeat: Beat) {
             next[idx] = newBeat;
         }
 
-        // Sort by createdAt DESC (newest first)
+        // Sort by updatedAt DESC (most recently changed first), like the backend
         next.sort(
             (a, b) =>
-                getDateCreatedTime(b) - getDateCreatedTime(a)
+                getUpdatedTime(b) - getUpdatedTime(a)
         );
 
         return next;
@@ -367,13 +372,61 @@ export function clearArtistFilter() {
 }
 
 
+/*
+ * A store that also remembers its value in the browser (localStorage, not a
+ * cookie), so a page reload, which clears every in-memory store, doesn't
+ * reset it. Falls back to the default if storage is unavailable or the
+ * saved value doesn't look right.
+ */
+function rememberedWritable<T>(
+    key: string,
+    fallback: T,
+    isValid: (value: unknown) => value is T,
+) {
+    let initial = fallback;
+
+    try {
+        const saved = localStorage.getItem(key);
+
+        if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (isValid(parsed)) initial = parsed;
+        }
+    } catch {
+        // no storage (SSR, private mode) or bad data: keep the default
+    }
+
+    const store = writable<T>(initial);
+
+    store.subscribe((value) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch {
+            // storage unavailable; the choice just isn't remembered
+        }
+    });
+
+    return store;
+}
+
+const isBoolean = (value: unknown): value is boolean =>
+    typeof value === "boolean";
+
+
 // track type view
 // Driven by the Beats / References / Both select rather than removable
 // filter pills. "All" leaves the filter empty, so the list falls back to
-// the unfiltered pagination.
+// the unfiltered pagination. Remembered across reloads.
 export type TrackTypeView = "Beat" | "Reference" | "All";
 
-export const beatTypeFilter = writable<string[]>(["Beat"]);
+export const beatTypeFilter = rememberedWritable<string[]>(
+    "trackList.beatTypeFilter",
+    ["Beat"],
+    (value): value is string[] =>
+        Array.isArray(value) &&
+        value.length <= 1 &&
+        value.every((type) => type === "Beat" || type === "Reference"),
+);
 
 export const trackTypeView = derived(
     beatTypeFilter,
@@ -392,7 +445,7 @@ export function setTrackTypeView(view: TrackTypeView) {
 
 
 // trash visibility (client side: trashed tracks are marked with a custom tag)
-export const showTrash = writable<boolean>(false);
+export const showTrash = rememberedWritable<boolean>("trackList.showTrash", false, isBoolean);
 
 export function toggleShowTrash() {
     showTrash.update((current) => !current);
@@ -403,10 +456,113 @@ export function toggleShowTrash() {
  * "trash only" (trashed tracks of any type); without it, nothing is shown.
  * Used with the track type view on "All".
  */
-export const noTrackTypes = writable<boolean>(false);
+export const noTrackTypes = rememberedWritable<boolean>("trackList.noTrackTypes", false, isBoolean);
 
 export function isTrashBeat(beat: Beat): boolean {
     return beat.customTag === "Trash" && beat.customTagColor === "ff1a1a";
+}
+
+
+// =========================
+// Search
+// =========================
+/*
+ * Text search across every track. The backend finds matches among all
+ * tracks (not just the pages loaded so far) and they're merged into
+ * `beats`; filteredBeats then narrows the list with the same word match,
+ * so the view, filters, and the player's next / previous all follow it.
+ */
+export const searchQuery = writable<string>("");
+export const searchActive = derived(searchQuery, ($query) => $query.trim().length > 0);
+export const isSearchingBeats = writable<boolean>(false);
+export const searchBeatsError = writable<string | null>(null);
+// more than the backend's result cap matched
+export const searchHasMore = writable<boolean>(false);
+
+let latestSearchId = 0;
+
+/*
+ * Lowercase, accents dropped (é -> e), apostrophes / backticks / quotes
+ * removed ("Pi`erre" -> "pierre"), any other punctuation becomes a space.
+ * Same steps as the backend's normalizeSearchText (SearchBeats.ts).
+ */
+function normalizeSearchText(value: string): string {
+    return value
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .toLowerCase()
+        .replace(/['‘’`´"“”]/g, "")
+        .replace(/[^\p{L}\p{N}]+/gu, " ")
+        .trim();
+}
+
+// same fields the backend searches
+function beatSearchText(beat: Beat): string {
+    return normalizeSearchText(
+        [
+            beat.beatTitle,
+            beat.tagOne,
+            beat.tagTwo,
+            beat.customTag,
+            beat.mood,
+            beat.trackType,
+            beat.key,
+            beat.mode,
+        ]
+            .filter(Boolean)
+            .join(" "),
+    );
+}
+
+// every query word appears in the track's text (also checked with spaces
+// removed, so "pierrebourne" or "uzivert" still match)
+function matchesSearch(beat: Beat, query: string): boolean {
+    const normalized = normalizeSearchText(query);
+    if (!normalized) return true;
+
+    const text = beatSearchText(beat);
+    const squashed = text.replace(/ /g, "");
+
+    return normalized
+        .split(" ")
+        .every((word) => text.includes(word) || squashed.includes(word));
+}
+
+export async function searchBeatsOnServer(query: string) {
+    const trimmed = query.trim();
+    const searchId = ++latestSearchId;
+
+    if (!trimmed) {
+        isSearchingBeats.set(false);
+        searchBeatsError.set(null);
+        searchHasMore.set(false);
+        return;
+    }
+
+    isSearchingBeats.set(true);
+    searchBeatsError.set(null);
+
+    try {
+        const result = await authorizedFetch(
+            `/secure/beats/search?q=${encodeURIComponent(trimmed)}`,
+        );
+
+        // a newer search started while this one was in flight
+        if (searchId !== latestSearchId) return;
+
+        const found: Beat[] = Array.isArray(result.beats) ? result.beats : [];
+
+        found.forEach((beat) => upsertBeat(beat));
+        searchHasMore.set(!!result.hasMore);
+    } catch (error: any) {
+        if (searchId === latestSearchId) {
+            searchBeatsError.set(error?.message || "Search failed.");
+        }
+    } finally {
+        if (searchId === latestSearchId) {
+            isSearchingBeats.set(false);
+        }
+    }
 }
 
 
@@ -444,6 +600,7 @@ export const filteredBeats = derived(
         beatTypeFilter,
         showTrash,
         noTrackTypes,
+        searchQuery,
     ],
     ([
         $beats,
@@ -453,6 +610,7 @@ export const filteredBeats = derived(
         $beatTypeFilter,
         $showTrash,
         $noTrackTypes,
+        $searchQuery,
     ]) => {
         /*
          * No track types: trash only when trash is showing, otherwise
@@ -463,6 +621,11 @@ export const filteredBeats = derived(
             $beats = $showTrash ? $beats.filter((beat) => isTrashBeat(beat)) : [];
         } else if (!$showTrash && !$tagFilter.includes("Trash")) {
             $beats = $beats.filter((beat) => !isTrashBeat(beat));
+        }
+
+        // searching: only tracks matching every word
+        if ($searchQuery.trim()) {
+            $beats = $beats.filter((beat) => matchesSearch(beat, $searchQuery));
         }
 
         const hasActiveFilters =

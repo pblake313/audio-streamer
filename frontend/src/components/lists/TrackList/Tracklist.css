@@ -1,4 +1,152 @@
+/* ========================= */
+/* SEARCH                    */
+/* ========================= */
+
+/* pill beside the Beats / References / Trash menu */
+.trackList_search {
+    position: relative;
+
+    display: flex;
+    flex: 0 1 340px;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 160px;
+    height: 36px;
+    padding: 0 8px 0 13px;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.trackList_search:focus-within,
+.trackList_search_active {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.trackList_searchIcon {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.trackList_searchInput {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #f7f7f7;
+
+    font-family: var(--font-sans);
+    /* same size as the view menu next to it */
+    font-size: 11pt;
+
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* phones: 16px stops iOS Safari zooming in when the field is tapped */
+@media (pointer: coarse) {
+    .trackList_searchInput {
+        font-size: 16px;
+    }
+}
+
+.trackList_searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+}
+
+/* the clear button below replaces the browser's own */
+.trackList_searchInput::-webkit-search-cancel-button {
+    display: none;
+}
+
+.trackList_searchSpinner {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #f7f7f7;
+    border-radius: 50%;
+
+    animation: trackList_spin 0.7s linear infinite;
+}
+
+@keyframes trackList_spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.trackList_searchClear {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 22px;
+    height: 22px;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f7f7f7;
+
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.trackList_searchClear:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.trackList_searchClear:focus-visible {
+    outline: 2px solid #f7f7f7;
+    outline-offset: 2px;
+}
+
+.trackList_searchMore {
+    padding: 18px 0 4px;
+    text-align: center;
+    font-size: 10pt;
+    opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trackList_searchSpinner {
+        animation-duration: 2s;
+    }
+}
+
+/* ========================= */
+/* TOOLBAR                   */
+/* ========================= */
+
+/*
+ * Sticks under the fixed nav once you scroll past it, so search, the view
+ * menu, and Stream / A | B stay in reach. Solid background so tracks
+ * scroll underneath cleanly.
+ */
 .trackList_filtersModeFlex {
+    position: sticky;
+    top: var(--trackList-sticky-top);
+    z-index: 40;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -9,19 +157,48 @@
     min-width: 0;
 
     margin-bottom: 15px;
-    overflow: hidden;
+    padding: 10px 0;
+    box-sizing: border-box;
+
+    background: var(--color-bg);
+    border-bottom: var(--border-light);
 }
 
-.trackList_filters {
-    flex: 1 1 auto;
+/*
+ * Once stuck: a solid full-width band from the nav down to the toolbar,
+ * so nothing (album covers, the highlighted track) shows beside or above it.
+ */
+.trackList_filtersModeFlex::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
 
-    width: 100%;
+    display: none;
+    top: calc(-1 * var(--trackList-sticky-top));
+    bottom: -1px;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
+
+    background: var(--color-bg);
+    border-bottom: var(--border-light);
+}
+
+.trackList_stuck .trackList_filtersModeFlex::before {
+    display: block;
+}
+
+/* filter pills take only the space left over (starting from 0, not 100%),
+   so they don't squeeze the view menu + search on the left */
+.trackList_filters {
+    flex: 1 1 0;
+
     max-width: 100%;
     min-width: 0;
 
     overflow: hidden;
 }
 
+/* right side: Beats / References / Trash menu, then Stream / A | B */
 .trackList_modeToggler {
     display: flex;
     flex: 0 0 auto;
@@ -30,13 +207,9 @@
     gap: 14px;
 }
 
-/* Beats / References / Both and trash dropdowns (left side) */
-.trackList_viewSelects {
-    display: flex;
+/* the view menu keeps its full width; the search shrinks instead */
+.trackList_modeToggler > .floatingMultiSelect {
     flex: 0 0 auto;
-    align-items: center;
-    gap: 16px;
-    min-width: 0;
 }
 
 /* Stream / A/B segmented toggle (right side) */
@@ -81,34 +254,68 @@
 }
 
 /*
- * mobile: view filter + mode toggle on the first row, active filter
- * pills on their own row below (only when there are any)
+ * mobile: view menu + mode toggle on the first row, search full width
+ * below, then active filter pills (only when there are any).
+ * Only the search sticks here (the whole toolbar would take up too much
+ * of a phone screen), so the toolbar box is dissolved and its parts are
+ * ordered within the list, which lets the search stick on its own.
  */
 @media (max-width: 700px) {
+    .trackList_megaWrap {
+        display: flex;
+        flex-direction: column;
+    }
+
     .trackList_filtersModeFlex {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas:
-            "view mode"
-            "filters filters";
-        align-items: center;
-        column-gap: 12px;
-        row-gap: 10px;
-
-        margin-bottom: 12px;
+        display: contents;
     }
 
-    .trackList_viewSelects {
-        grid-area: view;
-    }
-
+    /* menu on the left, Stream / A | B on the right */
     .trackList_modeToggler {
-        grid-area: mode;
+        order: -3;
+        justify-content: space-between;
         min-height: 0;
+        margin-bottom: 10px;
+    }
+
+    /* search gets its own full-width line, and sticks under the nav */
+    .trackList_search {
+        order: -2;
+        position: sticky;
+        top: var(--trackList-sticky-top);
+        z-index: 40;
+
+        flex: none;
+        width: 100%;
+        min-width: 0;
+        margin-bottom: 12px;
+
+        /* opaque, so rows don't show through the pill */
+        background: #2b2b2b;
+    }
+
+    /* the desktop band doesn't apply: the toolbar box is dissolved here */
+    .trackList_filtersModeFlex::before {
+        display: none !important;
+    }
+
+    /*
+     * Once stuck: page color all around the pill, full width, reaching up
+     * to the nav and 10px below, so tracks scroll under cleanly.
+     */
+    .trackList_stuck .trackList_search {
+        box-shadow: 0 0 0 100vmax var(--color-bg);
+        clip-path: inset(calc(-1 * var(--trackList-sticky-top)) -100vmax -10px -100vmax);
+    }
+
+    .trackList_search:focus-within,
+    .trackList_search_active {
+        background: #313131;
     }
 
     .trackList_filters {
-        grid-area: filters;
+        order: -1;
+        margin-bottom: 12px;
     }
 
     /* stays mounted (it drives the filtered fetch), just takes no space */
@@ -123,7 +330,10 @@
     }
 }
 
-.trackList_megaWrap{
+/* --trackList-sticky-top is the nav's real height, set from TrackList.svelte */
+.trackList_megaWrap {
+    --trackList-sticky-top: 68px;
+
     margin-bottom: 100px;
 }
 
@@ -139,7 +349,5 @@
 }
 
 .trackList_fetchError {
-    padding: 25px 0;
-    text-align: center;
-    color: #ff6b6b;
+    padding: 25px 15px;
 }

@@ -88,6 +88,13 @@
     function setTrackType(value: string | null) {
         if (value === "Beat" || value === "Reference") {
             form.trackType = value;
+
+            // references start with no BPM, key, or mode
+            if (value === "Reference") {
+                form.bpm = 0;
+                form.key = null;
+                form.mode = null;
+            }
         }
     }
 
@@ -374,6 +381,7 @@
                             <SelectButton
                                 onSelect={(v) => (form.tagOne = v)}
                                 options={tagOptions}
+                                clearable={true}
                                 id={"tagNoOne"}
                                 label={"Tag One"}
                                 selectedOption={form.tagOne}
@@ -384,6 +392,7 @@
                             <SelectButton
                                 onSelect={(v) => (form.tagTwo = v)}
                                 options={tagOptions}
+                                clearable={true}
                                 id={"tagNoTwo"}
                                 label={"Tag Two"}
                                 selectedOption={form.tagTwo}
@@ -393,6 +402,7 @@
                         <div>
                             <SelectButton
                                 options={beatMoodOptions}
+                                clearable={true}
                                 label="Mood"
                                 onSelect={(v) => (form.mood = v)}
                                 selectedOption={form.mood}

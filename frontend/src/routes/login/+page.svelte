@@ -9,6 +9,7 @@
     import { goto } from "$app/navigation";
     import PinForm from "../../components/forms/PinForm.svelte";
     import Seo from "../../components/misc/Seo.svelte";
+    import BackgroundVideo from "../../components/misc/BackgroundVideo.svelte";
 
     let showVideo = false;
 
@@ -59,15 +60,13 @@
     {/if}
 
     {#if showVideo}
-        <video
-            class="loginPage_video"
+        <BackgroundVideo
+            className="loginPage_video"
             src="/Videos/goldlines.mp4"
-            autoplay
-            loop
-            muted
-            playsinline
-            in:fade={{ duration: 1200, delay: 500 }}
-        ></video>
+            poster="/Images/VideoPosters/goldlines.webp"
+            fadeDuration={1200}
+            fadeDelay={500}
+        />
     {/if}
 
 </div>
