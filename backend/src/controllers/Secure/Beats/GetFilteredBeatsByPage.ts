@@ -115,7 +115,7 @@ export async function getFilteredBeatsByPage(
 
 
         const snapshot = await beatsQuery
-            .orderBy("createdAt", "desc")
+            .orderBy("updatedAt", "desc") // most recently changed first
             .offset(offset)
             .limit(beatPageSize + 1)
             .get();

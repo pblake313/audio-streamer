@@ -5,6 +5,7 @@
 
     import BoxButton from "../buttons/BoxButton.svelte";
     import GitHubLink from "../links/GitHubLink.svelte";
+    import BackgroundVideo from "../misc/BackgroundVideo.svelte";
     import { user } from "../../stores/UserStore";
     import { rise } from "../../helpers/transitions";
     import "./Hero.css";
@@ -78,14 +79,12 @@
     <div class="hero_bottomFade"></div>
 
     {#if showVideo}
-        <video
-            class="hero_video"
+        <BackgroundVideo
+            className="hero_video"
             src="/Videos/lineglass.mp4"
-            autoplay
-            loop
-            muted
-            playsinline
-            in:fade={{ duration: 1200, delay: 600 }}
-        ></video>
+            poster="/Images/VideoPosters/lineglass.webp"
+            fadeDuration={1200}
+            fadeDelay={600}
+        />
     {/if}
 </div>

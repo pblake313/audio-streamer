@@ -13,6 +13,7 @@
     import Logo from "../../Icons/Logos/Logo.svelte";
     import MobileNavLink from "../../buttons/MobileNavLink.svelte";
     import MobileNavAudioControls from "./MobileNavAudioControls.svelte";
+    import BackgroundVideo from "../../misc/BackgroundVideo.svelte";
 
     import { selectedBeat } from "../../../stores/AudioPlayer/selectedBeatStore";
 
@@ -239,17 +240,14 @@
         class="mobileNav_videoFade"
         class:mobileNav_videoVisible={$mobileNavOpen && videoReady}
     >
-        <video
-            class="mobileNav_video"
+        <BackgroundVideo
+            className="mobileNav_video"
             src="/Videos/glasslina.mp4"
-            autoplay
-            loop
-            muted
-            playsinline
-            on:loadeddata={() => {
+            poster="/Images/VideoPosters/glasslina.webp"
+            onReady={() => {
                 videoReady = true;
             }}
-        ></video>
+        />
     </div>
     <div class="mobileNav_content">
         <div class="mobileNav_links">

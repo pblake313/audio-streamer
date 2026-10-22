@@ -1,0 +1,18 @@
+/* the video sits over its poster and stays hidden until it's really playing */
+.bgv_video.bgv_waiting {
+    opacity: 0 !important;
+}
+
+.bgv_poster,
+.bgv_video {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* belt and braces: never draw Safari's / Chrome's built-in play button */
+.bgv_video::-webkit-media-controls,
+.bgv_video::-webkit-media-controls-start-playback-button,
+.bgv_video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    -webkit-appearance: none;
+}

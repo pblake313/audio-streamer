@@ -20,7 +20,7 @@
     } from "../../stores/AudioPlayerStore";
     import TrackList from "../../components/lists/TrackList/TrackList.svelte";
     import Loader from "../../components/loaders/Loader.svelte";
-    import PageHeading from "../../components/page-components/PageHeading.svelte";
+    import ErrorNotice from "../../components/errors/ErrorNotice.svelte";
     import ABTester from "../../components/standalone/ABTester.svelte";
     import { trackA, trackB } from "../../stores/ABTestStore";
 
@@ -82,14 +82,13 @@
 {#if $isFetchingBeats && !$oneBeatFetchSuccessfull}
     <Loader loaderStyle={"loader_full"} />
 {:else if $beatFetchError}
-    <PageHeading
-        title={"Fetch Beats Error"}
-        subtitle={$beatFetchError}
-        buttonText={"Retry"}
-        onButtonClick={() => {
-            fetchBeats();
-        }}
-    />
+    <div class="portal_fetchError">
+        <ErrorNotice
+            message={$beatFetchError}
+            title="Couldn't load your tracks"
+            onRetry={() => fetchBeats()}
+        />
+    </div>
 {:else}
     {#if $audioMode === "streamer"}
         <HighlightedTrack />
@@ -102,6 +101,11 @@
 {/if}
 
 <style>
+    /* below the fixed nav, centered on the page */
+    .portal_fetchError {
+        padding: 140px 15px 60px;
+    }
+
     .wrapTrackList {
         margin: auto;
         padding: 25px;
