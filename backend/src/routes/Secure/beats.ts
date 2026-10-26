@@ -59,7 +59,7 @@ router.get('/search', searchBeats)
 
 // a track's files, streamed back as downloads
 router.get('/download-artwork/:beatId', downloadBeatFile('artwork'))
-
+ 
 router.get('/download-mp3/:beatId', downloadBeatFile('mp3'))
 
 router.get('/download-wav/:beatId', downloadBeatFile('wav'))
