@@ -30,6 +30,8 @@
     import PopupBeat from "../misc/PopupBeat.svelte";
     import type { Beat } from "../../lib/types/Beats";
     import AudioFormatToggle from "../buttons/music/AudioFormatToggle.svelte";
+    import NotepadIcon from "../Icons/svg/NotepadIcon.svelte";
+    import Destinations from "../list-items/Tracks/Destinations.svelte";
 
     // which file is playing (WAV / MP3) and which ones the track has
     $: availableFormats = getAvailableFormats($selectedBeat);
@@ -188,7 +190,23 @@
                                 <h2 class="ht_title">{$selectedBeat.beatTitle}</h2>
 
                                 <div class="ht_tags">
-                                    <BeatTagsSwiper beat={$selectedBeat} />
+                                    <!-- same notepad / destination badges as the track list, before the tags -->
+                                    {#if $selectedBeat.notepad || $selectedBeat.futureDestinations.length >= 1}
+                                        <div class="ht_badges">
+                                            {#if $selectedBeat.notepad}
+                                                <div class="ht_notepadBadge" title="Has notes">
+                                                    <NotepadIcon color={"fff1a8"} height={"18px"} />
+                                                </div>
+                                            {/if}
+                                            {#if $selectedBeat.futureDestinations.length >= 1}
+                                                <Destinations beat={$selectedBeat} />
+                                            {/if}
+                                        </div>
+                                    {/if}
+
+                                    <div class="ht_tagsSwiper">
+                                        <BeatTagsSwiper beat={$selectedBeat} />
+                                    </div>
                                 </div>
                             </div>
                         {/key}
