@@ -263,6 +263,14 @@
                 />
             </div>
 
+            <div class="mobileNav_linkItem">
+                <MobileNavLink
+                    isActive={isRouteActive("/chord-builder")}
+                    title="Chord Builder"
+                    on:click={() => goToPage("/chord-builder")}
+                />
+            </div>
+
             {#if $user}
                 <div class="mobileNav_linkItem">
                     <MobileNavLink

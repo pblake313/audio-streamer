@@ -1,0 +1,105 @@
+.navDropdown {
+    position: relative;
+}
+
+/* trigger reuses .navLink styling; reset button defaults */
+.navDropdown_trigger {
+    gap: 6px;
+
+    border: none;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.navDropdown_trigger.navDropdown_open {
+    opacity: 1;
+    color: #ffffff;
+}
+
+.navDropdown_chevron {
+    width: 14px;
+    height: 14px;
+
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.navDropdown_open .navDropdown_chevron {
+    transform: rotate(180deg);
+}
+
+.navDropdown_menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    z-index: 100;
+
+    display: flex;
+    flex-direction: column;
+    min-width: 190px;
+    padding: 6px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(34, 34, 34, 0.92);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(-50%, -6px);
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0.25s;
+}
+
+.navDropdown_menu.navDropdown_menuOpen {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0s;
+}
+
+.navDropdown_item {
+    padding: 10px 14px;
+
+    border-radius: 9px;
+
+    color: #f7f7f7;
+    text-decoration: none;
+    white-space: nowrap;
+
+    opacity: 0.6;
+
+    transition:
+        opacity 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.navDropdown_item.navDropdown_itemActive {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.navDropdown_item:focus-visible {
+    opacity: 1;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .navDropdown_item:hover {
+        opacity: 1;
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+}

@@ -1,0 +1,171 @@
+/* closed control: the sound's category in small text after its name */
+.sp_triggerGroup {
+    margin-left: 6px;
+
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 8pt;
+    font-weight: 500;
+}
+
+/* ========================= */
+/* OPEN: categories | sounds */
+/* ========================= */
+
+.sp_panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0; /* the control sits at the right of the toolbar, so open leftward */
+    z-index: 120;
+
+    display: grid;
+    grid-template-columns: 190px 280px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: #262626;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+
+    overflow: hidden;
+    animation: dd_drop 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sp_categories,
+.sp_sounds {
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+}
+
+/* ---------- left column ---------- */
+
+.sp_categories {
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.sp_category {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    padding: 10px 10px;
+
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.65);
+    font: inherit;
+    font-size: 10.5pt;
+    text-align: left;
+    cursor: pointer;
+
+    transition:
+        background-color 0.12s ease,
+        color 0.12s ease;
+}
+
+.sp_category:hover {
+    color: #fff;
+}
+
+.sp_category.sp_categoryOn {
+    background: rgba(255, 255, 255, 0.09);
+    color: #fff;
+}
+
+.sp_categoryIcon {
+    display: flex;
+    flex: 0 0 auto;
+}
+
+.sp_categoryIcon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.sp_categoryName {
+    flex: 1;
+    white-space: nowrap;
+}
+
+.sp_count {
+    min-width: 20px;
+    padding: 1px 6px;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 8pt;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+/* small dot on the category that holds the current sound */
+.sp_category.sp_categoryHasCurrent .sp_count {
+    background: #f7f7f7;
+    color: #222;
+    font-weight: 600;
+}
+
+/* ---------- right column ---------- */
+
+.sp_sounds {
+    max-height: 340px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.sp_sound {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 8px 10px;
+    border-radius: 9px;
+
+    cursor: pointer;
+}
+
+.sp_sound.sp_soundActive {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sp_soundText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.sp_soundName {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 10.5pt;
+    font-weight: 500;
+}
+
+.sp_sound.sp_soundSelected .sp_soundName {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ---------- phones: stack the columns ---------- */
+
+@media (max-width: 600px) {
+    .sp_panel {
+        grid-template-columns: 1fr;
+        width: min(320px, calc(100vw - 30px));
+    }
+
+    .sp_categories {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+}

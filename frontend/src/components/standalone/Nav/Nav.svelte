@@ -11,6 +11,7 @@
     import GitHubLink from "../../links/GitHubLink.svelte";
     import BoxButton from "../../buttons/BoxButton.svelte";
     import NavigationLink from "../../buttons/NavigationLink.svelte";
+    import NavDropdown from "../../buttons/NavDropdown.svelte";
     import MobileMenuToggler from "../../UI/MobileMenuToggler.svelte";
     import MobileNav from "./MobileNav.svelte";
     import Logo from "../../Icons/Logos/Logo.svelte";
@@ -18,7 +19,15 @@
     let isScrolled = false;
     let activeHash = "";
 
-    const sectionIds = ["summary", "photos", "features", "wheres-my-pin"];
+    const projectDetailItems = [
+        { label: "Summary", linksTo: "/#summary" },
+        { label: "Photos", linksTo: "/#photos" },
+        { label: "Features", linksTo: "/#features" },
+        { label: "Technologies", linksTo: "/#tech-stack" },
+        { label: "Where's My PIN", linksTo: "/#wheres-my-pin" },
+    ];
+
+    const sectionIds = projectDetailItems.map((item) => item.linksTo.slice(2));
 
     function updateActiveSection() {
         isScrolled = window.scrollY > 0;
@@ -86,6 +95,11 @@
                     <NavigationLink linkText="Tracks" linksTo="/portal" />
 
                     <NavigationLink
+                        linkText="Chord Builder"
+                        linksTo="/chord-builder"
+                    />
+
+                    <NavigationLink
                         linkText="Add Track"
                         linksTo="/portal/add-beat"
                     />
@@ -116,27 +130,15 @@
                 <div class="nav_rightFlex">
                     <NavigationLink linkText="Home" linksTo="/" {activeHash} />
 
-                    <NavigationLink
-                        linkText="Summary"
-                        linksTo="/#summary"
+                    <NavDropdown
+                        label="Project Details"
+                        items={projectDetailItems}
                         {activeHash}
                     />
 
                     <NavigationLink
-                        linkText="Photos"
-                        linksTo="/#photos"
-                        {activeHash}
-                    />
-
-                    <NavigationLink
-                        linkText="Features"
-                        linksTo="/#features"
-                        {activeHash}
-                    />
-                    <NavigationLink
-                        linkText="Where's My PIN"
-                        linksTo="/#wheres-my-pin"
-                        {activeHash}
+                        linkText="Chord Builder"
+                        linksTo="/chord-builder"
                     />
 
                     <BoxButton

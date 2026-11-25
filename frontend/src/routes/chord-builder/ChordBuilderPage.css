@@ -1,0 +1,586 @@
+.chordBuilder_container {
+    max-width: var(--site-width);
+    min-height: 60vh;
+    margin: auto;
+    padding: 92px 25px 150px; /* just clears the fixed nav */
+}
+
+/* the transport row: play/pause first, at the top left. It sticks just
+   under the site nav while scrolling. Its background runs the full width of
+   the window (border-image with a huge sideways outset paints edge to edge
+   without causing horizontal scrolling). */
+.chordBuilder_header {
+    position: sticky;
+    top: var(--nav-h, 72px);
+    z-index: 60;
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px 32px;
+
+    margin: 0 0 14px;
+    padding: 8px 0;
+
+    border-image: linear-gradient(var(--color-bg), var(--color-bg)) fill 0 / / 0 100vmax;
+
+}
+
+/* only once the bar is actually stuck: a full-width divider line */
+.chordBuilder_header.chordBuilder_headerStuck {
+    border-image: linear-gradient(to top, rgba(255, 255, 255, 0.08) 1px, var(--color-bg) 1px) fill 0 / / 0
+        100vmax;
+}
+
+.chordBuilder_stickySentinel {
+    height: 0;
+}
+
+.chordBuilder_audioError {
+    margin: -4px 0 14px;
+
+    color: #ff8a8a;
+    font-size: 10pt;
+}
+
+/* ========================= */
+/* TRANSPORT                 */
+/* ========================= */
+
+/* play on the left, gray controls centered, shuffle on the right */
+.chordBuilder_transport {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+}
+
+.chordBuilder_middle {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 14px;
+}
+
+/* white play button: same 44px size and 12px corners as the other controls
+   (icons are the app's PlayIcon / PauseIcon) */
+.chordBuilder_play {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    align-self: flex-end; /* level with the BPM / Key boxes */
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 12px;
+    background: #f7f7f7;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 0.1s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.chordBuilder_play:hover {
+    background: #ffffff;
+}
+
+.chordBuilder_play:active {
+    transform: scale(0.94);
+}
+
+.chordBuilder_play:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+/* a soft ring while the loop plays */
+.chordBuilder_play.chordBuilder_playing {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12);
+}
+
+/* the play triangle looks centered when nudged right a touch */
+.chordBuilder_playIcon {
+    display: flex;
+    padding-left: 2px;
+}
+
+.chordBuilder_control {
+    display: flex;
+    flex-direction: column;
+}
+
+/* small label above each control (BPM, Bars, Key, Sound). Shown at the top
+   of the page; folds away once the bar is stuck, to keep it slim. */
+.chordBuilder_controlLabel {
+    max-height: 13px;
+    margin-bottom: 4px;
+    overflow: hidden;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 7.5pt;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    line-height: 13px;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    transition:
+        max-height 0.2s ease,
+        margin-bottom 0.2s ease,
+        opacity 0.15s ease;
+}
+
+.chordBuilder_header.chordBuilder_headerStuck .chordBuilder_controlLabel {
+    max-height: 0;
+    margin-bottom: 0;
+    opacity: 0;
+}
+
+/* ========================= */
+/* BPM: [ − ] 120 [ + ]      */
+/* ========================= */
+
+.chordBuilder_bpm {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: 44px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    overflow: hidden;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.chordBuilder_bpm:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.chordBuilder_bpm:focus-within {
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.06),
+        0 0 0 3px rgba(255, 255, 255, 0.07);
+}
+
+.chordBuilder_bpmStep {
+    width: 34px;
+    height: 100%;
+
+    border: none;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 15pt;
+    line-height: 1;
+    cursor: pointer;
+
+    transition:
+        color 0.12s ease,
+        background-color 0.12s ease;
+}
+
+.chordBuilder_bpmStep:hover:not(:disabled),
+.chordBuilder_bpmStep:focus-visible {
+    outline: none;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.chordBuilder_bpmStep:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.chordBuilder_bpmStep:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+.chordBuilder_bpmInput {
+    width: 52px;
+    height: 100%;
+    padding: 0;
+
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
+    background: transparent;
+
+    color: #fff;
+    font: inherit;
+    font-size: 15pt;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+
+    /* hide the browser's tiny spinner arrows */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.chordBuilder_bpmInput::-webkit-outer-spin-button,
+.chordBuilder_bpmInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.chordBuilder_bpmInput:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* ========================= */
+/* DROPDOWNS                 */
+/* ========================= */
+
+.chordBuilder_keyRow {
+    display: flex;
+    gap: 6px;
+}
+
+
+
+/* icon on/off buttons (metronome, key highlighting) */
+.chordBuilder_iconToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.chordBuilder_iconToggle svg {
+    width: 22px;
+    height: 22px;
+}
+
+.chordBuilder_iconToggle:hover,
+.chordBuilder_iconToggle:focus-visible {
+    outline: none;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.chordBuilder_iconToggle.chordBuilder_iconToggleOn {
+    border-color: #f7f7f7;
+    background: #f7f7f7;
+    color: #222;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
+}
+
+
+/* ========================= */
+/* PROGRESSION               */
+/* ========================= */
+
+.chordBuilder_progression {
+    margin-top: 0;
+}
+
+.chordBuilder_segmented {
+    box-sizing: border-box;
+    display: flex;
+    height: 44px;
+    padding: 4px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.chordBuilder_segmented button {
+    min-width: 34px;
+    padding: 0 12px;
+
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.5);
+    font: inherit;
+    font-size: 10pt;
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.chordBuilder_segmented button:hover,
+.chordBuilder_segmented button:focus-visible {
+    outline: none;
+    color: #fff;
+}
+
+.chordBuilder_segmented button.chordBuilder_segmentOn {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+/* the timeline sits straight on the page, no card around it */
+.chordBuilder_timelineCard {
+    padding: 0;
+}
+
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
+
+@media (max-width: 600px) {
+    .chordBuilder_container {
+        padding: 80px 15px 120px;
+    }
+
+    .chordBuilder_header {
+        margin-bottom: 12px;
+        padding: 8px 0;
+    }
+
+}
+
+/* the key-highlight button lights up in the same blue as the lanes */
+.chordBuilder_scaleToggle.chordBuilder_iconToggleOn {
+    border-color: rgb(74, 144, 255);
+    background: rgba(74, 144, 255, 0.18);
+    color: rgb(140, 185, 255);
+    box-shadow: 0 0 16px rgba(74, 144, 255, 0.25);
+}
+
+/* the note-color button lights up green, like the in-key notes */
+.chordBuilder_noteToggle.chordBuilder_iconToggleOn {
+    border-color: #3fae6a;
+    background: rgba(63, 174, 106, 0.18);
+    color: #8ae0aa;
+    box-shadow: 0 0 16px rgba(63, 174, 106, 0.25);
+}
+
+/* ========================= */
+/* SHUFFLE (icon, far right) */
+/* ========================= */
+
+.chordBuilder_shuffle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    align-self: flex-end; /* level with the BPM / Key boxes */
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid rgba(180, 150, 255, 0.55);
+    border-radius: 12px; /* same corners as the other controls */
+    background: linear-gradient(145deg, #8b5cf6, #6d3fe0);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 6px 18px rgba(124, 77, 255, 0.35);
+
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        filter 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+}
+
+.chordBuilder_shuffleIcon {
+    width: 20px;
+    height: 20px;
+    /* spins once each time it's pressed (re-created per shuffle) */
+    animation: chordBuilder_spin 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes chordBuilder_spin {
+    from {
+        transform: rotate(-180deg) scale(0.8);
+    }
+}
+
+.chordBuilder_shuffle:focus-visible {
+    outline: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 0 0 3px rgba(139, 92, 246, 0.45);
+}
+
+.chordBuilder_shuffle:active {
+    transform: scale(0.94);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .chordBuilder_shuffle:hover {
+        filter: brightness(1.12);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            0 8px 24px rgba(124, 77, 255, 0.5);
+    }
+}
+
+/* ========================= */
+/* MIDI DOWNLOAD (blue)      */
+/* ========================= */
+
+.chordBuilder_download {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    align-self: flex-end; /* level with the BPM / Key boxes */
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid rgba(140, 190, 255, 0.55);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #3b82f6, #1f5fd6);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 6px 18px rgba(59, 130, 246, 0.35);
+
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        filter 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.chordBuilder_download svg {
+    width: 20px;
+    height: 20px;
+}
+
+.chordBuilder_download:focus-visible {
+    outline: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 0 0 3px rgba(59, 130, 246, 0.45);
+}
+
+.chordBuilder_download:active:not(:disabled) {
+    transform: scale(0.94);
+}
+
+.chordBuilder_download:disabled {
+    cursor: progress;
+}
+
+/* small spinner while the backend builds the file */
+.chordBuilder_spinner {
+    width: 18px;
+    height: 18px;
+
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+
+    animation: chordBuilder_rotate 0.7s linear infinite;
+}
+
+@keyframes chordBuilder_rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .chordBuilder_download:hover:not(:disabled) {
+        filter: brightness(1.12);
+        opacity: 1;
+    }
+}
+
+/* ========================= */
+/* PROGRESSION NAME          */
+/* ========================= */
+
+/* next to play: "1 – 5 – 6 – 4 progression" over "I – V – vi – IV" */
+.chordBuilder_progressionName {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: flex-end;
+    gap: 2px;
+
+    min-height: 44px; /* same height as play, so the two line up */
+    min-width: 0;
+    max-width: 320px;
+    margin-left: -6px; /* sits snug against play */
+}
+
+.chordBuilder_progressionName h4 {
+    color: var(--font-color-heading);
+    font-size: 13pt;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chordBuilder_progressionName h4 span {
+    margin-left: 3px;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 400;
+}
+
+.chordBuilder_progressionName p {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    margin: 0;
+}
+
+.chordBuilder_numerals {
+    min-width: 0;
+
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 8.5pt;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
