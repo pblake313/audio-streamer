@@ -1,0 +1,382 @@
+/* ========================= */
+/* MODAL                     */
+/* ========================= */
+
+.cbs_backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    animation: cbs_fade 0.15s ease;
+}
+
+.cbs_panel {
+    display: flex;
+    flex-direction: column;
+
+    width: min(1180px, 100%);
+    max-height: min(88vh, 900px);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    background: #242424;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+
+    overflow: hidden;
+    outline: none;
+
+    animation: cbs_rise 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cbs_fade {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes cbs_rise {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+}
+
+/* ========================= */
+/* HEADER                    */
+/* ========================= */
+
+.cbs_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cbs_eyebrow {
+    margin-bottom: 4px;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.cbs_title {
+    color: var(--font-color-heading);
+    font-size: 22pt;
+    line-height: 1.1;
+}
+
+.cbs_meta {
+    margin-top: 6px;
+
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 10pt;
+}
+
+.cbs_context {
+    margin-top: 2px;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 9.5pt;
+}
+
+.cbs_context strong {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+}
+
+.cbs_close {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 20pt;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.cbs_close:hover,
+.cbs_close:focus-visible {
+    outline: none;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ========================= */
+/* GROUPS AS COLUMNS         */
+/* ========================= */
+
+.cbs_body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    align-items: start;
+    gap: 22px 18px;
+
+    padding: 18px 24px 22px;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* the 7ths & 9ths list is long, so it spans two columns and wraps */
+.cbs_group.cbs_groupWide {
+    grid-column: span 2;
+}
+
+.cbs_group.cbs_groupWide .cbs_items {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.cbs_groupTitle {
+    color: #f7f7f7;
+    font-size: 11pt;
+}
+
+.cbs_groupHint {
+    margin: 2px 0 10px;
+
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 8.5pt;
+}
+
+.cbs_items {
+    display: grid;
+    gap: 8px;
+}
+
+/* ========================= */
+/* CHORD CARDS               */
+/* ========================= */
+
+.cbs_item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+
+    width: 100%;
+    padding: 11px 12px 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease,
+        transform 0.1s ease;
+}
+
+.cbs_item:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cbs_item:active {
+    transform: scale(0.985);
+}
+
+.cbs_item:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.45);
+    outline-offset: 1px;
+}
+
+/* the chord currently in the progression */
+.cbs_item.cbs_itemOn {
+    border-color: #f7f7f7;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cbs_itemTop {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    width: 100%;
+}
+
+.cbs_name {
+    color: var(--font-color-heading);
+    font-size: 13.5pt;
+    font-weight: 600;
+}
+
+.cbs_role {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 8.5pt;
+}
+
+.cbs_vibe {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 9pt;
+    font-style: italic;
+}
+
+.cbs_reason {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 8.5pt;
+    line-height: 1.45;
+}
+
+.cbs_tension {
+    display: flex;
+    gap: 3px;
+    margin-left: auto;
+    align-self: center;
+}
+
+.cbs_dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+    background: var(--tension);
+}
+
+/* ========================= */
+/* IN KEY / BORROWED TAG     */
+/* ========================= */
+
+.cbs_keyTag {
+    padding: 2px 7px;
+
+    border-radius: 999px;
+
+    font-size: 7.5pt;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+/* same green as in-key notes in the piano roll */
+.cbs_keyTag.cbs_keyTagIn {
+    background: rgba(63, 174, 106, 0.16);
+    color: #7fdca4;
+}
+
+/* same red as out-of-key notes */
+.cbs_keyTag.cbs_keyTagOut {
+    background: rgba(210, 75, 75, 0.16);
+    color: #f29a9a;
+}
+
+/* ========================= */
+/* FOOTER                    */
+/* ========================= */
+
+.cbs_footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    padding: 12px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cbs_legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 8.5pt;
+}
+
+.cbs_legend .cbs_dot:last-of-type {
+    margin-right: 4px;
+}
+
+.cbs_footerActions {
+    display: flex;
+    gap: 8px;
+}
+
+.cbs_button {
+    padding: 8px 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 9px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.85);
+    font: inherit;
+    font-size: 9.5pt;
+    cursor: pointer;
+}
+
+.cbs_button:hover,
+.cbs_button:focus-visible {
+    outline: none;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.cbs_button.cbs_buttonPrimary {
+    border-color: #f7f7f7;
+    background: #f7f7f7;
+    color: #222;
+}
+
+.cbs_button.cbs_buttonPrimary:hover,
+.cbs_button.cbs_buttonPrimary:focus-visible {
+    background: #ffffff;
+}
+
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
+
+@media (max-width: 600px) {
+    .cbs_backdrop {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    /* bottom sheet on phones */
+    .cbs_panel {
+        max-height: 92vh;
+        border-radius: 18px 18px 0 0;
+    }
+
+    .cbs_body {
+        grid-template-columns: 1fr;
+        padding: 14px 16px 18px;
+    }
+
+    .cbs_group.cbs_groupWide {
+        grid-column: auto;
+    }
+
+    .cbs_header,
+    .cbs_footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}

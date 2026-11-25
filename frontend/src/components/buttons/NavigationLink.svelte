@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { tick } from "svelte";
     import { page } from "$app/stores";
-    import { goto } from "$app/navigation";
+    import { scrollToHash } from "../../helpers/scrollToHash";
     import "./NavigationLink.css";
 
     export let linksTo: string;
@@ -19,54 +18,12 @@
 
     $: isActive = pathnameMatches && hashMatches;
 
-    async function handleClick(event: MouseEvent) {
-        const targetUrl = new URL(linksTo, window.location.origin);
-
-        const targetPath = targetUrl.pathname;
-        const targetHash = targetUrl.hash;
-        const targetId = targetHash.slice(1);
-
+    function handleClick(event: MouseEvent) {
         // Let normal links behave normally
-        if (!targetHash) {
-            return;
-        }
+        if (!new URL(linksTo, window.location.origin).hash) return;
 
         event.preventDefault();
-
-        // Coming from another route
-        if ($page.url.pathname !== targetPath) {
-            await goto(targetPath, {
-                noScroll: true,
-                keepFocus: true,
-            });
-
-            await tick();
-
-            await new Promise<void>((resolve) => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => resolve());
-                });
-            });
-        }
-
-        const targetElement = document.getElementById(targetId);
-
-        if (!targetElement) {
-            console.warn(`Could not find section: #${targetId}`);
-            return;
-        }
-
-        // Change URL without triggering native hash scrolling
-        history.replaceState(
-            history.state,
-            "",
-            `${targetPath}${targetHash}`,
-        );
-
-        targetElement.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-        });
+        scrollToHash(linksTo);
     }
 </script>
 

@@ -5,6 +5,8 @@ import beats from './beats'
 
 import converterRoute from './converter'
 
+import midiRoute from './midi'
+
 import { getAuthorizedUser } from '../../controllers/Secure/GetAuthorizedUser'
 
 const router = Router()
@@ -20,6 +22,8 @@ router.get('/get-authorized-user', getAuthorizedUser)
 router.use('/beats', beats) // imports more routes
 
 router.use('/converter', converterRoute) // imports more routes
+
+router.use('/midi', midiRoute) // chord builder MIDI export
 
 
 export default router

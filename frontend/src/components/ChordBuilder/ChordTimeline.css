@@ -1,0 +1,621 @@
+/* scrolls sideways inside its card on small screens, never the page */
+.cbt_scroll {
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.cbt_timeline {
+    --cell-min: 34px;
+    --gutter: 52px;
+    --row-h: 9px;
+
+    min-width: calc(var(--gutter) + var(--beats) * var(--cell-min));
+    user-select: none;
+}
+
+/* every row = key/label gutter on the left + the beat grid */
+.cbt_row {
+    display: flex;
+}
+
+.cbt_row > :last-child {
+    flex: 1;
+    min-width: 0;
+}
+
+.cbt_gutter {
+    flex: 0 0 var(--gutter);
+}
+
+.cbt_gutterLabel {
+    display: flex;
+    align-items: center;
+
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.cbt_timeline.cbt_dragging,
+.cbt_timeline.cbt_dragging * {
+    cursor: grabbing !important;
+}
+
+.cbt_ruler,
+.cbt_lane,
+.cbt_counter {
+    display: grid;
+    grid-template-columns: repeat(var(--beats), minmax(0, 1fr));
+}
+
+/* ========================= */
+/* RULER                     */
+/* ========================= */
+
+.cbt_bar {
+    /* sits between the chord blocks and the tension row */
+    padding: 5px 0 1px 8px;
+
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
+
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 9pt;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ========================= */
+/* LANE                      */
+/* ========================= */
+
+.cbt_lane {
+    position: relative;
+    height: 62px;
+
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.cbt_cell {
+    grid-row: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    background: transparent;
+
+    color: transparent;
+    font-size: 14pt;
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.cbt_cell.cbt_cellBar {
+    border-left-color: rgba(255, 255, 255, 0.18);
+}
+
+.cbt_cell:first-child {
+    border-left-color: transparent;
+}
+
+.cbt_cell:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .cbt_cell:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* ========================= */
+/* CHORD BLOCKS              */
+/* ========================= */
+
+.cbt_block {
+    grid-row: 1;
+    z-index: 1;
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+
+    min-width: 0;
+    margin: 5px 2px;
+    padding: 0 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.13),
+        rgba(255, 255, 255, 0.05)
+    );
+
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.cbt_block:focus-visible {
+    outline: none;
+}
+
+.cbt_block.cbt_blockSelected {
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.cbt_block.cbt_blockActive {
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.24),
+        rgba(255, 255, 255, 0.1)
+    );
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.08);
+}
+
+/* runs past the loop end: fade the right edge */
+.cbt_block.cbt_blockClipped {
+    border-right-style: dashed;
+}
+
+.cbt_blockName {
+    color: var(--font-color-heading);
+    font-size: 12pt;
+    font-weight: 500;
+    line-height: 1.15;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* the chord in plain English, e.g. "A minor 7th" */
+.cbt_blockSpoken {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 8pt;
+    line-height: 1.2;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cbt_block.cbt_blockActive .cbt_blockSpoken {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.cbt_handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+
+    width: 10px;
+    cursor: ew-resize;
+    touch-action: none;
+}
+
+.cbt_handle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width: 3px;
+    height: 22px;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.35);
+    transform: translate(-50%, -50%);
+
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.cbt_handleStart {
+    left: 0;
+}
+
+.cbt_handleEnd {
+    right: 0;
+}
+
+.cbt_block.cbt_blockSelected .cbt_handle::after {
+    opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .cbt_block:hover .cbt_handle::after {
+        opacity: 1;
+    }
+}
+
+/* wider grab area on touch screens */
+@media (pointer: coarse) {
+    .cbt_handle {
+        width: 18px;
+    }
+
+    .cbt_handle::after {
+        opacity: 1;
+    }
+}
+
+/* ========================= */
+/* PLAYHEAD + COUNTER        */
+/* ========================= */
+
+.cbt_playhead {
+    grid-row: 1;
+    z-index: 3;
+
+    border-radius: 0; /* square corners keep the position line straight */
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.7);
+
+    pointer-events: none;
+}
+
+.cbt_counter {
+    margin-top: 10px;
+}
+
+/* ========================= */
+/* TENSION                   */
+/* ========================= */
+
+.cbt_tensionRow {
+    margin-top: 2px;
+}
+
+.cbt_tension {
+    position: relative;
+    height: 20px;
+
+    /* faint track the markers sit on */
+    background: linear-gradient(rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06))
+        center / 100% 2px no-repeat;
+}
+
+/* a glowing pill centered on the chord change, colored green -> red */
+.cbt_tensionMark {
+    position: absolute;
+    top: 50%;
+
+    width: 38px;
+    height: 12px;
+
+    border-radius: 999px;
+    background: var(--tension);
+
+    transform: translate(-50%, -50%);
+    cursor: help;
+}
+
+/* the loop's first chord: keep the marker inside the grid */
+.cbt_tensionMark.cbt_tensionMarkStart {
+    transform: translate(0, -50%);
+}
+
+/* ========================= */
+/* PIANO ROLL                */
+/* ========================= */
+
+/* the whole roll is shown at once, no inner scrolling */
+.cbt_rollWrap {
+    margin-top: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cbt_keys {
+    flex: 0 0 var(--gutter);
+
+    display: grid;
+    grid-template-rows: repeat(var(--rows), var(--row-h));
+}
+
+.cbt_key {
+    display: block;
+    width: 100%;
+    padding: 0 6px 0 0;
+
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: #e9e9e9;
+
+    color: #555;
+    font: inherit;
+    font-size: 7pt;
+    font-weight: 600;
+    line-height: var(--row-h);
+    text-align: right;
+
+    cursor: pointer;
+    transition: background-color 0.08s ease;
+}
+
+
+.cbt_key.cbt_keyBlack {
+    width: calc(100% - 18px);
+
+    background: #2b2b2b;
+    border-bottom-color: #2b2b2b;
+    border-radius: 0 3px 3px 0;
+}
+
+/* key highlighting on the keyboard: in-key keys get a marker on the right
+   edge, the root a solid one; out-of-key keys fade back */
+.cbt_key.cbt_keyInScale {
+    box-shadow: inset -3px 0 0 rgba(var(--key-blue), 0.75);
+}
+
+.cbt_key.cbt_keyBlack.cbt_keyInScale {
+    color: #f0f0f0;
+}
+
+.cbt_key.cbt_keyScaleRoot {
+    box-shadow: inset -5px 0 0 rgb(var(--key-blue));
+    color: #111;
+    font-weight: 700;
+}
+
+.cbt_key.cbt_keyBlack.cbt_keyScaleRoot {
+    color: #fff;
+}
+
+.cbt_key.cbt_keyOutScale {
+    opacity: 0.55;
+}
+
+/* a key that's sounding (playing in the loop, or clicked) lights green,
+   a touch more minty than the green notes in the roll */
+.cbt_timeline {
+    --key-play: #5fd39b;
+    --key-play-black: #2f9e6b;
+}
+
+.cbt_key.cbt_keyOn,
+.cbt_key:active {
+    background: var(--key-play);
+    color: #10331f;
+    opacity: 1;
+}
+
+.cbt_key.cbt_keyBlack.cbt_keyOn,
+.cbt_key.cbt_keyBlack:active {
+    background: var(--key-play-black);
+    border-bottom-color: var(--key-play-black);
+    color: #eafff2;
+}
+
+
+.cbt_roll {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: repeat(var(--beats), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--rows), var(--row-h));
+
+    background: rgba(255, 255, 255, 0.035);
+    cursor: pointer; /* click empty space to add a note */
+}
+
+.cbt_rollLane {
+    grid-column: 1 / -1;
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.cbt_rollLane.cbt_rollLaneBlack {
+    background: rgba(0, 0, 0, 0.22);
+}
+
+/* key highlighting (Ableton-style): in-key rows blue, out-of-key rows dark */
+.cbt_timeline {
+    --key-blue: 74, 144, 255;
+}
+
+.cbt_rollLane.cbt_rollLaneIn {
+    background: rgba(var(--key-blue), 0.13);
+}
+
+.cbt_rollLane.cbt_rollLaneOut {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.cbt_rollLane.cbt_rollLaneRoot {
+    background: rgba(var(--key-blue), 0.28);
+}
+
+/* octave line under every C */
+.cbt_rollLane.cbt_rollLaneC {
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.cbt_rollBeat {
+    grid-row: 1 / -1;
+
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+}
+
+.cbt_rollBeat.cbt_rollBeatBar {
+    border-left-color: rgba(255, 255, 255, 0.16);
+}
+
+/* ========================= */
+/* NOTES                     */
+/* ========================= */
+
+/*
+   Each note picks a palette (grey, or green/red for in/out of key), then the
+   state classes choose a tone from it:
+   base · dim (bass note) · bright (selected chord) · on (playing)
+*/
+.cbt_note {
+    --tone-base: #9a9a9a;
+    --tone-dim: #6e6e6e;
+    --tone-bright: #d8d8d8;
+    --tone-bright-dim: #a5a5a5;
+    --tone-on: #ffffff;
+    --tone-glow: rgba(255, 255, 255, 0.45);
+
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+    margin: 1px 2px;
+    padding: 0 6px;
+
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+    background: var(--tone-base);
+
+    overflow: hidden;
+    cursor: pointer; /* click removes it; dragging switches to ns-resize */
+    touch-action: none;
+
+    transition:
+        background-color 0.1s ease,
+        box-shadow 0.1s ease;
+}
+
+/* in the key */
+.cbt_note.cbt_noteIn {
+    --tone-base: #3fae6a;
+    --tone-dim: #23753f;
+    --tone-bright: #62d68e;
+    --tone-bright-dim: #3c9e62;
+    --tone-on: #a4f0bf;
+    --tone-glow: rgba(98, 214, 142, 0.6);
+}
+
+/* outside the key */
+.cbt_note.cbt_noteOut {
+    --tone-base: #d24b4b;
+    --tone-dim: #8e2c2c;
+    --tone-bright: #f27272;
+    --tone-bright-dim: #bd4747;
+    --tone-on: #ffb0b0;
+    --tone-glow: rgba(242, 114, 114, 0.6);
+}
+
+.cbt_noteName {
+    color: #1c1c1c;
+    font-size: 7.5pt;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.cbt_note.cbt_noteBass {
+    background: var(--tone-dim);
+}
+
+.cbt_note.cbt_noteBass .cbt_noteName {
+    color: #f0f0f0;
+}
+
+/* notes of the selected chord */
+.cbt_note.cbt_noteChord {
+    background: var(--tone-bright);
+}
+
+.cbt_note.cbt_noteChord.cbt_noteBass {
+    background: var(--tone-bright-dim);
+}
+
+.cbt_note.cbt_noteChord.cbt_noteBass .cbt_noteName {
+    color: #1c1c1c;
+}
+
+/* the note picked for moving: keeps its color, gets a white outline */
+.cbt_note.cbt_noteSelected {
+    background: var(--tone-bright);
+    border-color: #ffffff;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.6),
+        0 0 12px var(--tone-glow);
+}
+
+.cbt_note.cbt_noteSelected .cbt_noteName {
+    color: #1c1c1c;
+}
+
+.cbt_note.cbt_noteOn {
+    background: var(--tone-on);
+    box-shadow: 0 0 10px var(--tone-glow);
+}
+
+.cbt_note.cbt_noteOn .cbt_noteName {
+    color: #1c1c1c;
+}
+
+.cbt_timeline.cbt_noteDragging,
+.cbt_timeline.cbt_noteDragging * {
+    cursor: ns-resize !important;
+}
+
+.cbt_rollPlayhead {
+    grid-row: 1 / -1;
+}
+
+/* the small chord picker hangs just under the clicked chord */
+.cbt_picker {
+    position: absolute;
+    top: calc(100% + 8px);
+    z-index: 30;
+}
+
+/* ========================= */
+/* STICKY CHORD ROWS         */
+/* ========================= */
+
+/* bar numbers + chords + tension, on the page background so the piano roll
+   slides underneath when they stick */
+.cbt_stickyTop {
+    background: var(--color-bg);
+}
+
+/* Desktop: the timeline fits the page (columns shrink instead of scrolling
+   sideways), which lets the chord rows stick under the sticky top bar.
+   A sideways-scrolling box would stop sticky from working, so smaller
+   screens keep the scroll and the chords scroll normally there. */
+@media (min-width: 901px) {
+    .cbt_scroll {
+        overflow-x: visible;
+    }
+
+    .cbt_timeline {
+        min-width: 0;
+    }
+
+    .cbt_stickyTop {
+        position: sticky;
+        /* tucked 3px up under the top bar (which sits above it), so no gap shows */
+        top: calc(var(--nav-h, 72px) + var(--bar-h, 72px) - 3px);
+        z-index: 40;
+        padding-bottom: 6px;
+    }
+}
