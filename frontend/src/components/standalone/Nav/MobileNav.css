@@ -51,10 +51,10 @@
 }
 
 /* ========================================= */
-/* VIDEO                                     */
+/* BACKDROP (same as the login page)         */
 /* ========================================= */
 
-.mobileNav_videoFade {
+.mobileNav_backdrop {
     position: absolute;
     inset: 0;
     z-index: 0;
@@ -63,32 +63,60 @@
     pointer-events: none;
 
     opacity: 0;
-
     transition: opacity 150ms ease;
 }
 
-.mobileNav_videoFade.mobileNav_videoVisible {
+.mobileNav_backdrop.mobileNav_backdropVisible {
     opacity: 1;
-
-    transition: opacity 600ms ease 300ms;
+    transition: opacity 600ms ease 200ms;
 }
 
-.mobileNav_video {
+/* faint grid, faded out toward the edges */
+.mobileNav_grid {
     position: absolute;
-    top: 50%;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: center center;
+    mask-image: radial-gradient(ellipse 75% 60% at 50% 45%, black 10%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 45%, black 10%, transparent 75%);
+}
+
+.mobileNav_orb {
+    position: absolute;
     left: 50%;
+    border-radius: 50%;
+    filter: blur(80px);
+    translate: -50% 0;
+}
 
-    width: 100%;
-    height: 100%;
+.mobileNav_orb_a {
+    top: -15%;
+    width: 130vw;
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgba(96, 165, 255, 0.18), transparent);
+    animation: mobileNav_drift 18s ease-in-out infinite alternate;
+}
 
-    display: block;
+.mobileNav_orb_b {
+    bottom: -20%;
+    width: 150vw;
+    aspect-ratio: 1.3;
+    background: radial-gradient(closest-side, rgba(64, 224, 200, 0.09), transparent);
+    animation: mobileNav_drift 22s ease-in-out infinite alternate-reverse;
+}
 
-    object-fit: cover;
-    object-position: center;
+@keyframes mobileNav_drift {
+    from { transform: translate(-4%, -3%) scale(1); }
+    to   { transform: translate(4%, 4%) scale(1.08); }
+}
 
-    transform: translate(-50%, -50%);
-
-    opacity: 0.2;
+@media (prefers-reduced-motion: reduce) {
+    .mobileNav_orb {
+        animation: none;
+    }
 }
 
 /* ========================================= */
@@ -111,10 +139,30 @@
 /* LINKS                                     */
 /* ========================================= */
 
+/* the links, in groups; the groups are spaced apart, links within are close */
 .mobileNav_links {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 28px;
+}
+
+.mobileNav_group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+/* small grey label over a group (Vault, Tools) */
+.mobileNav_groupLabel {
+    margin: 0 0 2px;
+
+    color: rgba(255, 255, 255, 0.38);
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
 }
 
 .mobileNav_linkItem {

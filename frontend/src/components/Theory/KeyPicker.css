@@ -1,0 +1,111 @@
+/* the key picker in the theory page's sticky bar (KeyPicker.svelte).
+   --kh is the current key's circle hue, --oh each option's */
+.kp {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+}
+
+/* the button: the key's color, its name, a chevron */
+.kp_trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 11px 7px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.kp_trigger:hover,
+.kp_trigger.kp_triggerOpen {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.kp_trigger:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
+}
+
+.kp_dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: hsl(var(--kh) 85% 62%);
+    transition: background 0.2s ease;
+}
+
+.kp_name {
+    text-transform: capitalize;
+}
+
+.kp_chevron {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.6;
+    transition: transform 0.2s ease;
+}
+
+.kp_triggerOpen .kp_chevron {
+    transform: rotate(180deg);
+}
+
+/* the panel: a compact circle of fifths (the same component as the page's) */
+/* fixed to the window; top / left come from the button (KeyPicker.svelte) */
+.kp_panel {
+    position: fixed;
+    z-index: 30;
+    box-sizing: border-box; /* the width includes the padding, as KeyPicker.svelte places it */
+    width: min(320px, calc(100vw - 24px));
+    padding: 14px 14px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    background: #1b1b1b;
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.55),
+        0 2px 8px rgba(0, 0, 0, 0.35);
+    animation: kp_in 0.16s ease-out;
+}
+
+/* the circle's segment gaps are drawn in the page color; match the panel */
+.kp_panel .cof {
+    --color-bg: #1b1b1b;
+    max-width: 100%;
+}
+
+@keyframes kp_in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.98);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kp_panel {
+        animation: none;
+    }
+}
+
+.kp_hint {
+    margin: 8px 0 0;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+    text-align: center;
+}

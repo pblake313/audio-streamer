@@ -57,6 +57,13 @@ export const VIBES: Record<Quality, string> = {
     dim7: "Dramatic, cinematic, suspenseful",
     "7b9": "Dark, intense, flamenco/jazz pull",
     "13": "Lush, sophisticated big-band dominant",
+    "5": "Raw, heavy, neither happy nor sad",
+    "1": "Bare and hypnotic: just the root",
+    "6/9": "Lush, dreamy, wide open",
+    m11: "Deep, airy, floating minor",
+    "11": "Hazy, suspended dominant",
+    m7add11: "Moody and open",
+    add11: "Bright with a soft clash",
 };
 
 // ---------- key helpers ----------
@@ -73,7 +80,7 @@ const isDimish = (q: Quality) => q === "dim" || q === "dim7" || q === "m7b5";
 const isMajorish = (q: Quality) => (QUALITIES[q].intervals as readonly number[]).includes(4);
 
 /** 7-note scale steps used for harmony (pentatonic/blues borrow from major/minor). */
-function harmonySteps(scale: ScaleId): number[] {
+export function harmonySteps(scale: ScaleId): number[] {
     if (scale === "majorPentatonic" || scale === "none") return [...SCALES.major.intervals];
     if (scale === "minorPentatonic" || scale === "blues") return [...SCALES.minor.intervals];
     return [...SCALES[scale].intervals];
@@ -88,7 +95,7 @@ const shapeKey = (intervals: readonly number[]) =>
  * chord. e.g. degree 1 of C major -> Dm / Dm7 / Dm9. Null if the result
  * isn't a chord type the app knows (like iii's m7b9).
  */
-function diatonicChord(keyPc: number, steps: number[], degree: number, size: 3 | 4 | 5): SimpleChord | null {
+export function diatonicChord(keyPc: number, steps: number[], degree: number, size: 3 | 4 | 5): SimpleChord | null {
     const stack = [0, 2, 4, 6, 8].slice(0, size);
     const pcs = stack.map((s) => (keyPc + steps[(degree + s) % 7]) % 12);
     const shape = shapeKey(pcs.map((pc) => pc - pcs[0] + 12));

@@ -1,0 +1,377 @@
+/*
+    Features as a pricing table. Section, heading and eyebrow styles come from
+    ProjectDetails.css (.pd_section, .pd_heading, .pd_eyebrow). Each plan card
+    sets --fp-accent (r, g, b).
+*/
+
+/* ========================= */
+/* HEADING + LEGEND          */
+/* ========================= */
+
+.fp_head {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) 2fr;
+    column-gap: 40px;
+    align-items: end;
+}
+
+.fp_intro {
+    max-width: 640px;
+    margin-bottom: 32px;
+
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12pt;
+    line-height: 1.6;
+}
+
+.fp_legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 10pt;
+}
+
+.fp_legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* row markers: green check = works here, purple lock = own instance */
+.fp_mark {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.fp_mark svg {
+    width: 12px;
+    height: 12px;
+}
+
+.fp_mark_included {
+    background: rgba(98, 214, 142, 0.14);
+    color: rgb(98, 214, 142);
+}
+
+.fp_mark_instance {
+    background: rgba(170, 120, 255, 0.16);
+    color: rgb(190, 150, 255);
+}
+
+/* ========================= */
+/* PLAN CARDS                */
+/* ========================= */
+
+.fp_plans {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    align-items: stretch;
+}
+
+.fp_plans > div {
+    display: flex;
+}
+
+.fp_plan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    box-sizing: border-box;
+    padding: 30px 26px 32px;
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    background: linear-gradient(
+        160deg,
+        rgba(255, 255, 255, 0.055),
+        rgba(255, 255, 255, 0.015)
+    );
+}
+
+/* accent stripe along the top edge */
+.fp_plan::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 26px;
+    right: 26px;
+    height: 2px;
+    border-radius: 2px;
+    background: rgb(var(--fp-accent));
+    opacity: 0.7;
+}
+
+.fp_planFeatured {
+    border-color: rgba(var(--fp-accent), 0.4);
+    background: linear-gradient(
+        160deg,
+        rgba(var(--fp-accent), 0.12),
+        rgba(255, 255, 255, 0.015) 55%
+    );
+}
+
+.fp_ribbon {
+    position: absolute;
+    top: 26px;
+    right: 22px;
+
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(var(--fp-accent), 0.18);
+
+    color: rgb(var(--fp-accent));
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.fp_name {
+    font-size: 17pt;
+    line-height: 1.2;
+}
+
+.fp_tagline {
+    min-height: 3.2em; /* two lines, so the prices line up across cards */
+    margin-top: 8px;
+
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 10.5pt;
+    line-height: 1.6;
+}
+
+.fp_price {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.fp_priceValue {
+    color: white;
+    font-size: 26pt;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+}
+
+.fp_priceNote {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 9.5pt;
+}
+
+/* ========================= */
+/* ACTIONS                   */
+/* ========================= */
+
+.fp_cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin-top: 22px;
+    padding: 10px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+
+    color: #f7f7f7;
+    font-size: 11pt;
+    font-weight: 500;
+    line-height: 1.25;
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.fp_cta:hover {
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: white;
+}
+
+/* the featured plan gets the solid button */
+.fp_planFeatured .fp_cta {
+    border-color: #f7f7f7;
+    background: #f7f7f7;
+    color: #222;
+    font-weight: 600;
+}
+
+.fp_planFeatured .fp_cta:hover {
+    border-color: white;
+    background: white;
+    color: #222;
+}
+
+.fp_cta svg {
+    width: 15px;
+    height: 15px;
+}
+
+.fp_secondary {
+    margin-top: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 9.5pt;
+    text-align: center;
+}
+
+.fp_secondary:hover {
+    color: white;
+}
+
+.fp_cta:focus-visible,
+.fp_secondary:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 3px;
+}
+
+/* ========================= */
+/* FEATURE LISTS             */
+/* ========================= */
+
+.fp_groupLabel {
+    margin: 28px 0 14px;
+
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.fp_list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.fp_list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 10.5pt;
+    line-height: 1.5;
+}
+
+.fp_list .fp_mark {
+    margin-top: 1px;
+}
+
+/* labels for screen readers, since the icons are decorative */
+.fp_srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
+
+/* small screens: one row of cards that swipes sideways and snaps per card.
+   It runs to the screen edges (cancelling the section's 25px side padding),
+   with the next card peeking in so it's clear there's more. */
+@media (max-width: 1100px) {
+    .fp_plans {
+        --fp-gutter: 25px;
+
+        display: flex;
+        gap: 14px;
+
+        margin: 0 calc(var(--fp-gutter) * -1);
+        padding: 4px var(--fp-gutter) 8px;
+        overflow-x: auto;
+        overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 var(--fp-gutter);
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .fp_plans::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* in the row, cards fade in without the rise: the row clips anything
+       below its edge, and rising cards would look cut off */
+    .fp_plans > .reveal {
+        transform: none;
+    }
+
+    .fp_plans > div {
+        flex: 0 0 min(420px, 82%);
+        scroll-snap-align: center;
+    }
+}
+
+@media (max-width: 850px) {
+    .fp_head {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fp_head .pd_heading {
+        margin-bottom: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* matches the section's narrower side padding on phones */
+    .fp_plans {
+        --fp-gutter: 15px;
+        gap: 10px;
+    }
+
+    .fp_plans > div {
+        flex-basis: 86%;
+    }
+
+    .fp_plan {
+        padding: 26px 20px 28px;
+    }
+
+    .fp_plan::before {
+        left: 20px;
+        right: 20px;
+    }
+
+    .fp_ribbon {
+        top: 22px;
+        right: 18px;
+    }
+
+    .fp_priceValue {
+        font-size: 22pt;
+    }
+}

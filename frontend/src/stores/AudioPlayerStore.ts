@@ -25,9 +25,17 @@ import {
     preferredAudioFormat,
     type AudioFormat,
 } from "./AudioFormatStore";
+import { isLinkExpiring, refreshBeatUrls } from "./AudioPlayer/freshBeatUrls";
 
-// How many seconds before we show the "Still Listening?" popup
+// How many seconds of continuous listening before the "Still Listening?" popup
 const LISTEN_TIMEOUT_SECONDS = 60 * 30;
+
+/*
+ * Whether the listener wants audio playing right now (they pressed play, or
+ * autoplay took over). Used to pick up where they were after an audio link
+ * is swapped for a fresh one.
+ */
+let wantsToPlay = false;
 
 // =========================
 // Audio element initialization
@@ -110,31 +118,132 @@ export const userTapped = writable<boolean>(false);
  */
 let pendingResume: { url: string; time: number; play: boolean } | null = null;
 
-export function setAudioFormat(format: AudioFormat) {
+export async function setAudioFormat(format: AudioFormat) {
     preferredAudioFormat.set(format);
 
     const beat = get(selectedBeat);
     const a = get(audioStore);
     if (!beat || !a) return;
 
-    const source = getBeatAudioSource(beat, format);
+    let source = getBeatAudioSource(beat, format);
     if (!source || source.url === get(audioPlayerUrl)) return;
 
-    pendingResume = {
-        url: source.url,
-        time: a.currentTime || 0,
-        play: !a.paused && !a.ended,
-    };
+    const time = a.currentTime || 0;
+    const play = !a.paused && !a.ended;
+
+    // the other file's link may have run out since the list loaded
+    if (isLinkExpiring(source.url)) {
+        const fresh = await refreshBeatUrls(beat);
+        if (get(selectedBeat)?.id !== beat.id) return;
+        if (fresh) source = getBeatAudioSource(fresh, format);
+        if (!source) return;
+    }
+
+    pendingResume = { url: source.url, time, play };
 
     audioPlayerUrl.set(source.url);
 }
 
-// Timeout-related stores
-export const trackTimer = writable<number>(0);
+// =========================
+// Expired audio links
+// =========================
+/*
+ * Audio links last an hour. When the loaded track's link has run out (or
+ * failed mid-stream), fetch a fresh one and carry on from the same spot,
+ * playing again if it was playing, instead of needing a page refresh.
+ * Returns false when no fresh link could be had.
+ */
+async function reloadWithFreshLink(resumePlaying: boolean): Promise<boolean> {
+    const beat = get(selectedBeat);
+    const a = get(audioStore);
+    const url = get(audioPlayerUrl);
+    if (!beat || !a || !url) return false;
+
+    const time = a.currentTime || 0;
+
+    clearAudioPlayerErrorMessage();
+    audioPlayerState.set("Loading");
+
+    const fresh = await refreshBeatUrls(beat);
+
+    // another track was picked meanwhile: nothing left to recover
+    if (get(selectedBeat)?.id !== beat.id) return true;
+
+    const source = fresh ? getBeatAudioSource(fresh, get(preferredAudioFormat)) : null;
+    if (!source || source.url === url) return false;
+
+    pendingResume = { url: source.url, time, play: resumePlaying };
+    audioPlayerUrl.set(source.url);
+    return true;
+}
+
+// one automatic retry per track per minute, so a file that's really gone
+// shows its error instead of retrying forever
+const RECOVERY_COOLDOWN_MS = 60 * 1000;
+let lastRecovery: { beatId: string; at: number } | null = null;
+
+async function handleAudioError(error: MediaError | null) {
+    const beat = get(selectedBeat);
+
+    // 2 = network failure, 4 = source rejected (what a 403 from an expired link looks like)
+    const linkProblem = error?.code === 2 || error?.code === 4;
+    const recentlyTried =
+        !!beat && lastRecovery?.beatId === beat.id && Date.now() - lastRecovery.at < RECOVERY_COOLDOWN_MS;
+
+    if (linkProblem && beat && !recentlyTried) {
+        lastRecovery = { beatId: beat.id, at: Date.now() };
+        if (await reloadWithFreshLink(wantsToPlay)) return;
+    }
+
+    setAudioPlayerError(error);
+}
+
+// =========================
+// "Still Listening?" timeout
+// =========================
+/*
+ * Listening time is measured on the clock while audio is actually playing
+ * (not from timeupdate gaps, which browsers space out in background tabs and
+ * on locked phones). It keeps adding up across tracks, and only resets when
+ * the listener does something: play, pause, skip, scrub, or answer the popup.
+ */
+export const trackTimer = writable<number>(0); // seconds listened
 export const inTimeout = writable<boolean>(false);
 
-// Internal helper for accumulating time
-let lastAudioTime = 0;
+let listenedMs = 0;
+let playingSince: number | null = null;
+
+function startListeningClock() {
+    if (playingSince === null) playingSince = Date.now();
+}
+
+function stopListeningClock() {
+    if (playingSince === null) return;
+    listenedMs += Date.now() - playingSince;
+    playingSince = null;
+}
+
+function checkListenTimeout() {
+    if (get(inTimeout)) return;
+
+    const seconds = (listenedMs + (playingSince !== null ? Date.now() - playingSince : 0)) / 1000;
+    trackTimer.set(Math.floor(seconds));
+    if (seconds < LISTEN_TIMEOUT_SECONDS) return;
+
+    stopListeningClock();
+    wantsToPlay = false;
+    inTimeout.set(true);
+
+    const live = get(audioStore);
+    if (live && !live.paused) live.pause();
+    audioPlayerState.set("Paused");
+}
+
+// timeupdate covers the foreground; this covers background tabs, where
+// browsers fire media events and timers far less often
+if (typeof window !== "undefined") {
+    setInterval(checkListenTimeout, 10 * 1000);
+}
 
 
 // =========================
@@ -559,11 +668,11 @@ if (audio) {
     audio.addEventListener("playing", () => {
         clearAudioPlayerErrorMessage();
         audioPlayerState.set("Playing");
-
-        lastAudioTime = audio?.currentTime ?? 0;
+        startListeningClock();
     });
 
     audio.addEventListener("pause", () => {
+        stopListeningClock();
         if (!audio) return;
         if (audio.ended) return;
 
@@ -574,18 +683,18 @@ if (audio) {
         }
     });
 
-    audio.addEventListener("seeking", () => {
-        resetTrackTimer();
-        lastAudioTime = audio?.currentTime ?? 0;
-    });
+    // (seeking no longer resets the listening timer: the app seeks on its own,
+    // e.g. looping or switching WAV / MP3. Scrubbing resets it explicitly.)
 
     audio.addEventListener("ended", async () => {
+        stopListeningClock();
         clearAudioPlayerErrorMessage();
         audioPlayerState.set("Ended");
         userTapped.set(true);
 
         if (get(loopTrack)) {
-            restartTrack();
+            // replay without resetting the timer, so looping still times out
+            replayFromStart();
             return;
         }
 
@@ -593,48 +702,16 @@ if (audio) {
     });
 
     audio.addEventListener("waiting", () => {
+        stopListeningClock(); // buffering isn't listening
         audioPlayerState.set("Buffering");
     });
 
     audio.addEventListener("error", () => {
-        setAudioPlayerError(audio?.error);
+        stopListeningClock();
+        void handleAudioError(audio?.error ?? null);
     });
 
-    audio.addEventListener("timeupdate", () => {
-        const a = audio;
-        if (!a) return;
-
-        if (get(inTimeout)) return;
-        if (get(audioPlayerState) !== "Playing") return;
-
-        const currentTime = a.currentTime;
-        const rawDelta = currentTime - lastAudioTime;
-
-        if (rawDelta < 0 || rawDelta > 1.5) {
-            lastAudioTime = currentTime;
-            return;
-        }
-
-        const delta = Math.max(0, rawDelta);
-        lastAudioTime = currentTime;
-
-        trackTimer.update((prev) => {
-            const next = prev + delta;
-
-            if (next >= LISTEN_TIMEOUT_SECONDS) {
-                const live = get(audioStore);
-
-                if (live) {
-                    live.pause();
-                    audioPlayerState.set("Paused");
-                }
-
-                inTimeout.set(true);
-            }
-
-            return next;
-        });
-    });
+    audio.addEventListener("timeupdate", checkListenTimeout);
 }
 
 
@@ -645,13 +722,30 @@ function playTrackInternal(resetTimer: boolean) {
     const a = get(audioStore);
     if (!a) return;
 
+    // autoplay waits while "Still Listening?" is up; pressing play answers it
+    if (!resetTimer && get(inTimeout)) return;
+
     userTapped.set(true);
     clearAudioPlayerErrorMessage();
+    wantsToPlay = true;
 
     if (resetTimer) {
         resetTrackTimer();
     }
 
+    // the loaded track's link has run out (e.g. paused for over an hour):
+    // swap in a fresh one, which resumes from the same spot and plays
+    if (isLinkExpiring(get(audioPlayerUrl))) {
+        void reloadWithFreshLink(true).then((reloaded) => {
+            if (!reloaded) startPlayback(a);
+        });
+        return;
+    }
+
+    startPlayback(a);
+}
+
+function startPlayback(a: HTMLAudioElement) {
     a.play().catch((err: any) => {
         if (err?.name === "AbortError") {
             console.debug(
@@ -675,20 +769,23 @@ function autoPlayTrack() {
 }
 
 
+// back to the start of the current track (the listener chose this, so the
+// "Still Listening?" timer starts over)
 function restartTrack() {
+    resetTrackTimer();
+    replayFromStart();
+}
+
+// the loop's replay: same as above, but the timer keeps counting
+function replayFromStart() {
     const a = get(audioStore);
     if (!a) return;
 
     userTapped.set(true);
     clearAudioPlayerErrorMessage();
-    resetTrackTimer();
 
     a.currentTime = 0;
-
-    a.play().catch((err) => {
-        if (err?.name === "AbortError") return;
-        setAudioPlayerError(err);
-    });
+    playTrackInternal(false);
 }
 
 
@@ -736,6 +833,7 @@ function pauseTrack() {
 
     if (a && !a.paused) {
         userTapped.set(true);
+        wantsToPlay = false;
         resetTrackTimer();
         a.pause();
     }
@@ -771,6 +869,7 @@ function stopTrack() {
 
     userTapped.set(true);
     clearAudioPlayerErrorMessage();
+    wantsToPlay = false;
 
     a.pause();
     a.currentTime = 0;
@@ -785,9 +884,11 @@ function stopTrack() {
 // Reset timer helper
 // =========================
 export function resetTrackTimer() {
+    listenedMs = 0;
+    // still playing: count again from now
+    playingSince = audio && !audio.paused && !audio.ended ? Date.now() : null;
     trackTimer.set(0);
     inTimeout.set(false);
-    lastAudioTime = audio?.currentTime ?? 0;
 }
 
 

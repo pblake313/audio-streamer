@@ -40,14 +40,10 @@
     */
     let snapIndex = 0;
     let snapCount = 0;
-    let isBeginning = true;
-    let isEnd = false;
 
     function updateNavigationState(sw: SwiperCore) {
         snapIndex = sw.snapIndex;
         snapCount = sw.snapGrid.length;
-        isBeginning = sw.isBeginning;
-        isEnd = sw.isEnd;
     }
 
     // ---------------------------------------------
@@ -161,12 +157,8 @@
         <SwiperControls
             current={snapIndex}
             total={snapCount}
-            {isBeginning}
-            {isEnd}
-            showCount={false}
             label="mobile screenshots"
-            onPrev={() => mobileSwiper?.slidePrev()}
-            onNext={() => mobileSwiper?.slideNext()}
+            onGoTo={(i) => mobileSwiper?.slideTo(i)}
         />
     </div>
 </div>

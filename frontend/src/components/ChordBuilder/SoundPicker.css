@@ -1,12 +1,3 @@
-/* closed control: the sound's category in small text after its name */
-.sp_triggerGroup {
-    margin-left: 6px;
-
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 8pt;
-    font-weight: 500;
-}
-
 /* ========================= */
 /* OPEN: categories | sounds */
 /* ========================= */

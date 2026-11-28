@@ -15,7 +15,12 @@
         type ScaleId,
     } from "../../helpers/ChordBuilder/chords";
     import { tensionColor, transitionTension } from "../../helpers/ChordBuilder/tension";
+    import { FUNCTION_HUES, harmonicFunction } from "../../helpers/ChordBuilder/harmonicFunction";
     import type { SimpleChord } from "../../helpers/ChordBuilder/suggestions";
+    import { chordAnatomy } from "../../helpers/ChordBuilder/chordAnatomy";
+    import { onDestroy } from "svelte";
+    import { dragScroll } from "../../helpers/dragScroll";
+    import { floatPanel } from "../../helpers/ChordBuilder/floatPanel";
     import ChordSuggestions from "./ChordSuggestions.svelte";
     import ChordPicker from "./ChordPicker.svelte";
     import {
@@ -48,11 +53,13 @@
     const isKeyRoot = (midi: number, pitches: Set<number> | null, rootPc: number) =>
         !!pitches && midi % 12 === rootPc;
 
-    // the roll shows C2 up to MAX_NOTE (E5) and never goes higher;
-    // it only grows downward, by whole octaves, for notes moved below C2
+    // the roll shows C2 up to F#4 (Ableton naming: just over the default chords,
+    // so not much empty space on top) and grows by whole octaves either way for
+    // notes outside that: down to C0, up to MAX_NOTE (C6)
     const NOTE_MIN = 24;
     const NOTE_MAX = MAX_NOTE;
-    const SHOW_LOW = 36;
+    const SHOW_LOW = 48;
+    const SHOW_HIGH = 78;
     const ROW_H = 16;
 
     let lane: HTMLDivElement;
@@ -72,7 +79,7 @@
     // clicking (not dragging) a chord opens a small picker under it; its
     // "Suggestions" button opens the big ideas modal on top. The chord as it was
     // is remembered so "Back to ..." can undo whatever was tried.
-    let ideasFor: { id: number; original: Pick<ChordSlot, "root" | "quality" | "notes"> } | null = null;
+    let ideasFor: { id: number; original: Pick<ChordSlot, "root" | "quality" | "notes" | "slashBass"> } | null = null;
     let showSuggestions = false;
     let pickerPanel: HTMLDivElement;
 
@@ -81,8 +88,24 @@
         ideasFor =
             ideasFor?.id === chord.id
                 ? null
-                : { id: chord.id, original: { root: chord.root, quality: chord.quality, notes: chord.notes ?? null } };
+                : { id: chord.id, original: { root: chord.root, quality: chord.quality, notes: chord.notes ?? null, slashBass: chord.slashBass ?? null } };
     }
+
+    /*
+        The small chord picker opens under (or above) the chord, fixed to the
+        window so the timeline's sideways scroll can't clip it, and capped to
+        the room on screen (helpers/ChordBuilder/floatPanel.ts). Its anchor is
+        the chord's span on the chord row.
+    */
+    const pickerAnchor = {
+        getBoundingClientRect() {
+            const r = lane.getBoundingClientRect();
+            if (!ideasChord) return r;
+            const from = ideasChord.start / totalBeats;
+            const to = Math.min(ideasChord.start + ideasChord.beats, totalBeats) / totalBeats;
+            return new DOMRect(r.left + r.width * from, r.top, r.width * (to - from), r.height);
+        },
+    };
 
     function closeIdeas() {
         ideasFor = null;
@@ -103,6 +126,7 @@
         chord.root = idea.root;
         chord.quality = idea.quality;
         chord.notes = null; // fresh voicing for the new chord
+        chord.slashBass = null;
         chords = chords;
         onPreviewChord(effectiveNotes(idea));
     }
@@ -195,6 +219,15 @@
         return pc >= 0 ? pc : ROOTS.indexOf(chord.root);
     };
 
+    // tonic / predominant / dominant badge for each chord in the current key
+    const functionOf = (chord: ChordSlot, rootPc: number, scalePcs: Set<number> | null) =>
+        harmonicFunction(
+            effectiveNotes(chord).map((midi) => midi % 12),
+            rootPcOf(chord),
+            rootPc,
+            scalePcs,
+        );
+
 
     $: transitions = (() => {
         const ordered = [...visible].sort((a, b) => a.start - b.start);
@@ -218,8 +251,40 @@
     })();
 
     $: usedMidi = rollNotes.map((n) => n.midi);
-    $: rollLow = Math.min(SHOW_LOW, ...usedMidi.map((m) => m - (m % 12)));
-    const rollHigh = NOTE_MAX;
+    /*
+        The roll's range: C2-C5, plus whole octaves either way when needed:
+          - for notes already outside it (an import, transposing, an octave jump)
+          - when you put a note in the top or bottom EDGE_ROWS rows (click, drag
+            or arrow keys), so there's room to keep going that way
+        A grown octave stays while a note is still in it or next to it, then
+        goes away. Never past C0 / C6, and never mid-drag: it waits for the
+        release so the rows don't move under the pointer.
+    */
+    const EDGE_ROWS = 2;
+    let reachHigh = SHOW_HIGH; // where your edits have asked the roll to reach
+    let reachLow = SHOW_LOW;
+    let rollHigh = SHOW_HIGH;
+    let rollLow = SHOW_LOW;
+
+    $: usedTop = usedMidi.length ? Math.max(...usedMidi) : SHOW_HIGH;
+    $: usedBottom = usedMidi.length ? Math.min(...usedMidi) : SHOW_LOW;
+    // a grown octave is kept while a note sits in it or just inside the old edge
+    $: keptHigh = reachHigh > SHOW_HIGH && usedTop >= reachHigh - 12 - EDGE_ROWS ? reachHigh : SHOW_HIGH;
+    $: keptLow = reachLow < SHOW_LOW && usedBottom <= reachLow + 12 + EDGE_ROWS - 1 ? reachLow : SHOW_LOW;
+    // the top grows in octaves from SHOW_HIGH (F#4, F#5, then the C6 ceiling) to fit
+    // the highest note; the bottom to the C under the lowest note
+    $: neededHigh = SHOW_HIGH + Math.max(0, Math.ceil((usedTop - SHOW_HIGH) / 12)) * 12;
+    $: neededLow = usedBottom - (usedBottom % 12);
+    $: if (!noteDrag) {
+        rollHigh = Math.min(NOTE_MAX, Math.max(SHOW_HIGH, neededHigh, keptHigh));
+        rollLow = Math.max(NOTE_MIN, Math.min(SHOW_LOW, neededLow, keptLow));
+    }
+
+    /** After you put a note at `midi`: near the top or bottom edge opens the next octave that way. */
+    function reachFor(midi: number) {
+        if (midi > rollHigh - EDGE_ROWS && rollHigh < NOTE_MAX) reachHigh = Math.min(NOTE_MAX, rollHigh + 12);
+        if (midi < rollLow + EDGE_ROWS && rollLow > NOTE_MIN) reachLow = Math.max(NOTE_MIN, rollLow - 12);
+    }
     $: rollKeys = Array.from({ length: rollHigh - rollLow + 1 }, (_, i) => rollHigh - i);
     $: rowOf = (midi: number) => rollHigh - midi + 1;
 
@@ -246,6 +311,7 @@
 
     function commitNotes(chord: ChordSlot, notes: number[]) {
         chord.notes = notes;
+        chord.slashBass = null; // hand-edited: name it from its notes again
 
         // keep root/type in sync when the new notes spell a known chord
         const detected = detectChord(notes);
@@ -283,16 +349,40 @@
         commitNotes(chord, notes);
     }
 
+    /*
+        A press on empty roll space adds a note on release, and only if it
+        didn't move: a clean click or tap. A press that moves is a pan instead,
+        swiping the roll sideways with a finger, or dragging it with the mouse
+        (use:dragScroll on .cbt_scroll, when the roll is wider than the screen),
+        so moving around never drops notes. When the browser takes a touch over
+        to scroll, it sends pointercancel and the tap is dropped.
+    */
+    const TAP_SLOP_PX = 8;
+    let pendingTap: { id: number; x: number; y: number } | null = null;
+
     function addNoteAt(event: PointerEvent) {
         if (event.button !== 0) return;
 
+        // a mouse press shouldn't select text; a touch is left alone so it can still scroll
+        if (event.pointerType === "mouse") event.preventDefault();
+        pendingTap = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    }
+
+    function finishTap(event: PointerEvent) {
+        if (!pendingTap || event.pointerId !== pendingTap.id) return;
+        const tap = pendingTap;
+        pendingTap = null;
+        if (event.type !== "pointerup") return; // cancelled: the browser scrolled instead
+        if (Math.hypot(event.clientX - tap.x, event.clientY - tap.y) > TAP_SLOP_PX) return;
+        addNoteAtPoint(event.clientX, event.clientY);
+    }
+
+    function addNoteAtPoint(clientX: number, clientY: number) {
         const rect = roll.getBoundingClientRect();
-        const beat = Math.floor((event.clientX - rect.left) / (rect.width / totalBeats));
-        const midi = midiAt(event.clientY);
+        const beat = Math.floor((clientX - rect.left) / (rect.width / totalBeats));
+        const midi = midiAt(clientY);
 
         if (beat < 0 || beat >= totalBeats || midi < rollLow || midi > rollHigh) return;
-
-        event.preventDefault();
 
         const chord = visible.find((c) => beat >= c.start && beat < c.start + c.beats);
 
@@ -311,6 +401,7 @@
         }
 
         onPreview(midi);
+        reachFor(midi);
     }
 
     function midiAt(clientY: number) {
@@ -342,7 +433,10 @@
         // hop over notes the chord already has
         let target = rawNotes(chord)[selectedNote.index] + step;
         while (target >= NOTE_MIN && target <= NOTE_MAX) {
-            if (setNote(chord, selectedNote.index, target)) break;
+            if (setNote(chord, selectedNote.index, target)) {
+                reachFor(target);
+                break;
+            }
             target += Math.sign(step);
         }
     }
@@ -377,10 +471,49 @@
         return (clientX - rect.left) / (rect.width / totalBeats);
     }
 
+    // ---------- hover card: how the chord is built ----------
+
+    // shown after a short pause over a chord; fixed-positioned so the
+    // timeline's scroll box can't clip it
+    let hoverCard: { chordId: number; left: number; top: number; above: boolean } | null = null;
+    let hoverTimer: ReturnType<typeof setTimeout> | null = null;
+    const CARD_W = 300;
+
+    function showCardSoon(event: PointerEvent, chord: ChordSlot) {
+        if (event.pointerType !== "mouse" || drag) return; // no hover on touch
+        const block = event.currentTarget as HTMLElement;
+        hideCard();
+        hoverTimer = setTimeout(() => {
+            const rect = block.getBoundingClientRect();
+            const above = window.innerHeight - rect.bottom < 260 && rect.top > 260;
+            hoverCard = {
+                chordId: chord.id,
+                left: Math.max(12, Math.min(rect.left, window.innerWidth - CARD_W - 12)),
+                top: above ? rect.top - 8 : rect.bottom + 8,
+                above,
+            };
+        }, 350);
+    }
+
+    function hideCard() {
+        if (hoverTimer) clearTimeout(hoverTimer);
+        hoverTimer = null;
+        hoverCard = null;
+    }
+
+    // the card always describes the chord as it is now (it may change while shown)
+    $: hoveredChord = hoverCard ? visible.find((c) => c.id === hoverCard?.chordId) ?? null : null;
+    $: anatomy = hoveredChord ? chordAnatomy(hoveredChord) : null;
+    // out of the way while dragging or while that chord's picker is open
+    $: showAnatomy = anatomy !== null && drag === null && ideasFor?.id !== hoverCard?.chordId;
+
+    onDestroy(hideCard);
+
     function beginDrag(event: PointerEvent, chord: ChordSlot, mode: DragMode) {
         if (event.button !== 0) return;
         event.preventDefault();
         event.stopPropagation();
+        hideCard();
 
         selectedId = chord.id;
         drag = {
@@ -437,9 +570,17 @@
     }
 
     function endDrag(event?: PointerEvent) {
+        if (event) finishTap(event); // a touch on empty roll space: add a note only if it was a tap
         // a note pressed and released without moving was a click: remove it
         if (noteDrag && !noteMoved && pressedNote && event?.type === "pointerup") {
             removeNote(pressedNote.note);
+        }
+
+        // a note dragged to the top or bottom edge opens the next octave (now, after the release)
+        if (noteDrag && noteMoved && selectedNote) {
+            const chord = chords.find((c) => c.id === selectedNote!.chordId);
+            const midi = chord ? rawNotes(chord)[selectedNote.index] : undefined;
+            if (midi !== undefined) reachFor(midi);
         }
 
         // a chord pressed and released without moving was a click: show ideas
@@ -461,9 +602,43 @@
     on:pointercancel={endDrag}
     on:pointerdown={handleWindowPointerDown}
     on:keydown={handleKeydown}
+    on:scroll={hideCard}
 />
 
-<div class="cbt_scroll">
+<!-- how the hovered chord is built -->
+{#if showAnatomy && anatomy && hoverCard}
+    <div
+        class="cbt_anatomy"
+        class:cbt_anatomyAbove={hoverCard.above}
+        style="left: {hoverCard.left}px; top: {hoverCard.top}px; width: {CARD_W}px"
+        role="tooltip"
+    >
+        <div class="cbt_anatomyHead">
+            <span class="cbt_anatomyName">{anatomy.name}</span>
+            <span class="cbt_anatomySpoken">{anatomy.spoken}</span>
+        </div>
+
+        <p class="cbt_anatomyRecipe">{anatomy.recipe}</p>
+
+        <ul class="cbt_anatomyParts">
+            {#each anatomy.parts as part}
+                <li class:cbt_anatomyRoot={part.role === "Root"}>
+                    <span class="cbt_anatomyNote">{part.note}</span>
+                    <span class="cbt_anatomyRole">{part.role}</span>
+                </li>
+            {/each}
+        </ul>
+
+        {#if anatomy.bass}
+            <p class="cbt_anatomyBass">With {anatomy.bass} in the bass instead of the root.</p>
+        {/if}
+        {#if anatomy.vibe}
+            <p class="cbt_anatomyVibe">{anatomy.vibe}</p>
+        {/if}
+    </div>
+{/if}
+
+<div class="cbt_scroll" use:dragScroll>
     <div
         class="cbt_timeline"
         style="--beats: {totalBeats}; --rows: {rollKeys.length}; --row-h: {ROW_H}px; --cell-min: {cellMin}px"
@@ -481,10 +656,15 @@
                         type="button"
                         class="cbt_cell"
                         class:cbt_cellBar={beat % BEATS_PER_BAR === 0}
+                        class:cbt_cellTaken={taken[beat]}
                         style="grid-column: {beat + 1}"
                         tabindex={taken[beat] ? -1 : 0}
+                        aria-hidden={taken[beat] ? "true" : undefined}
                         aria-label={`Add chord at bar ${Math.floor(beat / BEATS_PER_BAR) + 1}, beat ${(beat % BEATS_PER_BAR) + 1}`}
-                        on:click={() => onCreate(beat)}
+                        on:click={() => {
+                            // a chord's margin leaves the cell under it showing at the edges
+                            if (!taken[beat]) onCreate(beat);
+                        }}
                     >
                         <span aria-hidden="true">+</span>
                     </button>
@@ -492,6 +672,7 @@
 
                 {#each visible as chord (chord.id)}
                     {@const shown = Math.min(chord.beats, totalBeats - chord.start)}
+                    {@const func = functionOf(chord, keyRootPc, tensionKey)}
                     <div
                         class="cbt_block"
                         class:cbt_blockSelected={selectedId === chord.id}
@@ -501,7 +682,8 @@
                         role="button"
                         tabindex="0"
                         aria-label={`${chordLabel(chord)} (${chordSpokenName(chord)}), ${chord.beats} beats`}
-                        title={chordSpokenName(chord)}
+                        on:pointerenter={(e) => showCardSoon(e, chord)}
+                        on:pointerleave={hideCard}
                         on:pointerdown={(e) => beginDrag(e, chord, "move")}
                         on:keydown={(e) => {
                             if (e.key === "Enter") selectedId = chord.id;
@@ -515,7 +697,16 @@
                         ></span>
 
                         <span class="cbt_blockName">{chordLabel(chord)}</span>
-                        <span class="cbt_blockSpoken">{chordSpokenName(chord)}</span>
+                        <span class="cbt_blockSpokenRow">
+                            <span class="cbt_blockSpoken">{chordSpokenName(chord)}</span>
+                            {#if func}
+                                <span
+                                    class="cbt_blockFunction"
+                                    style="--fh: {FUNCTION_HUES[func]}"
+                                    title={`${func} in this key`}>{func}</span
+                                >
+                            {/if}
+                        </span>
 
                         <span
                             class="cbt_handle cbt_handleEnd"
@@ -535,9 +726,7 @@
                         <div
                             class="cbt_picker"
                             bind:this={pickerPanel}
-                            style={ideasAnchorRight
-                                ? `right: ${(1 - Math.min(ideasChord.start + ideasChord.beats, totalBeats) / totalBeats) * 100}%`
-                                : `left: ${(ideasChord.start / totalBeats) * 100}%`}
+                            use:floatPanel={{ anchor: pickerAnchor, align: ideasAnchorRight ? "right" : "left", fit: true }}
                         >
                             <ChordPicker
                                 current={{ root: ideasChord.root, quality: ideasChord.quality }}

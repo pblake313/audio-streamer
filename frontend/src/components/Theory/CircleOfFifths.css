@@ -1,0 +1,102 @@
+.cof {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    margin: 0 auto;
+    user-select: none;
+    outline: none;
+    border-radius: 50%;
+}
+
+.cof:focus-visible {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45);
+}
+
+.cof_segment {
+    cursor: pointer;
+    outline: none;
+}
+
+.cof_segment path {
+    stroke: var(--color-bg, #222222);
+    stroke-width: 2;
+    transition: fill 0.18s ease;
+}
+
+/* segments outside the key share one neutral fill; only the key's chords carry their hue (--h) */
+.cof_segment path {
+    fill: rgba(255, 255, 255, 0.07);
+}
+
+.cof_segment:hover path {
+    fill: rgba(255, 255, 255, 0.16);
+}
+
+.cof_inKey path,
+.cof_inKey:hover path {
+    fill: hsl(var(--h) 85% 60% / 0.62);
+}
+
+.cof_selected path,
+.cof_selected:hover path {
+    fill: hsl(var(--h) 90% 66%);
+}
+
+.cof_label,
+.cof_sig,
+.cof_centerCount,
+.cof_centerLabel {
+    font-family: var(--font-sans);
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+}
+
+.cof_label {
+    fill: rgba(255, 255, 255, 0.8);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.cof_minor .cof_label {
+    font-size: 13px;
+    font-weight: 500;
+    fill: rgba(255, 255, 255, 0.6);
+}
+
+.cof_labelSmall {
+    font-size: 11px !important;
+}
+
+.cof_sig {
+    fill: rgba(255, 255, 255, 0.55);
+    font-size: 9px;
+}
+
+.cof_inKey .cof_label {
+    fill: white;
+}
+
+.cof_selected .cof_label,
+.cof_selected .cof_sig {
+    fill: #1a1a1a;
+}
+
+.cof_center {
+    fill: hsl(var(--h) 70% 50% / 0.14);
+    transition: fill 0.3s ease;
+}
+
+.cof_centerCount {
+    fill: white;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.cof_centerLabel {
+    fill: rgba(255, 255, 255, 0.45);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}

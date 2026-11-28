@@ -1,53 +1,26 @@
 <script lang="ts">
-    import RightArrowIcon from "../Icons/svg/RightArrowIcon.svelte";
-
+    // same dots as the swipeable card rows (Features, Summary), so every
+    // slider on the site shows its position the same way. Swiping or tapping
+    // a dot changes slides; there are no arrow buttons.
+    import "../UI/SwipeDots.css";
     import "./SwiperControls.css";
 
     export let current = 0;
     export let total = 0;
-    export let isBeginning = true;
-    export let isEnd = false;
-    export let showCount = true;
     export let label = "screenshots";
-
-    export let onPrev: () => void = () => {};
-    export let onNext: () => void = () => {};
-
-    $: progress = total > 1 ? (current / (total - 1)) * 100 : 100;
-
-    const pad = (n: number) => String(n).padStart(2, "0");
+    export let onGoTo: (index: number) => void = () => {};
 </script>
 
-<div class="sc_controls" aria-label={`${label} navigation`}>
-    <button
-        type="button"
-        class="sc_arrow sc_arrowPrev"
-        on:click={onPrev}
-        disabled={isBeginning}
-        aria-label={`Previous ${label}`}
-    >
-        <RightArrowIcon height="14px" color="currentColor" />
-    </button>
-
-    {#if showCount}
-        <span class="sc_count" aria-live="polite">
-            <span class="sc_countCurrent">{pad(current + 1)}</span>
-            <span class="sc_countDivider">/</span>
-            <span>{pad(total)}</span>
-        </span>
-    {/if}
-
-    <div class="sc_track" aria-hidden="true">
-        <div class="sc_fill" style:width={`${progress}%`} />
-    </div>
-
-    <button
-        type="button"
-        class="sc_arrow"
-        on:click={onNext}
-        disabled={isEnd}
-        aria-label={`Next ${label}`}
-    >
-        <RightArrowIcon height="14px" color="currentColor" />
-    </button>
+<div class="swipeDots sc_dots" role="tablist" aria-label={`${label} position`}>
+    {#each Array(total) as _, i}
+        <button
+            type="button"
+            role="tab"
+            class="swipeDot"
+            class:swipeDotOn={current === i}
+            aria-selected={current === i}
+            aria-label={`Go to ${i + 1} of ${total}`}
+            on:click={() => onGoTo(i)}
+        ></button>
+    {/each}
 </div>

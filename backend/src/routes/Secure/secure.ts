@@ -7,6 +7,8 @@ import converterRoute from './converter'
 
 import midiRoute from './midi'
 
+import statsRoute from './stats'
+
 import { getAuthorizedUser } from '../../controllers/Secure/GetAuthorizedUser'
 
 const router = Router()
@@ -24,6 +26,8 @@ router.use('/beats', beats) // imports more routes
 router.use('/converter', converterRoute) // imports more routes
 
 router.use('/midi', midiRoute) // chord builder MIDI export
+
+router.use('/stats', statsRoute) // site traffic, for the portal's Traffic page
 
 
 export default router

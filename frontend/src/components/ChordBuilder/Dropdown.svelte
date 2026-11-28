@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { floatPanel } from "../../helpers/ChordBuilder/floatPanel";
     import "./Dropdown.css";
 
     import { tick } from "svelte";
@@ -11,6 +12,16 @@
     export let onChange: (value: string) => void;
     export let icon: "sound" | null = null;
     export let minWidth: string | null = null;
+    // a fixed width keeps the control from resizing (and nudging its neighbors)
+    // when the selected label changes; long labels cut off with "…"
+    export let width: string | null = null;
+    // when value is placeholderValue, the control shows this dimmed text instead
+    // (e.g. "Select artist"), so an empty choice reads as a placeholder
+    export let placeholder: string | null = null;
+    export let placeholderValue: string | null = null;
+    // greys the control out and stops it opening; `title` explains why on hover
+    export let disabled = false;
+    export let title: string | null = null;
 
     const id = `dd-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -100,11 +111,13 @@
         class="dd_trigger"
         class:dd_triggerOpen={open}
         class:dd_withIcon={icon !== null}
-        style={minWidth ? `min-width: ${minWidth}` : ""}
+        style={width ? `width: ${width}` : minWidth ? `min-width: ${minWidth}` : ""}
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={`${id}-list`}
+        title={title ?? undefined}
+        {disabled}
         bind:this={trigger}
         on:click={() => (open ? close() : openList())}
         on:keydown={handleKeydown}
@@ -116,7 +129,11 @@
                 <path d="M18.5 5.5a9 9 0 0 1 0 13" />
             </svg>
         {/if}
-        <span class="dd_value">{selected?.label ?? ""}</span>
+        {#if placeholder && value === placeholderValue}
+            <span class="dd_value dd_placeholder">{placeholder}</span>
+        {:else}
+            <span class="dd_value">{selected?.label ?? ""}</span>
+        {/if}
         <svg class="dd_chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 9l6 6 6-6" />
         </svg>
@@ -126,6 +143,7 @@
         <ul
             class="dd_list"
             class:dd_listUp={openUp}
+            use:floatPanel={{ anchor: trigger, align: "left", up: openUp, matchWidth: true }}
             id={`${id}-list`}
             role="listbox"
             aria-label={ariaLabel}

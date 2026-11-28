@@ -1,50 +1,69 @@
+/* a link in the mobile menu: right-aligned, so it sits near the menu button */
 .mnl_link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+
     width: 100%;
-    display: block;
-    text-align: right;
-    font-size: 36pt;
-    font-weight: 500;
-    background-color: transparent;
-    border: none;
     padding: 0;
     margin: 0;
-    color: var(--font-color-light);
-    cursor: pointer;
-    transition: color 0.3s;
 
-    /* Removes the mobile tap flash */
+    border: none;
+    background-color: transparent;
+
+    color: rgba(255, 255, 255, 0.62);
+    font-size: clamp(26px, 7.2vw, 32px);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    text-align: right;
+    cursor: pointer;
+
+    transition: color 0.25s ease;
+
+    /* removes the mobile tap flash */
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Only use hover on devices with an actual mouse/trackpad */
+/* the current page: white, with a small blue dot */
+.mnl_link.mnl_active {
+    color: #fff;
+}
+
+.mnl_dot {
+    flex-shrink: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgb(96, 165, 255);
+    box-shadow: 0 0 10px rgba(96, 165, 255, 0.7);
+}
+
+.mnl_link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 4px;
+    border-radius: 6px;
+}
+
+/* hover only on devices with a real mouse / trackpad */
 @media (hover: hover) and (pointer: fine) {
     .mnl_link:hover {
-        color: var(--font-color-heading);
+        color: #fff;
     }
 }
 
-.mnl_active {
-    color: var(--font-color-heading);
-}
-
-/* Remove touch-screen hover and focus styling */
+/* touch screens: no sticky hover or focus colors */
 @media (hover: none) and (pointer: coarse) {
     .mnl_link:hover,
-    .mnl_link:focus,
-    .mnl_link:focus-visible {
-        color: var(--font-color-light);
+    .mnl_link:focus {
+        color: rgba(255, 255, 255, 0.62);
         outline: none;
-        box-shadow: none;
     }
 
-    /* Keep the active link highlighted */
-    .mnl_link.mnl_active {
-        color: var(--font-color-heading);
-    }
-}
-
-@media (max-width: 600px) {
-    .mnl_link {
-        font-size: 30pt;
+    .mnl_link.mnl_active,
+    .mnl_link.mnl_active:hover,
+    .mnl_link.mnl_active:focus {
+        color: #fff;
     }
 }

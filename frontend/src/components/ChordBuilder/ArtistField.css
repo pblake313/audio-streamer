@@ -1,0 +1,247 @@
+/* the artist field in the MIDI library (ArtistField.svelte): a field that
+   opens a searchable list. Sizes match the
+   library's other fields (38px, 9px corners). */
+.af_field {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    height: 38px;
+    padding: 0 11px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #f7f7f7;
+    font: inherit;
+    font-size: 10pt;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.af_field:hover,
+.af_field.af_fieldOpen {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.af_field:focus-visible {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.af_value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.af_fieldEmpty .af_value {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.af_chevron {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.55;
+    transition: transform 0.2s ease;
+}
+
+.af_fieldOpen .af_chevron {
+    transform: rotate(180deg);
+}
+
+/* an invisible stand-in so the browser's own "required" check still works */
+.af_required,
+.ml_field .af_required {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* the list: fixed to the window, under the field (or above it) */
+.af_panel {
+    position: fixed;
+    z-index: 260;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    max-height: min(340px, 60vh);
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: #1b1b1b;
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.55),
+        0 2px 8px rgba(0, 0, 0, 0.35);
+    animation: af_in 0.14s ease-out;
+}
+
+.af_panel.af_panelAbove {
+    transform: translateY(-100%);
+    animation-name: af_inAbove;
+}
+
+@keyframes af_in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes af_inAbove {
+    from {
+        opacity: 0;
+        transform: translateY(calc(-100% + 4px));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .af_panel {
+        animation: none;
+    }
+}
+
+.af_searchRow {
+    position: relative;
+    flex: 0 0 auto;
+    margin-bottom: 6px;
+}
+
+.af_searchIcon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.af_panel .af_search {
+    box-sizing: border-box;
+    width: 100%;
+    height: 36px;
+    padding: 0 10px 0 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #f7f7f7;
+    font: inherit;
+    font-size: 10pt;
+}
+
+.af_panel .af_search:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.af_list {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.af_option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.af_option.af_optionActive {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.af_option[aria-selected="true"] {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.af_optionText {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.af_optionName {
+    overflow: hidden;
+    color: #f7f7f7;
+    font-size: 10pt;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.af_optionMeta {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 8.5pt;
+}
+
+.af_check {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* "+ Add … as a new artist", set off from the list above it */
+.af_add {
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0 0 8px 8px;
+}
+
+.af_add:first-child {
+    margin-top: 0;
+    border-top: none;
+    border-radius: 8px;
+}
+
+.af_addIcon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border: 1px dashed rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 1;
+}
+
+.af_empty {
+    padding: 14px 8px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 9.5pt;
+    text-align: center;
+}

@@ -40,14 +40,10 @@
     */
     let snapIndex = 0;
     let snapCount = 0;
-    let isBeginning = true;
-    let isEnd = false;
 
     function updateNavigationState(sw: SwiperCore) {
         snapIndex = sw.snapIndex;
         snapCount = sw.snapGrid.length;
-        isBeginning = sw.isBeginning;
-        isEnd = sw.isEnd;
     }
 
     // ---------------------------------------------
@@ -165,10 +161,7 @@
         <SwiperControls
             current={snapIndex}
             total={snapCount}
-            {isBeginning}
-            {isEnd}
-            onPrev={() => swiper?.slidePrev()}
-            onNext={() => swiper?.slideNext()}
+            onGoTo={(i) => swiper?.slideTo(i)}
         />
     </div>
 </div>

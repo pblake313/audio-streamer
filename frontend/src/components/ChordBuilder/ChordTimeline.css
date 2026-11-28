@@ -4,6 +4,19 @@
     padding-bottom: 4px;
 }
 
+/* once it swipes (900px and down), it runs edge to edge: the page's side
+   padding (--cb-side, from the chord builder page) is cancelled, so the pinned
+   keys sit flush against the screen's left edge */
+@media (max-width: 900px) {
+    .cbt_scroll {
+        margin: 0 calc(var(--cb-side, 25px) * -1);
+    }
+
+    .cbt_rollWrap {
+        border-radius: 0;
+    }
+}
+
 .cbt_timeline {
     --cell-min: 34px;
     --gutter: 52px;
@@ -11,6 +24,8 @@
 
     min-width: calc(var(--gutter) + var(--beats) * var(--cell-min));
     user-select: none;
+    /* no blue flash on tap (mobile browsers' default tap highlight); inherited by everything inside */
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* every row = key/label gutter on the left + the beat grid */
@@ -23,8 +38,14 @@
     min-width: 0;
 }
 
+/* the gutter (row labels, piano keys) stays put at the left edge while the
+   timeline swipes sideways on smaller screens, like the theory page's keyboard */
 .cbt_gutter {
+    position: sticky;
+    left: 0;
+    z-index: 5;
     flex: 0 0 var(--gutter);
+    background: var(--color-bg, #222);
 }
 
 .cbt_gutterLabel {
@@ -118,6 +139,12 @@
     }
 }
 
+/* cells under a chord: they peek out around the chord's edges, but must
+   never add a second chord there */
+.cbt_cell.cbt_cellTaken {
+    pointer-events: none;
+}
+
 /* ========================= */
 /* CHORD BLOCKS              */
 /* ========================= */
@@ -192,6 +219,38 @@
     color: rgba(255, 255, 255, 0.55);
     font-size: 8pt;
     line-height: 1.2;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* spoken name with the chord's function badge to its right */
+.cbt_blockSpokenRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.cbt_blockSpokenRow .cbt_blockSpoken {
+    min-width: 0;
+}
+
+/* tonic / predominant / dominant / ...; --fh is the function's hue */
+.cbt_blockFunction {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: hsl(var(--fh) 80% 62% / 0.2);
+    border: 1px solid hsl(var(--fh) 80% 62% / 0.45);
+    color: hsl(var(--fh) 85% 74%);
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    line-height: 1.3;
+    text-transform: uppercase;
 
     white-space: nowrap;
     overflow: hidden;
@@ -323,11 +382,19 @@
 .cbt_rollWrap {
     margin-top: 12px;
     border-radius: 8px;
-    overflow: hidden;
+    /* clip, not hidden: hidden would make this its own scroll box and stop the
+       keys sticking while the timeline swipes */
+    overflow: clip;
 }
 
+/* the piano keys stick to the left edge too; the page color fills the gap
+   beside the shorter black keys so notes passing underneath don't show */
 .cbt_keys {
+    position: sticky;
+    left: 0;
+    z-index: 5;
     flex: 0 0 var(--gutter);
+    background: var(--color-bg, #222);
 
     display: grid;
     grid-template-rows: repeat(var(--rows), var(--row-h));
@@ -618,4 +685,135 @@
         z-index: 40;
         padding-bottom: 6px;
     }
+}
+
+/* ========================= */
+/* HOVER CARD: CHORD ANATOMY */
+/* ========================= */
+
+/* fixed to the window, so the timeline's scroll box can't clip it */
+.cbt_anatomy {
+    position: fixed;
+    z-index: 400;
+    box-sizing: border-box;
+    padding: 14px 16px 15px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: #262626;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+
+    pointer-events: none; /* never in the way of the mouse */
+    animation: cbt_anatomyIn 0.15s ease-out;
+}
+
+/* above the chord: anchored by its bottom edge */
+.cbt_anatomy.cbt_anatomyAbove {
+    transform: translateY(-100%);
+    animation: none;
+}
+
+@keyframes cbt_anatomyIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+.cbt_anatomyHead {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+}
+
+.cbt_anatomyName {
+    color: #fff;
+    font-size: 15pt;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+
+.cbt_anatomySpoken {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 9.5pt;
+}
+
+.cbt_anatomyRecipe {
+    margin: 8px 0 12px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 9.5pt;
+    line-height: 1.5;
+}
+
+/* each note as a chip: the note name over its job in the chord */
+.cbt_anatomyParts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cbt_anatomyParts li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    min-width: 42px;
+    padding: 5px 8px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cbt_anatomyParts li.cbt_anatomyRoot {
+    border-color: rgba(98, 214, 142, 0.45);
+    background: rgba(98, 214, 142, 0.1);
+}
+
+.cbt_anatomyNote {
+    color: #fff;
+    font-size: 10.5pt;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.cbt_anatomyRole {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 7.5pt;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.cbt_anatomyBass,
+.cbt_anatomyVibe {
+    margin: 10px 0 0;
+    font-size: 9pt;
+    line-height: 1.4;
+}
+
+.cbt_anatomyBass {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.cbt_anatomyVibe {
+    color: rgba(255, 255, 255, 0.45);
+    font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cbt_anatomy {
+        animation: none;
+    }
+}
+
+/* mouse drag to pan the roll when it's wider than the screen (helpers/dragScroll.ts) */
+.cbt_scroll.dragScroll.dragScrolling,
+.cbt_scroll.dragScroll.dragScrolling * {
+    cursor: grabbing !important;
+    user-select: none;
 }

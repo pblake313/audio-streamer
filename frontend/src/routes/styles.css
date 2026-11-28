@@ -28,7 +28,6 @@ html {
     padding: 0px;
     margin: 0px;
     color: rgba(255, 255, 255, 0.11);
-    scroll-behavior: smooth;
 
     /* stop mobile browsers from inflating some text (font boosting / landscape zoom) */
     -webkit-text-size-adjust: 100%;

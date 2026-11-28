@@ -1,8 +1,9 @@
 .chordBuilder_container {
-    max-width: var(--site-width);
+    --cb-side: 25px; /* side padding; the swipeable controls row cancels it to run edge to edge */
+    max-width: none; /* full width: the chord builder uses the whole window */
     min-height: 60vh;
     margin: auto;
-    padding: 92px 25px 150px; /* just clears the fixed nav */
+    padding: 92px 25px 40px; /* just clears the fixed nav */
 }
 
 /* the transport row: play/pause first, at the top left. It sticks just
@@ -48,21 +49,39 @@
 /* TRANSPORT                 */
 /* ========================= */
 
-/* play on the left, gray controls centered, shuffle on the right */
+/* play + progression on the left; every other control pinned to the right,
+   next to download and shuffle, so nothing moves when the progression changes */
 .chordBuilder_transport {
     flex: 1;
     display: flex;
     align-items: flex-end;
-    gap: 18px;
+    gap: var(--cb-gap);
+    min-width: 0;
+
+    /* one spacing value for every button and filter in the bar */
+    --cb-gap: 8px;
+
+    /* widths of the controls whose text changes; trimmed on smaller screens */
+    --cb-w-style: 150px;
+    --cb-w-scale: 140px;
+    --cb-w-sound: 180px;
+    --cb-w-complexity: 140px;
 }
 
+/* every filter on one line, pinned right (they only stack on small screens) */
 .chordBuilder_middle {
-    flex: 1;
+    flex: 0 0 auto;
+    margin-left: auto; /* pinned to the right, next to the action buttons */
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
     align-items: flex-end;
-    gap: 14px;
+    gap: var(--cb-gap);
+    min-width: 0;
+}
+
+.chordBuilder_middle > * {
+    flex: 0 0 auto;
 }
 
 /* white play button: same 44px size and 12px corners as the other controls
@@ -179,7 +198,7 @@
 }
 
 .chordBuilder_bpmStep {
-    width: 34px;
+    width: 30px;
     height: 100%;
 
     border: none;
@@ -212,7 +231,7 @@
 }
 
 .chordBuilder_bpmInput {
-    width: 52px;
+    width: 46px;
     height: 100%;
     padding: 0;
 
@@ -248,9 +267,62 @@
 /* DROPDOWNS                 */
 /* ========================= */
 
+/* grouped controls (Inspired by + dice, Key + toggles) use the same spacing */
 .chordBuilder_keyRow {
     display: flex;
-    gap: 6px;
+    gap: var(--cb-gap, 8px);
+}
+
+/* previous / next song arrows beside "Inspired by": one joined control */
+.chordBuilder_stepper {
+    box-sizing: border-box;
+    display: flex;
+    flex: 0 0 auto;
+    height: 44px;
+    padding: 4px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.chordBuilder_stepper button {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    padding: 0;
+
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.chordBuilder_stepper button:hover:not(:disabled),
+.chordBuilder_stepper button:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.chordBuilder_stepper button:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.chordBuilder_stepper button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.chordBuilder_stepper svg {
+    width: 15px;
+    height: 15px;
 }
 
 
@@ -319,8 +391,8 @@
 }
 
 .chordBuilder_segmented button {
-    min-width: 34px;
-    padding: 0 12px;
+    min-width: 30px;
+    padding: 0 9px;
 
     border: none;
     border-radius: 9px;
@@ -358,7 +430,8 @@
 
 @media (max-width: 600px) {
     .chordBuilder_container {
-        padding: 80px 15px 120px;
+        --cb-side: 15px;
+        padding: 80px 15px 32px;
     }
 
     .chordBuilder_header {
@@ -540,9 +613,12 @@
     gap: 2px;
 
     min-height: 44px; /* same height as play, so the two line up */
+    /* takes whatever room is left between play and the controls (up to a max),
+       so long labels have space; the controls are pinned right, so nothing
+       moves when the text changes on a shuffle */
+    flex: 1 1 0;
+    max-width: 460px;
     min-width: 0;
-    max-width: 320px;
-    margin-left: -6px; /* sits snug against play */
 }
 
 .chordBuilder_progressionName h4 {
@@ -583,4 +659,247 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* ========================= */
+/* DICE: shuffle everything  */
+/* ========================= */
+
+.chordBuilder_diceIcon {
+    /* tumbles once per roll (re-created on each click) */
+    animation: chordBuilder_tumble 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes chordBuilder_tumble {
+    from {
+        transform: rotate(-200deg) scale(0.7);
+    }
+}
+
+/* amber, next to shuffle on the right (same shape as the other action buttons) */
+.chordBuilder_dice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    align-self: flex-end; /* level with the other controls */
+
+    width: 44px;
+    height: 44px;
+
+    border: 1px solid rgba(253, 200, 110, 0.6);
+    border-radius: 12px;
+    background: linear-gradient(145deg, #f59e0b, #d97706);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 6px 18px rgba(245, 158, 11, 0.35);
+
+    color: #fff;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        filter 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+}
+
+.chordBuilder_dice svg {
+    width: 21px;
+    height: 21px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .chordBuilder_dice:hover {
+        filter: brightness(1.1);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            0 8px 24px rgba(245, 158, 11, 0.5);
+    }
+}
+
+.chordBuilder_dice:active {
+    transform: scale(0.94);
+}
+
+.chordBuilder_dice:focus-visible {
+    outline: none;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 0 0 3px rgba(245, 158, 11, 0.45);
+}
+
+/* ========================= */
+/* ONE-LINE TOP BAR          */
+/* ========================= */
+
+/* laptops: trim the text controls a little more so it all still fits one line */
+@media (max-width: 1440px) {
+    .chordBuilder_transport {
+        --cb-w-style: 132px;
+        --cb-w-scale: 124px;
+        --cb-w-sound: 156px;
+        --cb-w-complexity: 132px;
+    }
+}
+
+/* smaller laptops: tighter still */
+@media (max-width: 1300px) {
+    .chordBuilder_transport {
+        --cb-w-style: 112px;
+        --cb-w-scale: 104px;
+        --cb-w-sound: 132px;
+        --cb-w-complexity: 124px;
+    }
+}
+
+/* COMPACT ("mobile") BAR: when one line gets squished. Always below 1180px
+   (so phones and tablets get it from the first paint); above that, the page adds
+   .chordBuilder_compact as soon as the one-line bar starts to squish (that width
+   depends on what's in it, e.g. "Inspired by" when logged in). The bar also
+   starts flush under the nav, already in its slim stuck state. */
+@media (max-width: 1180px) {
+    .chordBuilder_container {
+        padding-top: var(--nav-h, 72px);
+    }
+
+    .chordBuilder_transport {
+        flex-wrap: wrap;
+        row-gap: 10px;
+    }
+
+    /* row 1: play and the progression (with room to breathe) */
+    .chordBuilder_progressionName {
+        flex: 1 1 160px;
+        max-width: none;
+    }
+
+    /* row 2: every other control on one line that swipes sideways, running to the
+       screen edges (cancelling the page's side padding). Their menus open fixed to
+       the window (helpers/ChordBuilder/floatPanel.ts), so the row never clips them */
+    .chordBuilder_middle {
+        order: 5;
+        flex: 1 1 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        margin: 0 calc(var(--cb-side) * -1);
+        padding: 2px var(--cb-side) 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .chordBuilder_middle::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.chordBuilder_container.chordBuilder_compact {
+    padding-top: var(--nav-h, 72px);
+}
+
+.chordBuilder_compact .chordBuilder_transport {
+    flex-wrap: wrap;
+    row-gap: 10px;
+}
+
+/* row 1: play and the progression (with room to breathe) */
+.chordBuilder_compact .chordBuilder_progressionName {
+    flex: 1 1 160px;
+    max-width: none;
+}
+
+/* row 2: every other control on one line that swipes sideways, running to the
+   screen edges (cancelling the page's side padding). Their menus open fixed to
+   the window (helpers/ChordBuilder/floatPanel.ts), so the row never clips them */
+.chordBuilder_compact .chordBuilder_middle {
+    order: 5;
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    margin: 0 calc(var(--cb-side) * -1);
+    padding: 2px var(--cb-side) 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.chordBuilder_compact .chordBuilder_middle::-webkit-scrollbar {
+    display: none;
+}
+
+/* ========================= */
+/* MIDI IMPORT               */
+/* ========================= */
+
+/* the real file picker stays hidden; the icon button opens it */
+.chordBuilder_fileInput {
+    display: none;
+}
+
+.chordBuilder_import:hover,
+.chordBuilder_import:focus-visible {
+    color: #fff;
+}
+
+.chordBuilder_import:disabled {
+    cursor: progress;
+}
+
+.chordBuilder_spinner.chordBuilder_spinnerDark {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.8);
+}
+
+/* dragging a file over the page: a full-screen drop hint */
+.chordBuilder_dropHint {
+    position: fixed;
+    inset: 12px;
+    z-index: 300;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px dashed rgba(255, 255, 255, 0.45);
+    border-radius: 20px;
+    background: rgba(20, 20, 20, 0.75);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+
+    color: #fff;
+    font-size: 15pt;
+    font-weight: 600;
+
+    pointer-events: none; /* the drop lands on the page behind it */
+}
+
+/* ========================= */
+/* FULL-WIDTH NAV + FOOTER   */
+/* ========================= */
+
+/* only while the chord builder is open (the class is added/removed by the page) */
+body.chordBuilder_fullWidth .nav_inside,
+body.chordBuilder_fullWidth .footer_insideContainer {
+    max-width: none;
+}
+
+/* transpose ▼ ▲: wide enough buttons that the control is as wide as its label */
+.chordBuilder_transpose button {
+    width: 36px;
+}
+
+/* mouse drag on the swipeable controls row (helpers/dragScroll.ts) */
+.chordBuilder_middle.dragScroll {
+    cursor: grab;
+}
+
+.chordBuilder_middle.dragScroll.dragScrolling,
+.chordBuilder_middle.dragScroll.dragScrolling * {
+    cursor: grabbing;
+    user-select: none;
 }

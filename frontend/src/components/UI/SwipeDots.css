@@ -1,0 +1,40 @@
+/* dots under a swipeable row of cards (see SwipeDots.svelte) */
+
+.swipeDots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.swipeDot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+
+    border: none;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.22);
+    cursor: pointer;
+
+    transition:
+        width 0.25s ease,
+        background-color 0.25s ease;
+}
+
+/* the current card's dot stretches into a pill */
+.swipeDot.swipeDotOn {
+    width: 22px;
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.swipeDot:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .swipeDot {
+        transition: none;
+    }
+}

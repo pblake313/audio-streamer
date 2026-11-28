@@ -1,0 +1,250 @@
+/* the portal's Traffic page; header styles match the converter page */
+.traffic_container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 110px 25px 150px;
+}
+
+.traffic_topper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.traffic_eyebrow {
+    margin-bottom: 8px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 9pt;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.traffic_subtitle {
+    max-width: 560px;
+    margin-top: 12px;
+}
+
+/* dims while a new range loads, so the old numbers don't read as the new ones */
+.traffic_body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: opacity 0.2s ease;
+}
+
+.traffic_body.traffic_bodyLoading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* headline numbers, and the chart's legend: the swatch is the line's color
+   (--series); a hidden line's tile goes quiet */
+.traffic_tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.traffic_tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    font-family: var(--font-sans);
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.traffic_tile:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.traffic_tile.traffic_tileOff {
+    opacity: 0.55;
+}
+
+.traffic_swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 7px;
+    border-radius: 3px;
+    background: var(--series);
+    vertical-align: -1px;
+}
+
+.traffic_tileOff .traffic_swatch {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--series);
+}
+
+.traffic_cardHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-bottom: 14px;
+}
+
+.traffic_cardHead .traffic_cardTitle {
+    margin: 0;
+}
+
+.traffic_cardHint.traffic_cardHintInline {
+    margin: 0;
+}
+
+.traffic_tileLabel {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.traffic_tileValue {
+    color: white;
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.traffic_tileHint {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+}
+
+.traffic_card {
+    padding: 18px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    min-width: 0;
+}
+
+.traffic_cardTitle {
+    margin: 0 0 14px;
+    font-size: 13pt;
+}
+
+.traffic_cardTitleSpaced {
+    margin-top: 28px;
+}
+
+.traffic_cardHint {
+    margin: -10px 0 14px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+}
+
+.traffic_lists {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+/* ranked rows: a soft bar behind each, scaled to the top row */
+.traffic_rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.traffic_row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+.traffic_rowBar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 6px;
+    background: rgba(51, 140, 237, 0.18);
+}
+
+.traffic_rowName,
+.traffic_rowCount {
+    position: relative;
+}
+
+.traffic_rowName {
+    min-width: 0;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.85);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.traffic_rowNameCap {
+    text-transform: capitalize;
+}
+
+.traffic_rowCount {
+    flex: 0 0 auto;
+    color: rgba(255, 255, 255, 0.6);
+    font-variant-numeric: tabular-nums;
+}
+
+.traffic_empty {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+}
+
+@media (max-width: 750px) {
+    .traffic_lists {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .traffic_container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .traffic_tiles {
+        grid-template-columns: 1fr;
+    }
+
+    .traffic_tile {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: baseline;
+        column-gap: 10px;
+    }
+
+    .traffic_tileValue {
+        font-size: 24px;
+    }
+
+    .traffic_tileHint {
+        flex-basis: 100%;
+    }
+}
+
+/* the date range picker (components/UI/DateRangePicker) opens a panel below
+   it; keep it anchored to the right edge with the header */
+.traffic_range {
+    position: relative;
+    z-index: 5;
+}

@@ -15,8 +15,14 @@
 
     const menuId = `navDropdown_${Math.random().toString(36).slice(2, 8)}`;
 
+    /*
+        Items are either sections of a page ("/#summary": active while that
+        section is on screen) or whole pages ("/theory": active on that page
+        and anything under it, like /theory/d-minor).
+    */
     function itemIsActive(linksTo: string, hash: string, pathname: string) {
         const url = new URL(linksTo, "http://x");
+        if (!url.hash) return pathname === url.pathname || pathname.startsWith(`${url.pathname}/`);
         return url.pathname === pathname && url.hash === hash;
     }
 
@@ -25,8 +31,10 @@
     );
 
     function handleItemClick(event: MouseEvent, linksTo: string) {
-        event.preventDefault();
         open = false;
+        // page links navigate as normal; section links scroll smoothly
+        if (!linksTo.includes("#")) return;
+        event.preventDefault();
         scrollToHash(linksTo);
     }
 

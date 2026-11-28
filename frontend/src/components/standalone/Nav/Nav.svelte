@@ -15,8 +15,12 @@
     import MobileMenuToggler from "../../UI/MobileMenuToggler.svelte";
     import MobileNav from "./MobileNav.svelte";
     import Logo from "../../Icons/Logos/Logo.svelte";
+    import { page } from "$app/stores";
 
     let isScrolled = false;
+
+    // the theory pages (/theory, /theory/d-minor, ...) and the chord builder show the logo, not the GitHub link
+    $: onToolPage = /^\/(theory|chord-builder)(\/|$)/.test($page.url.pathname);
     let activeHash = "";
 
     const projectDetailItems = [
@@ -25,6 +29,13 @@
         { label: "Features", linksTo: "/#features" },
         { label: "Technologies", linksTo: "/#tech-stack" },
         { label: "Where's My PIN", linksTo: "/#wheres-my-pin" },
+    ];
+
+    // logged in: the tools share one menu
+    const toolItems = [
+        { label: "Chord Builder", linksTo: "/chord-builder" },
+        { label: "Theory", linksTo: "/theory" },
+        { label: "Converter", linksTo: "/portal/converter" },
     ];
 
     const sectionIds = projectDetailItems.map((item) => item.linksTo.slice(2));
@@ -95,19 +106,13 @@
                     <NavigationLink linkText="Tracks" linksTo="/portal" />
 
                     <NavigationLink
-                        linkText="Chord Builder"
-                        linksTo="/chord-builder"
-                    />
-
-                    <NavigationLink
                         linkText="Add Track"
                         linksTo="/portal/add-beat"
                     />
 
-                    <NavigationLink
-                        linkText="Converter"
-                        linksTo="/portal/converter"
-                    />
+                    <NavDropdown label="Tools" items={toolItems} />
+
+                    <NavigationLink linkText="Traffic" linksTo="/portal/traffic" />
 
                     <BoxButton
                         buttonText="Logout"
@@ -123,9 +128,18 @@
             </div>
         {:else}
             <div class="nav_noUserFlex">
-                <div class="nav_githubFlex">
-                    <GitHubLink gitText="@pblake313" />
-                </div>
+                {#if onToolPage}
+                    <!-- the public tools (theory, chord builder) carry the PATTSWAY logo -->
+                    <div class="nav_logoFlex">
+                        <a href="/" aria-label="Go to home page">
+                            <Logo color="#f7f7f7" width="145px" />
+                        </a>
+                    </div>
+                {:else}
+                    <div class="nav_githubFlex">
+                        <GitHubLink gitText="@pblake313" />
+                    </div>
+                {/if}
 
                 <div class="nav_rightFlex">
                     <NavigationLink linkText="Home" linksTo="/" {activeHash} />
@@ -140,6 +154,8 @@
                         linkText="Chord Builder"
                         linksTo="/chord-builder"
                     />
+
+                    <NavigationLink linkText="Theory" linksTo="/theory" />
 
                     <BoxButton
                         buttonText="Login"

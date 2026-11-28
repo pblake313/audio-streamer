@@ -1,0 +1,125 @@
+/* Inspired-by picker: builds on the sound picker's two-column panel */
+
+.ip_panel {
+    /* sits in the middle of the bar, so open from its left edge */
+    left: 0;
+    right: auto;
+    grid-template-columns: 190px 320px;
+}
+
+.ip_artists {
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* × on the control: clears the artist in one click */
+.ip_x {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    translate: 0 -50%;
+
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.ip_x:hover,
+.ip_x:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.ip_x svg {
+    width: 13px;
+    height: 13px;
+}
+
+/* the chevron keeps its space (so the name doesn't run under the ×) */
+.dd_chevron.ip_chevronHidden {
+    visibility: hidden;
+}
+
+.ip_clearRow {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ip_clear {
+    width: 100%;
+    padding: 8px 10px;
+
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+
+    color: rgba(255, 255, 255, 0.5);
+    font: inherit;
+    font-size: 9.5pt;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ip_clear:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* "New in this style" row */
+.ip_generate {
+    margin-bottom: 4px;
+    border: 1px dashed rgba(139, 92, 246, 0.5);
+}
+
+.ip_generate:hover {
+    background: rgba(139, 92, 246, 0.12);
+}
+
+.ip_meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 8.5pt;
+    white-space: nowrap;
+}
+
+.ip_tag {
+    padding: 0 6px;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.ip_tag.ip_tagSaved {
+    background: rgba(59, 130, 246, 0.18);
+    color: #93b9fb;
+}
+
+@media (max-width: 600px) {
+    .ip_panel {
+        grid-template-columns: 1fr;
+    }
+}

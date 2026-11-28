@@ -9,16 +9,15 @@
     import { goto } from "$app/navigation";
     import PinForm from "../../components/forms/PinForm.svelte";
     import Seo from "../../components/misc/Seo.svelte";
-    import BackgroundVideo from "../../components/misc/BackgroundVideo.svelte";
 
-    let showVideo = false;
+    let mounted = false;
 
     $: if ($user){
         goto('/portal')
     }
 
     onMount(() => {
-        showVideo = true;
+        mounted = true;
     });
 </script>
 
@@ -29,10 +28,17 @@
 />
 
 <div class="loginPage_container">
+    <!-- ambient light, same build as the home hero in a different color -->
+    <div class="loginPage_backdrop" aria-hidden="true">
+        <div class="loginPage_grid"></div>
+        <div class="loginPage_orb loginPage_orb_a"></div>
+        <div class="loginPage_orb loginPage_orb_b"></div>
+    </div>
+
     <div class="loginPage_topFade"></div>
     <div class="loginPage_bottomFade"></div>
 
-    {#if showVideo}
+    {#if mounted}
         <div class="loginPage_glass" in:rise={{ delay: 250 }}>
             <GlassSurface>
                 <div class="loginPage_wrapForm">
@@ -57,16 +63,6 @@
                 </div>
             </GlassSurface>
         </div>
-    {/if}
-
-    {#if showVideo}
-        <BackgroundVideo
-            className="loginPage_video"
-            src="/Videos/goldlines.mp4"
-            poster="/Images/VideoPosters/goldlines.webp"
-            fadeDuration={1200}
-            fadeDelay={500}
-        />
     {/if}
 
 </div>

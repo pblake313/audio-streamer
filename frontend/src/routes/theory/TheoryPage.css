@@ -1,0 +1,24 @@
+/* same width and side padding as the nav and footer */
+.theory_container {
+    max-width: var(--site-width);
+    min-height: 60vh;
+    margin: auto;
+    padding: 92px 25px 150px; /* just clears the fixed nav */
+}
+
+/* phones / tablets: the section bar is the first thing on the page, so start
+   it flush under the fixed nav, already "stuck", instead of a little lower.
+   --kd-site-nav is the nav's measured height (SectionNav.svelte); the
+   fallback is close to it so the first paint barely moves. */
+@media (max-width: 950px) {
+    .theory_container {
+        padding-top: var(--kd-site-nav, 68px);
+    }
+}
+
+@media (max-width: 600px) {
+    .theory_container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

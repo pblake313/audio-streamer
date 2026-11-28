@@ -1,0 +1,1245 @@
+/* --h is the selected key's hue (its color on the circle); --fh is a chord's
+   function hue (tonic / predominant / dominant); --rh a related key's hue */
+.kd {
+    --accent: hsl(var(--h) 85% 66%);
+    --accent-soft: hsl(var(--h) 85% 62% / 0.16);
+
+    /* space between sections, and the bigger break before the chords and
+       the progressions; both step down on smaller screens */
+    --kd-section-gap: 88px;
+    --kd-major-gap: 150px;
+    /* the page's side padding; swipeable rows cancel it to run edge to edge */
+    --kd-gutter: 25px;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--kd-section-gap);
+    min-width: 0;
+}
+
+@media (max-width: 950px) {
+    .kd {
+        --kd-section-gap: 64px;
+        --kd-major-gap: 100px;
+    }
+}
+
+@media (max-width: 650px) {
+    .kd {
+        --kd-section-gap: 44px;
+        --kd-major-gap: 64px;
+    }
+}
+
+/* matches the theory page's narrower side padding on phones */
+@media (max-width: 600px) {
+    .kd {
+        --kd-gutter: 15px;
+    }
+}
+
+.kd p {
+    margin: 0;
+}
+
+.kd button {
+    font-family: var(--font-sans);
+    cursor: pointer;
+}
+
+/* top: circle on the left, the key's overview on the right; everything
+   after it runs the full width */
+.kd_top {
+    display: grid;
+    grid-template-columns: minmax(300px, 460px) minmax(0, 1fr);
+    gap: 44px;
+    align-items: center; /* the overview sits level with the middle of the circle */
+}
+
+.kd_overview {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    min-width: 0;
+}
+
+/* header */
+.kd_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px 22px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, hsl(var(--h) 80% 55% / 0.28), hsl(calc(var(--h) + 40) 80% 50% / 0.08));
+    border: 1px solid hsl(var(--h) 80% 60% / 0.3);
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.kd_titleRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.kd_camelot {
+    padding: 3px 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid hsl(var(--h) 85% 66% / 0.5);
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.kd_title {
+    margin: 0;
+    font-size: 36px;
+    text-transform: capitalize;
+    color: white;
+}
+
+.kd_sig {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.kd_accidental {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: hsl(var(--h) 85% 62% / 0.3);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.kd_muted {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 6px !important;
+}
+
+/* section headings: same look as the home page's h2s, a step smaller so
+   they stay under the key's title */
+.kd_heading {
+    margin: 0 0 14px;
+    font-family: var(--font-sans);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--font-color-heading);
+}
+
+@media (max-width: 500px) {
+    .kd_heading {
+        font-size: 24px;
+    }
+}
+
+/* a small label instead of a full heading (related keys, beside the circle) */
+.kd_eyebrow {
+    margin: 0 0 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.kd_headingRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* extra room before the chords and the progressions (--kd-major-gap in all) */
+.kd_chordsBlock,
+.kd_progBlock,
+.kd_guitarBlock {
+    margin-top: calc(var(--kd-major-gap) - var(--kd-section-gap));
+}
+
+.kd_fretNote {
+    margin-top: 12px !important;
+}
+
+/* a heading row with a group of controls on the right (the scale picker and
+   play, the positions and notes / degrees toggle). When there isn't room the
+   controls drop under the heading */
+.kd_headingRowWrap {
+    flex-wrap: wrap;
+    row-gap: 12px;
+}
+
+.kd_headControls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px 16px;
+}
+
+/* the scale picker is inline here, so it drops its usual bottom margin */
+.kd_kinds.kd_kindsInline {
+    margin: 0;
+}
+
+/* the scale's own neck, below its notes and blurb */
+.kd_pentaNeckHead {
+    margin-top: 36px;
+}
+
+.kd_pentaNeckHead .kd_eyebrow {
+    margin: 0;
+}
+
+/* position picker: All, 1-5 or 1-7 (pills styled like the chord types) */
+.kd_positions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+@media (max-width: 650px) {
+    .kd_headControls {
+        justify-content: flex-start;
+    }
+}
+
+.kd_positionsLabel {
+    margin-right: 4px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.kd_positionBtn {
+    min-width: 36px;
+}
+
+.kd_headingRow .kd_heading {
+    margin: 0;
+}
+
+/* segmented toggle (sharps / flats) */
+.kd_toggle {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.kd_toggle button {
+    border: none;
+    background: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+}
+
+.kd_toggle button.kd_toggleOn {
+    background: var(--accent);
+    color: #1a1a1a;
+}
+
+.kd_play {
+    border: none;
+    background: white;
+    color: #1a1a1a;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 16px;
+    border-radius: 999px;
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.kd_play:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* related keys, each in its own circle color. There are always four, so
+   they sit 2 x 2, or 4 across when the overview is wide enough; never 3 + 1.
+   Keyed to the overview's own width, since the circle beside it changes that. */
+.kd_overview {
+    container-type: inline-size;
+}
+
+.kd_related {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+@container (min-width: 700px) {
+    .kd_related {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.kd_relatedBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 11px 13px;
+    text-align: left;
+    border: 1px solid hsl(var(--rh) 80% 60% / 0.3);
+    border-left: 4px solid hsl(var(--rh) 85% 62%);
+    border-radius: 10px;
+    background: hsl(var(--rh) 80% 55% / 0.1);
+    transition: background 0.15s ease;
+}
+
+.kd_relatedBtn:hover {
+    background: hsl(var(--rh) 80% 55% / 0.24);
+}
+
+.kd_relatedLabel {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+}
+
+.kd_relatedCamelot {
+    margin-left: 4px;
+    color: hsl(var(--rh) 85% 72%);
+    font-size: 12px;
+    text-transform: none;
+}
+
+.kd_related + .kd_muted {
+    margin-top: 10px !important;
+}
+
+.kd_relatedKey {
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+/* scale: one card per note, with whole/half step markers between them. Always
+   one line: cards grow to fill the row but never shrink under 96px, and once
+   they can't fit the row swipes sideways instead. It runs to the screen edges
+   (cancelling the page's side padding), so when everything fits it lines up
+   exactly as before. */
+.kd_scale {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    margin: 0 calc(var(--kd-gutter) * -1);
+    padding: 2px var(--kd-gutter) 4px;
+    list-style: none;
+    overflow-x: auto;
+    overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 var(--kd-gutter);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.kd_scale::-webkit-scrollbar {
+    display: none;
+}
+
+.kd_note {
+    flex: 1 0 96px;
+    scroll-snap-align: start;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 4px 12px;
+    border-radius: 12px;
+    background: hsl(var(--h) 60% 50% / 0.12);
+    border: 1px solid hsl(var(--h) 70% 60% / 0.22);
+    text-align: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.kd_noteDegree {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* the label inside a degree / step circle. Trimmed to the glyph's own height
+   (cap height to baseline) so the circle centres the digit itself rather than
+   its line box, which this font sits a little off. Browsers without text-box
+   fall back to line-height: 1. */
+.kd_glyph {
+    display: block;
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
+}
+
+.kd_noteName {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.kd_noteRole {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.25;
+}
+
+.kd_noteInterval {
+    margin-top: auto;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: hsl(var(--h) 80% 60% / 0.22);
+    color: hsl(var(--h) 90% 80%);
+    font-size: 10.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.kd_noteOctave {
+    opacity: 0.7;
+}
+
+/* the gap between two notes: W (whole) or H (half) */
+.kd_step {
+    flex: 0 0 auto;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: hsl(200 80% 60% / 0.22);
+    color: hsl(200 90% 80%);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.kd_step.kd_stepHalf {
+    background: hsl(42 90% 60% / 0.25);
+    color: hsl(42 100% 75%);
+}
+
+.kd_formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    margin-top: 12px !important;
+}
+
+.kd_formulaSteps {
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.kd_formula .kd_muted {
+    margin: 0 !important;
+}
+
+.kd_w {
+    color: hsl(200 90% 80%);
+}
+
+.kd_h {
+    color: hsl(42 100% 75%);
+}
+
+.kd_noteTonic {
+    background: var(--accent);
+    border-color: transparent;
+}
+
+.kd_noteTonic .kd_noteDegree {
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.kd_noteTonic .kd_noteDegree,
+.kd_noteTonic .kd_noteName,
+.kd_noteTonic .kd_noteRole {
+    color: #1a1a1a;
+}
+
+.kd_noteTonic .kd_noteInterval {
+    background: rgba(0, 0, 0, 0.18);
+    color: #1a1a1a;
+}
+
+/* chord type picker */
+.kd_kinds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.kd_kind {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 13px;
+    border-radius: 999px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.kd_kind:hover {
+    background: var(--accent-soft);
+    color: white;
+}
+
+.kd_kind.kd_kindOn {
+    background: var(--accent);
+    border-color: transparent;
+    color: #1a1a1a;
+}
+
+/* chords, colored by function. Like the scale: the columns grow to fill the
+   row but never shrink under --chord-min, and once they can't fit, the cards
+   and the piano roll swipe sideways together. Runs to the screen edges
+   (cancelling the page's side padding), so when it fits it lines up as before. */
+.kd_chordScroll {
+    margin: 0 calc(var(--kd-gutter) * -1);
+    padding: 0 var(--kd-gutter) 2px;
+    overflow-x: auto;
+    overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    /* snap a chord to just past the keyboard, not under it */
+    scroll-padding: 0 var(--kd-gutter) 0 calc(var(--kd-gutter) + var(--keys-w) + 8px);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.kd_chordScroll::-webkit-scrollbar {
+    display: none;
+}
+
+.kd_chordScroll,
+.kd_chordGrid {
+    --keys-w: 58px;
+    --chord-min: 118px;
+}
+
+.kd_chordGrid {
+    --cols: var(--keys-w) repeat(7, minmax(var(--chord-min), 1fr));
+    /* the keyboard, 7 chord columns and the 7 gaps between them */
+    min-width: calc(var(--keys-w) + 7 * var(--chord-min) + 7 * 8px);
+}
+
+.kd_chord {
+    scroll-snap-align: start;
+}
+
+/* once the chords swipe (the grid's min-width plus the page's side padding,
+   ~990px), the piano sits flush against the screen edge from the start, so
+   nothing ever shows to the left of it */
+@media (max-width: 990px) {
+    .kd_chordScroll {
+        padding-left: 0;
+        scroll-padding-left: calc(var(--keys-w) + 8px);
+    }
+
+    .kd_chordScroll .kd_roll {
+        border-radius: 0 10px 10px 0;
+    }
+}
+
+.kd_chords {
+    display: grid;
+    grid-template-columns: var(--cols);
+    gap: 8px;
+}
+
+/* piano roll of the chords, with a keyboard down the left like the chord builder */
+.kd_roll {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--cols);
+    column-gap: 8px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background: #1b1b1b;
+    /* clip, not hidden: hidden would make the roll its own scroll container
+       and stop the keyboard sticking to the swipeable row */
+    overflow: clip;
+}
+
+/* horizontal lanes behind the notes, one per key */
+.kd_rollLane {
+    grid-column: 2 / -1;
+    margin-left: -8px; /* run under the column gap next to the keyboard */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.kd_rollLane.kd_rollLaneBlack {
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.kd_rollLane.kd_rollLaneIn {
+    background: hsl(var(--h) 60% 55% / 0.08);
+}
+
+.kd_rollLane.kd_rollLaneTonic {
+    background: hsl(var(--h) 80% 60% / 0.16);
+}
+
+/* a slightly stronger line under each C, where an octave starts */
+.kd_rollLane.kd_rollLaneC {
+    border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+/* the keyboard sticks to the left edge while the chords swipe under it. A
+   sticky box can't leave its grid cell, so each key spans the whole row and
+   keeps the keyboard's width itself */
+.kd_rollKey {
+    position: sticky;
+    left: 0;
+    grid-column: 1 / -1;
+    justify-self: start;
+    z-index: 3; /* above the notes sliding underneath */
+    display: block;
+    width: var(--keys-w);
+    padding: 0 9px 0 0;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    background: #e9e9e9;
+    color: #444;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: right;
+    cursor: pointer;
+    transition: background-color 0.08s ease;
+}
+
+.kd_rollKey.kd_rollKeyBlack {
+    width: calc(var(--keys-w) - 20px);
+    background: #2b2b2b;
+    border-bottom-color: #2b2b2b;
+    border-radius: 0 3px 3px 0;
+    color: #f0f0f0;
+}
+
+/* black keys are shorter than the column; fill the rest with the roll's own
+   background so notes passing under the stuck keyboard don't show through */
+.kd_rollKey.kd_rollKeyBlack::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: -1px; /* covers the key's bottom border row too */
+    left: 100%;
+    width: 20px;
+    background: #1b1b1b;
+    pointer-events: none;
+}
+
+/* in-key keys get a colored marker on the right edge, the tonic a solid one */
+.kd_rollKey.kd_rollKeyIn {
+    box-shadow: inset -3px 0 0 hsl(var(--h) 80% 60% / 0.8);
+}
+
+.kd_rollKey.kd_rollKeyTonic {
+    box-shadow: inset -6px 0 0 hsl(var(--h) 85% 60%);
+    color: #111;
+}
+
+.kd_rollKey.kd_rollKeyBlack.kd_rollKeyTonic {
+    color: #fff;
+}
+
+.kd_rollKey.kd_rollKeyOut {
+    opacity: 0.5;
+}
+
+/* sounding right now */
+.kd_rollKey.kd_rollKeyOn,
+.kd_rollKey:active {
+    background: #5fd39b;
+    color: #10331f;
+    opacity: 1;
+}
+
+.kd_rollKey.kd_rollKeyBlack.kd_rollKeyOn,
+.kd_rollKey.kd_rollKeyBlack:active {
+    background: #2f9e6b;
+    border-bottom-color: #2f9e6b;
+    color: #eafff2;
+}
+
+.kd_rollColumn {
+    grid-row: 1 / -1;
+    z-index: 1;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    transition: background 0.15s ease;
+}
+
+.kd_rollColumn:hover,
+.kd_rollColumn.kd_rollColumnLit {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.kd_rollNote {
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1px 4px;
+    border-radius: 4px;
+    background: hsl(var(--fh) 70% 60%);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+    color: #141414;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.kd_rollNote.kd_rollRoot {
+    background: hsl(var(--fh) 90% 72%);
+    box-shadow: 0 0 12px hsl(var(--fh) 85% 60% / 0.55);
+}
+
+/* a chord button: numeral and play icon on top, the name, its notes, then its role.
+   States use colors and inset rings only (no scaling), so nothing grows past the
+   scroll area and brings up a scrollbar */
+.kd_chord {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    padding: 12px 12px 11px;
+    text-align: left;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(165deg, hsl(var(--fh) 70% 52% / 0.24), hsl(var(--fh) 60% 40% / 0.07) 70%);
+    box-shadow: inset 0 0 0 1px hsl(var(--fh) 75% 62% / 0.28);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kd_chord:hover {
+    background: linear-gradient(165deg, hsl(var(--fh) 75% 55% / 0.36), hsl(var(--fh) 65% 42% / 0.12) 70%);
+    box-shadow: inset 0 0 0 1px hsl(var(--fh) 80% 66% / 0.6);
+}
+
+.kd_chord:active {
+    background: linear-gradient(165deg, hsl(var(--fh) 75% 55% / 0.45), hsl(var(--fh) 65% 42% / 0.18) 70%);
+}
+
+.kd_chord:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px hsl(var(--fh) 85% 70%);
+}
+
+/* sounding right now */
+.kd .kd_chord.kd_lit {
+    transform: none;
+    background: linear-gradient(165deg, hsl(var(--fh) 80% 58% / 0.55), hsl(var(--fh) 70% 45% / 0.22) 75%);
+    box-shadow:
+        inset 0 0 0 2px hsl(var(--fh) 90% 72%),
+        inset 0 0 24px hsl(var(--fh) 90% 65% / 0.35);
+}
+
+.kd_chordTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    gap: 6px;
+}
+
+.kd_roman {
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    color: hsl(var(--fh) 90% 76%);
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kd_chordPlay {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    padding-left: 2px; /* optically centers the triangle */
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 9px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.kd_chord:hover .kd_chordPlay,
+.kd_chord.kd_lit .kd_chordPlay {
+    background: hsl(var(--fh) 85% 66%);
+    color: #1a1a1a;
+}
+
+.kd_chordName {
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.1;
+    word-break: break-word;
+}
+
+.kd_tones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+
+.kd_tone {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.kd_tone:first-child {
+    background: hsl(var(--fh) 80% 62% / 0.3);
+    color: white;
+}
+
+.kd_func {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    color: hsl(var(--fh) 85% 72%);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.kd_func::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: hsl(var(--fh) 85% 62%);
+}
+
+.kd_chordBorrowed {
+    box-shadow: inset 0 0 0 1px hsl(var(--fh) 75% 62% / 0.45);
+    outline: 1px dashed hsl(var(--fh) 75% 62% / 0.5);
+    outline-offset: 3px;
+}
+
+.kd_legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+}
+
+.kd_legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.kd_legend strong {
+    color: hsl(var(--fh) 85% 70%);
+}
+
+.kd_legendDot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: hsl(var(--fh) 80% 62%);
+}
+
+.kd_borrowed {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.kd_borrowed .kd_chord {
+    flex: 0 0 140px;
+}
+
+/* progressions: a card each, with the chords as a strip of tiles colored by role */
+.kd_progressions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.kd_progCard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, hsl(var(--h) 50% 50% / 0.1), rgba(255, 255, 255, 0.02) 60%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+    transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.kd_progCard:hover {
+    box-shadow: inset 0 0 0 1px hsl(var(--h) 70% 65% / 0.3);
+}
+
+.kd_progCard.kd_progCardOn {
+    background: linear-gradient(160deg, hsl(var(--h) 60% 50% / 0.2), rgba(255, 255, 255, 0.03) 70%);
+    box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 66% / 0.6);
+}
+
+.kd_progHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.kd_progTitle {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    min-width: 0;
+}
+
+.kd_progName {
+    margin: 0;
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.kd_progTag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.kd_progPlay {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    padding: 0 0 0 2px; /* optically centers the triangle */
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #1a1a1a;
+    font-size: 12px;
+    box-shadow: 0 4px 14px hsl(var(--h) 80% 50% / 0.35);
+    transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kd_progPlay:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 4px 18px hsl(var(--h) 80% 55% / 0.55);
+}
+
+.kd_progStop {
+    width: 11px;
+    height: 11px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: #1a1a1a;
+}
+
+.kd_progAbout {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* the 4 bars, laid out like a mini timeline */
+.kd_progBars {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    margin-top: 4px;
+    padding: 4px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.kd_progBar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 4px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.kd_progBarNum {
+    padding-left: 3px;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kd_progBarChords {
+    display: flex;
+    gap: 3px;
+    height: 54px;
+}
+
+.kd_progChord {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: linear-gradient(160deg, hsl(var(--fh) 65% 52% / 0.3), hsl(var(--fh) 55% 40% / 0.12));
+    box-shadow: inset 0 0 0 1px hsl(var(--fh) 75% 62% / 0.3);
+    transition:
+        background 0.12s ease,
+        box-shadow 0.12s ease,
+        opacity 0.2s ease;
+}
+
+.kd_progChord.kd_progChordHalf {
+    padding: 6px 6px;
+}
+
+.kd_progRoman {
+    color: hsl(var(--fh) 90% 76%);
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kd_progChordName {
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kd_progChordHalf .kd_progChordName {
+    font-size: 13px;
+}
+
+/* while playing: upcoming chords sit back, played ones stay half lit, and the
+   current one fills solid with its role color */
+.kd_progBarsOn .kd_progChord {
+    opacity: 0.45;
+}
+
+.kd_progBarsOn .kd_progChord.kd_progChordDone {
+    opacity: 0.75;
+}
+
+.kd_progBarsOn .kd_progChord.kd_progChordOn {
+    opacity: 1;
+    background: hsl(var(--fh) 85% 64%);
+    box-shadow:
+        inset 0 0 0 1px hsl(var(--fh) 95% 80%),
+        0 0 18px hsl(var(--fh) 85% 60% / 0.55);
+}
+
+.kd_progChordOn .kd_progRoman,
+.kd_progChordOn .kd_progChordName {
+    color: #141414;
+}
+
+/* playhead: a light trail with a bright line at its front edge */
+.kd_progPlayhead {
+    position: absolute;
+    z-index: 2;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: 0;
+    border-right: 2px solid white;
+    border-radius: 8px 0 0 8px;
+    background: linear-gradient(90deg, transparent, hsl(var(--h) 85% 70% / 0.14));
+    box-shadow: 6px 0 12px -6px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    animation: kd_sweep linear forwards;
+}
+
+@keyframes kd_sweep {
+    to {
+        width: calc(100% - 8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kd_progPlayhead {
+        display: none;
+    }
+}
+
+/* whatever is sounding right now */
+.kd .kd_lit {
+    background: hsl(var(--fh, var(--h)) 85% 60% / 0.45);
+    transform: translateY(-2px);
+}
+
+.kd .kd_noteTonic.kd_lit {
+    background: var(--accent);
+}
+
+@media (max-width: 950px) {
+    .kd_top {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .kd_circle {
+        width: 100%;
+        max-width: 440px;
+        margin: 0 auto;
+    }
+}
+
+/* small screens: the progression cards become one row that swipes sideways
+   and snaps per card, running to the screen edges (cancelling the page's side
+   padding) with the next card peeking in so it's clear there's more */
+@media (max-width: 800px) {
+    .kd_progressions {
+        display: flex;
+        gap: 12px;
+
+        margin: 0 calc(var(--kd-gutter) * -1);
+        padding: 2px var(--kd-gutter) 4px;
+        overflow-x: auto;
+        overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 var(--kd-gutter);
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .kd_progressions::-webkit-scrollbar {
+        display: none;
+    }
+
+    .kd_progCard {
+        flex: 0 0 min(400px, 86%);
+        scroll-snap-align: center;
+    }
+}
+
+@media (max-width: 650px) {
+    .kd_borrowed {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .kd_borrowed .kd_chord {
+        flex: none;
+        width: 150px;
+    }
+}
+
+/* mouse drag on the swipeable rows (helpers/dragScroll.ts) */
+.kd .dragScroll {
+    cursor: grab;
+}
+
+.kd .dragScroll.dragScrolling,
+.kd .dragScroll.dragScrolling * {
+    cursor: grabbing;
+    user-select: none;
+}
+
+/* a note raised or lowered from the key's own scale (the blues' blue note, a
+   mode's changed degree): dashed, in a contrasting hue, matching the neck */
+.kd_note.kd_noteAltered {
+    border: 1.5px dashed hsl(calc(var(--h) + 180) 85% 70%);
+    background: hsl(calc(var(--h) + 180) 50% 50% / 0.12);
+}
+
+.kd_note.kd_noteAltered .kd_noteRole {
+    color: hsl(calc(var(--h) + 180) 90% 78%);
+}
+
+/* related keys are links now; keep them looking like the cards they were */
+a.kd_relatedBtn {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* the key in a sentence, under the header (also what search results quote) */
+.kd_summary {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* the scale picker's pills are links to each scale's page */
+a.kd_kind {
+    display: inline-block;
+    font-family: var(--font-sans);
+    line-height: normal;
+    text-decoration: none;
+}

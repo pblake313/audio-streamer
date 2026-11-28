@@ -86,6 +86,11 @@
     display: flex;
 }
 
+/* dots for the swipe row: only part of the layout on small screens */
+.pd_pillarDots {
+    display: none;
+}
+
 .pd_pillar {
     display: flex;
     flex-direction: column;
@@ -156,87 +161,146 @@
 }
 
 /* ========================= */
-/* CARD GRID                 */
+/* TECHNOLOGIES              */
 /* ========================= */
 
-.pd_grid {
+/* three layer cards across, with the security band below */
+.pd_techGrid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
 }
 
-.pd_grid > div {
+.pd_techCell {
     display: flex;
 }
 
-.pd_card {
+/* one layer: monochrome, fine borders and a faint top highlight */
+.pd_tech {
     position: relative;
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
-    gap: 8px;
 
     width: 100%;
     box-sizing: border-box;
-    padding: 24px 22px;
+    padding: 26px 24px 24px;
 
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background:
+        radial-gradient(90% 60% at 50% 0%, rgba(255, 255, 255, 0.05), transparent 70%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
     transition:
         translate 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-        border-color 0.35s ease,
-        background-color 0.35s ease;
-}
-
-/* soft light that follows the top edge on hover */
-.pd_card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background: radial-gradient(
-        120% 60% at 50% 0%,
-        rgba(255, 255, 255, 0.08),
-        transparent 60%
-    );
-
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease;
+        border-color 0.35s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .pd_card:hover {
-        translate: 0 -4px;
-        border-color: rgba(255, 255, 255, 0.15);
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    .pd_card:hover::before {
-        opacity: 1;
+    .pd_tech:hover {
+        translate: 0 -3px;
+        border-color: rgba(255, 255, 255, 0.16);
     }
 }
 
-.pd_cardIndex {
-    margin-bottom: 14px;
+.pd_techIcon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
 
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 9pt;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.08em;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 18px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    color: #fff;
 }
 
-.pd_cardTitle {
-    font-size: 14pt;
+.pd_techIcon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.pd_techWhere {
+    margin: 0 0 4px;
+
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     line-height: 1.3;
+    text-transform: uppercase;
 }
 
-.pd_cardText {
+.pd_techTitle {
+    font-size: 17pt;
+    line-height: 1.2;
+}
+
+.pd_techText {
+    margin-top: 8px;
     font-size: 10.5pt;
     line-height: 1.6;
+}
+
+/* technologies as chips */
+.pd_techTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    margin: auto 0 0; /* sits at the bottom, so chips line up across cards */
+    padding: 20px 0 0;
+    list-style: none;
+}
+
+.pd_techTags li {
+    padding: 4px 10px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 9pt;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* security: a full-width band under the three layers */
+/* security: the last cell, spanning the full row under the three layers */
+.pd_techBandCell {
+    grid-column: 1 / -1;
+}
+
+.pd_techBand {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px 48px;
+}
+
+.pd_techBandHead {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    flex: 0 1 420px;
+}
+
+.pd_techBandHead .pd_techIcon {
+    margin-bottom: 0;
+}
+
+.pd_techBand .pd_techTags {
+    flex: 1 1 0;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0;
 }
 
 /* ========================= */
@@ -254,99 +318,240 @@
     display: flex;
 }
 
+/* the panels share the tech cards' surface (.pd_tech); these add the layout */
 .pd_panel {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 32px 30px;
+    padding: 30px 28px 28px;
+}
 
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 20px;
-    background: linear-gradient(
-        160deg,
-        rgba(255, 255, 255, 0.05),
-        rgba(255, 255, 255, 0.015)
-    );
+.pd_panelHead {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.pd_panelHead .pd_techIcon {
+    margin-bottom: 0;
+}
+
+.pd_panelHead .pd_techWhere {
+    margin-bottom: 2px;
 }
 
 .pd_panelTitle {
-    margin-bottom: 16px;
-    font-size: 26pt;
+    font-size: 20pt;
+    line-height: 1.15;
 }
 
-.pd_callout {
-    margin-top: 24px;
-    padding: 18px 20px;
+.pd_panelText {
+    margin-top: 18px;
+    font-size: 11pt;
+    line-height: 1.65;
+}
 
-    border-left: 2px solid rgba(255, 255, 255, 0.25);
-    border-radius: 0 12px 12px 0;
-    background: rgba(255, 255, 255, 0.035);
+/* "Where's my PIN?": an inset box at the bottom of the auth card */
+.pd_callout {
+    margin-top: 20px;
+    padding: 18px 20px 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .pd_calloutTitle {
     margin-bottom: 6px;
-    font-size: 13pt;
+    font-size: 12pt;
 }
 
-.pd_link {
-    color: var(--font-color-heading);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: rgba(255, 255, 255, 0.35);
-}
-
-.pd_link:hover {
-    text-decoration-color: #ffffff;
-}
-
-/* ========================= */
-/* FRONTEND / BACKEND LIST   */
-/* ========================= */
-
-.pd_list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 48px;
-}
-
-.pd_listItem {
-    display: grid;
-    grid-template-columns: 170px 1fr;
-    gap: 20px;
-
-    padding: 18px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.pd_listTitle {
-    font-size: 11.5pt;
+.pd_callout p {
+    font-size: 10pt;
     line-height: 1.6;
 }
 
-.pd_listText {
+.pd_calloutButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-top: 14px;
+    padding: 8px 14px;
+
+    border: 1px solid #f7f7f7;
+    border-radius: 8px;
+    background: #f7f7f7;
+
+    color: #222;
+    font-size: 10pt;
+    font-weight: 600;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.pd_calloutButton:hover {
+    border-color: #fff;
+    background: #fff;
+    color: #222;
+}
+
+.pd_calloutButton:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 3px;
+}
+
+.pd_calloutButton svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ========================= */
+/* FRONTEND / BACKEND CARDS  */
+/* ========================= */
+
+/* nine small cards per group, three across; they share the tech cards'
+   surface (.pd_tech) */
+.pd_details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.pd_detailCell {
+    display: flex;
+}
+
+.pd_detail {
+    padding: 22px 22px 24px;
+}
+
+.pd_detailIndex {
+    margin-bottom: 14px;
+
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 9pt;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+}
+
+.pd_detailTitle {
+    font-size: 13pt;
+    line-height: 1.3;
+}
+
+.pd_detailText {
+    margin-top: 8px;
     font-size: 10.5pt;
+    line-height: 1.6;
 }
 
 /* ========================= */
 /* RESPONSIVE                */
 /* ========================= */
 
-@media (max-width: 1100px) {
-    .pd_grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+/* the four tech cards (security included) become one row that swipes
+   sideways and snaps per card, running to the screen edges */
+@media (max-width: 1000px) {
+    .pd_techGrid {
+        --pd-gutter: 25px;
+
+        display: flex;
+        gap: 10px;
+
+        margin: 0 calc(var(--pd-gutter) * -1);
+        padding: 4px var(--pd-gutter) 8px;
+        overflow-x: auto;
+        overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 var(--pd-gutter);
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .pd_list {
-        grid-template-columns: 1fr;
+    .pd_techGrid::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* in the row, cards fade in without the rise: the row clips anything
+       below its edge, and rising cards would look cut off */
+    .pd_techGrid > .reveal {
+        transform: none;
+    }
+
+    .pd_techCell {
+        flex: 0 0 min(380px, 82%);
+        scroll-snap-align: center;
+    }
+
+    /* security is just another card in the row here */
+    .pd_techBand {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* laid out like the other cards: icon on top, chips at the bottom */
+    .pd_techBandHead {
+        flex-direction: column;
+        flex-basis: auto;
+        gap: 0;
+    }
+
+    .pd_techBandHead .pd_techIcon {
+        margin-bottom: 18px;
+    }
+
+    .pd_techBand .pd_techTags {
+        justify-content: flex-start;
+        margin-top: auto;
+        padding-top: 20px;
+    }
+}
+
+/* the frontend / backend cards: one row that swipes sideways and snaps per
+   card, like the tech cards */
+@media (max-width: 1000px) {
+    .pd_details {
+        --pd-gutter: 25px;
+
+        display: flex;
+        gap: 10px;
+
+        margin: 0 calc(var(--pd-gutter) * -1);
+        padding: 4px var(--pd-gutter) 8px;
+        overflow-x: auto;
+        overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 var(--pd-gutter);
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pd_details::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* fade in without the rise, so the row's edge doesn't clip it */
+    .pd_details > .reveal {
+        transform: none;
+    }
+
+    .pd_detailCell {
+        flex: 0 0 min(320px, 78%);
+        scroll-snap-align: center;
     }
 }
 
 @media (max-width: 850px) {
     .pd_summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr); /* the card row can't widen the column */
         grid-template-areas:
             "head"
             "lead"
-            "pillars";
+            "pillars"
+            "dots";
         row-gap: 28px;
     }
 
@@ -354,9 +559,45 @@
         margin-top: -12px;
     }
 
+    /* summary cards: one row that swipes sideways and snaps per card,
+       running to the screen edges with the next card peeking in */
     .pd_pillars {
-        grid-template-columns: 1fr;
+        --pd-gutter: 25px;
+
+        display: flex;
         gap: 10px;
+        min-width: 0;
+
+        margin: 0 calc(var(--pd-gutter) * -1);
+        padding: 4px var(--pd-gutter) 8px;
+        overflow-x: auto;
+        overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scroll-padding: 0 var(--pd-gutter);
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pd_pillars::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* in the row, cards fade in without the rise: the row clips anything
+       below its edge, and rising cards would look cut off */
+    .pd_pillars > .reveal {
+        transform: none;
+    }
+
+    .pd_pillars > div {
+        flex: 0 0 min(360px, 82%);
+        scroll-snap-align: center;
+    }
+
+    .pd_pillarDots {
+        display: block;
+        grid-area: dots;
+        margin-top: -16px;
     }
 
     .pd_split {
@@ -375,22 +616,31 @@
         padding-right: 15px;
     }
 
+    /* the summary card row follows the narrower phone padding */
+    .pd_pillars {
+        --pd-gutter: 15px;
+    }
+
+    .pd_pillars > div {
+        flex-basis: 86%;
+    }
+
+    /* the tech card row follows the narrower phone padding too */
+    .pd_techGrid {
+        --pd-gutter: 15px;
+    }
+
+    .pd_techCell {
+        flex-basis: 86%;
+    }
+
     .pd_section,
     .pd_photos {
         padding-top: 90px;
     }
 
-    .pd_grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .pd_card {
-        padding: 20px 18px;
-    }
-
-    .pd_cardIndex {
-        margin-bottom: 6px;
+    .pd_tech {
+        padding: 22px 20px 20px;
     }
 
     .pd_panel {
@@ -398,11 +648,15 @@
     }
 
     .pd_panelTitle {
-        font-size: 22pt;
+        font-size: 18pt;
     }
 
-    .pd_listItem {
-        grid-template-columns: 1fr;
-        gap: 4px;
+    /* the frontend / backend rows follow the narrower phone padding */
+    .pd_details {
+        --pd-gutter: 15px;
+    }
+
+    .pd_detailCell {
+        flex-basis: 84%;
     }
 }

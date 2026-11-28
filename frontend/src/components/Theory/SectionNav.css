@@ -1,0 +1,94 @@
+/* sticky section links on the theory page (SectionNav.svelte). Lives inside
+   .kd, so it picks up --h and --kd-gutter. `top` is set inline to the site
+   nav's height. */
+.sn {
+    position: sticky;
+    z-index: 20;
+    /* the page's section gap would push the circle too far down */
+    margin: 0 calc(var(--kd-gutter) * -1) calc(28px - var(--kd-section-gap));
+    padding: 10px 0;
+    /* same as the site nav once it's scrolled (.nav_scrolled), so the two
+       read as one bar */
+    background-color: #222;
+    border-bottom: var(--border-light);
+
+    display: flex;
+    align-items: center;
+}
+
+/* the key picker: last in the row and pushed to the right end on wide screens */
+.sn_end {
+    order: 99;
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding-left: 12px;
+}
+
+/* tight: the picker leads the swipeable row instead, set off by a divider */
+@media (max-width: 860px) {
+    .sn_end {
+        order: -1;
+        margin: 0 6px 0 0;
+        padding: 0 12px 0 0;
+        border-right: 1px solid rgba(255, 255, 255, 0.14);
+    }
+}
+
+.sn_scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 var(--kd-gutter);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sn_scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.sn_link {
+    flex: 0 0 auto;
+    padding: 7px 14px;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.sn_link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.sn_link.sn_linkOn {
+    background: white;
+    color: #1a1a1a;
+}
+
+.sn_link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 2px;
+}
+
+/* the dragScroll grab cursor beats the link's pointer while there's room to drag */
+.sn_scroll.dragScroll .sn_link {
+    cursor: pointer;
+}
+
+/* each section (the direct children of .kd with an id) lands under both
+   sticky bars when jumped to */
+.kd > [id] {
+    scroll-margin-top: var(--kd-jump, 140px);
+}

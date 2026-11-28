@@ -1,0 +1,238 @@
+/* guitar neck (Fretboard.svelte). Lives inside .kd, so --h (the key's hue),
+   --kd-gutter and the toggle styles come from KeyDetails.css.
+
+   Same swipe behaviour as the chords: frets grow to fill the row but never
+   shrink under --fret-min, and once they can't fit the neck swipes sideways,
+   with the string names pinned to the left edge. */
+.fb_scroll {
+    --label-w: 28px;
+    --open-w: 46px;
+    --fret-min: 52px;
+    --row-h: 38px;
+    --board: #1b1b1b;
+
+    margin: 0 calc(var(--kd-gutter) * -1);
+    padding: 0 var(--kd-gutter) 2px;
+    overflow-x: auto;
+    overflow-y: hidden; /* sideways only, vertical swipes go to the page */
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.fb_scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.fb_board {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--label-w) var(--open-w) repeat(15, minmax(var(--fret-min), 1fr));
+    grid-template-rows: repeat(6, var(--row-h)) 28px;
+    min-width: calc(var(--label-w) + var(--open-w) + 15 * var(--fret-min));
+    padding-top: 6px;
+    border-radius: 12px;
+    background: var(--board);
+    /* clip, not hidden, so the string names can stick to the scrolling row */
+    overflow: clip;
+}
+
+/* once it swipes (min-width plus the page's side padding), the neck sits flush
+   against the screen edge so nothing shows to the left of the string names */
+@media (max-width: 900px) {
+    .fb_scroll {
+        padding-left: 0;
+    }
+
+    .fb_board {
+        border-radius: 0 12px 12px 0;
+    }
+}
+
+/* fret wire on the right edge of each column; the nut is thicker and lighter */
+.fb_fret {
+    grid-row: 1 / 7;
+    z-index: 0;
+    border-right: 2px solid rgba(255, 255, 255, 0.14);
+}
+
+.fb_fret.fb_nut {
+    border-right: 5px solid rgba(255, 255, 255, 0.55);
+}
+
+/* position dots between the middle strings, a double at the 12th */
+.fb_inlay {
+    grid-row: 1 / 7;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--row-h) * 2 - 12px);
+    pointer-events: none;
+}
+
+.fb_inlay span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.fb_string {
+    grid-column: 2 / -1;
+    align-self: center;
+    z-index: 1;
+    height: var(--thick);
+    background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.28));
+    pointer-events: none;
+}
+
+/* string names, pinned to the left while the neck swipes. A sticky box can't
+   leave its grid cell, so each spans the row and sets its own width */
+.fb_label {
+    position: sticky;
+    left: 0;
+    grid-column: 1 / -1;
+    justify-self: start;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: var(--label-w);
+    height: 100%;
+    background: var(--board);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fb_note {
+    z-index: 2;
+    align-self: center;
+    justify-self: center;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid hsl(var(--h) 80% 66% / 0.55);
+    border-radius: 50%;
+    background: hsl(var(--h) 45% 26%);
+    color: white;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.fb_note:hover {
+    background: hsl(var(--h) 55% 34%);
+    transform: scale(1.08);
+}
+
+.fb_note:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+/* open strings sit just left of the nut, a little smaller */
+.fb_note.fb_open {
+    width: 26px;
+    height: 26px;
+    background: var(--board); /* hides the string running behind it */
+    font-size: 11px;
+}
+
+.fb_note.fb_tonic {
+    border-color: transparent;
+    background: hsl(var(--h) 85% 66%);
+    color: #1a1a1a;
+}
+
+.fb_note.fb_open.fb_tonic {
+    background: var(--board);
+    border: 2px solid hsl(var(--h) 85% 66%);
+    color: hsl(var(--h) 90% 78%);
+}
+
+.fb_note.fb_lit {
+    transform: scale(1.15);
+    box-shadow: 0 0 16px hsl(var(--h) 85% 62% / 0.8);
+    background: hsl(var(--h) 90% 72%);
+    color: #1a1a1a;
+}
+
+/* trimmed to the glyph so it sits dead centre in the circle (see .kd_glyph) */
+.fb_noteText {
+    display: block;
+    line-height: 1;
+    text-box: trim-both cap alphabetic;
+}
+
+.fb_num {
+    grid-row: 7;
+    display: grid;
+    place-items: center;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.fb_num.fb_numInlay {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 650px) {
+    .fb_scroll {
+        --row-h: 34px;
+        --fret-min: 48px;
+    }
+
+    .fb_note {
+        width: 27px;
+        height: 27px;
+        font-size: 11px;
+    }
+}
+
+/* one pentatonic position picked: its frets are shaded, everything else dims */
+.fb_band {
+    grid-row: 1 / 7;
+    z-index: 0;
+    margin: 2px 0;
+    border-radius: 8px;
+    background: hsl(var(--h) 70% 55% / 0.16);
+    box-shadow: inset 0 0 0 1px hsl(var(--h) 80% 65% / 0.4);
+    pointer-events: none;
+}
+
+.fb_note {
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        opacity 0.2s ease;
+}
+
+.fb_note.fb_out {
+    opacity: 0.18;
+}
+
+.fb_note.fb_out:hover {
+    opacity: 0.6;
+}
+
+/* a note raised or lowered from the key's scale (the blues' blue note, a
+   mode's changed degree): dashed, in a contrasting hue */
+.fb_note.fb_altered {
+    border: 1.5px dashed hsl(calc(var(--h) + 180) 85% 70%);
+    background: hsl(calc(var(--h) + 180) 40% 22%);
+}
+
+.fb_note.fb_open.fb_altered {
+    background: var(--board);
+}

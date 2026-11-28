@@ -13,7 +13,6 @@
     import Logo from "../../Icons/Logos/Logo.svelte";
     import MobileNavLink from "../../buttons/MobileNavLink.svelte";
     import MobileNavAudioControls from "./MobileNavAudioControls.svelte";
-    import BackgroundVideo from "../../misc/BackgroundVideo.svelte";
 
     import { selectedBeat } from "../../../stores/AudioPlayer/selectedBeatStore";
 
@@ -23,7 +22,6 @@
         userTapped,
     } from "../../../stores/AudioPlayerStore";
 
-    let videoReady = false;
     let activeHash = "";
 
     const sectionIds = ["summary", "photos", "features", "wheres-my-pin"];
@@ -70,10 +68,6 @@
         }
 
         activeHash = currentSection;
-    }
-
-    function isHashActive(hash: string) {
-        return $page.url.pathname === "/" && activeHash === hash;
     }
 
     async function waitForPageRender() {
@@ -236,18 +230,15 @@
     aria-hidden={!$mobileNavOpen}
     on:click|stopPropagation={handleContainerClick}
 >
+    <!-- ambient light, same as the login page: grid + blue and teal glows -->
     <div
-        class="mobileNav_videoFade"
-        class:mobileNav_videoVisible={$mobileNavOpen && videoReady}
+        class="mobileNav_backdrop"
+        class:mobileNav_backdropVisible={$mobileNavOpen}
+        aria-hidden="true"
     >
-        <BackgroundVideo
-            className="mobileNav_video"
-            src="/Videos/glasslina.mp4"
-            poster="/Images/VideoPosters/glasslina.webp"
-            onReady={() => {
-                videoReady = true;
-            }}
-        />
+        <div class="mobileNav_grid"></div>
+        <div class="mobileNav_orb mobileNav_orb_a"></div>
+        <div class="mobileNav_orb mobileNav_orb_b"></div>
     </div>
     <div class="mobileNav_content">
         <div class="mobileNav_links">
@@ -255,23 +246,9 @@
                 <MobileNavAudioControls beat={$selectedBeat} />
             {/if}
 
-            <div class="mobileNav_linkItem">
-                <MobileNavLink
-                    isActive={$page.url.pathname === "/" && activeHash === ""}
-                    title="Home"
-                    on:click={() => goToPage("/")}
-                />
-            </div>
-
-            <div class="mobileNav_linkItem">
-                <MobileNavLink
-                    isActive={isRouteActive("/chord-builder")}
-                    title="Chord Builder"
-                    on:click={() => goToPage("/chord-builder")}
-                />
-            </div>
-
             {#if $user}
+            <div class="mobileNav_group">
+                <p class="mobileNav_groupLabel">Vault</p>
                 <div class="mobileNav_linkItem">
                     <MobileNavLink
                         isActive={isRouteActive("/portal", true)}
@@ -279,15 +256,6 @@
                         on:click={() => goToPage("/portal")}
                     />
                 </div>
-
-                <div class="mobileNav_linkItem">
-                    <MobileNavLink
-                        isActive={isRouteActive("/portal/converter", true)}
-                        title="Converter"
-                        on:click={() => goToPage("/portal/converter")}
-                    />
-                </div>
-
                 <div class="mobileNav_linkItem">
                     <MobileNavLink
                         isActive={isRouteActive("/portal/add-beat")}
@@ -295,50 +263,86 @@
                         on:click={() => goToPage("/portal/add-beat")}
                     />
                 </div>
-
                 <div class="mobileNav_linkItem">
-                    <MobileNavLink title="Logout" on:click={handleLogout} />
+                    <MobileNavLink
+                        isActive={isRouteActive("/portal/traffic", true)}
+                        title="Traffic"
+                        on:click={() => goToPage("/portal/traffic")}
+                    />
                 </div>
+            </div>
+
+            <div class="mobileNav_group">
+                <p class="mobileNav_groupLabel">Tools</p>
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
+                        isActive={isRouteActive("/chord-builder")}
+                        title="Chord Builder"
+                        on:click={() => goToPage("/chord-builder")}
+                    />
+                </div>
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
+                        isActive={isRouteActive("/theory")}
+                        title="Theory"
+                        on:click={() => goToPage("/theory")}
+                    />
+                </div>
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
+                        isActive={isRouteActive("/portal/converter", true)}
+                        title="Converter"
+                        on:click={() => goToPage("/portal/converter")}
+                    />
+                </div>
+            </div>
+
+            <div class="mobileNav_group">
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
+                        isActive={$page.url.pathname === "/" && activeHash === ""}
+                        title="Home"
+                        on:click={() => goToPage("/")}
+                    />
+                </div>
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
+                        title="Log out"
+                        on:click={handleLogout}
+                    />
+                </div>
+            </div>
             {:else}
+            <div class="mobileNav_group">
+                <div class="mobileNav_linkItem">
+                    <MobileNavLink
+                        isActive={$page.url.pathname === "/" && activeHash === ""}
+                        title="Home"
+                        on:click={() => goToPage("/")}
+                    />
+                </div>
                 <div class="mobileNav_linkItem">
                     <MobileNavLink
                         isActive={isRouteActive("/login", true)}
-                        title="Login"
+                        title="Log in"
                         on:click={() => goToPage("/login")}
                     />
                 </div>
-
                 <div class="mobileNav_linkItem">
                     <MobileNavLink
-                        isActive={isHashActive("#summary")}
-                        title="Summary"
-                        on:click={() => goToPage("/#summary")}
+                        isActive={isRouteActive("/chord-builder")}
+                        title="Chord Builder"
+                        on:click={() => goToPage("/chord-builder")}
                     />
                 </div>
-
                 <div class="mobileNav_linkItem">
                     <MobileNavLink
-                        isActive={isHashActive("#photos")}
-                        title="Photos"
-                        on:click={() => goToPage("/#photos")}
+                        isActive={isRouteActive("/theory")}
+                        title="Theory"
+                        on:click={() => goToPage("/theory")}
                     />
                 </div>
-
-                <div class="mobileNav_linkItem">
-                    <MobileNavLink
-                        isActive={isHashActive("#features")}
-                        title="Features"
-                        on:click={() => goToPage("/#features")}
-                    />
-                </div>
-
-                <div class="mobileNav_linkItem">
-                    <MobileNavLink
-                        isActive={isHashActive("#wheres-my-pin")}
-                        title="Where's My PIN"
-                        on:click={() => goToPage("/#wheres-my-pin")}
-                    />
-                </div>
+            </div>
             {/if}
         </div>
 

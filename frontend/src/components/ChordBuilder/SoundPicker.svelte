@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { floatPanel } from "../../helpers/ChordBuilder/floatPanel";
     import "./Dropdown.css";
     import "./SoundPicker.css";
 
@@ -92,7 +93,7 @@
         type="button"
         class="dd_trigger dd_withIcon"
         class:dd_triggerOpen={open}
-        style="min-width: 180px"
+        style="width: var(--cb-w-sound, 180px)"
         aria-label={`Sound: ${INSTRUMENTS[value].label}`}
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -107,7 +108,6 @@
         </svg>
         <span class="dd_value">
             {INSTRUMENTS[value].label}
-            <small class="sp_triggerGroup">{INSTRUMENTS[value].group}</small>
         </span>
         <svg class="dd_chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 9l6 6 6-6" />
@@ -115,7 +115,7 @@
     </button>
 
     {#if open}
-        <div class="sp_panel" role="dialog" aria-label="Choose a sound">
+        <div class="sp_panel" role="dialog" aria-label="Choose a sound" use:floatPanel={{ anchor: trigger, align: "right" }}>
             <!-- left: categories -->
             <ul class="sp_categories" role="tablist" aria-label="Sound categories">
                 {#each INSTRUMENT_GROUPS as group (group)}

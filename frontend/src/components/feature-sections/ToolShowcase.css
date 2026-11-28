@@ -1,0 +1,138 @@
+/* text on one side, a picture of the tool on the other; --ts-accent is
+   the tool's color as "r, g, b" */
+.ts_section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    grid-template-areas: "text visual";
+    gap: 64px;
+    align-items: center;
+}
+
+.ts_section.ts_flip {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "visual text";
+}
+
+.ts_text {
+    grid-area: text;
+}
+
+.ts_lead {
+    margin-top: 18px;
+}
+
+/* plain rows split by hairlines */
+.ts_points {
+    margin: 30px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ts_point {
+    padding: 14px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 11pt;
+    line-height: 1.55;
+}
+
+.ts_point:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* neutral glass button, matching the hero's secondary buttons */
+.ts_cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 34px;
+    padding: 11px 18px;
+
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    background: #ffffff;
+
+    color: #111111;
+    font-size: 12pt;
+    font-weight: 500;
+    text-decoration: none;
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.ts_cta svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.25s ease;
+}
+
+.ts_cta:hover {
+    background: #e6e6e6;
+    border-color: #e6e6e6;
+}
+
+.ts_cta:hover svg {
+    transform: translateX(3px);
+}
+
+/* the picture, with a soft glow in the tool's color behind it */
+.ts_visual {
+    grid-area: visual;
+    position: relative;
+    display: block;
+}
+
+.ts_visual::before {
+    content: "";
+    position: absolute;
+    inset: 8% 6%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(var(--ts-accent), 0.16), transparent 70%);
+    filter: blur(30px);
+}
+
+.ts_visual img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ts_flip .ts_visual img {
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .ts_visual:hover img {
+        transform: translateY(-6px);
+    }
+}
+
+@media (max-width: 850px) {
+    .ts_section,
+    .ts_section.ts_flip {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "text"
+            "visual";
+        gap: 40px;
+    }
+
+    .ts_flip .ts_visual img {
+        max-width: 420px;
+    }
+}
+
+@media (max-width: 600px) {
+    .ts_cta {
+        justify-content: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

@@ -5,6 +5,7 @@ import { audioPlayerUrl } from "../AudioPlayerStore";
 import { getAuthenticatedUser } from "../../helpers/Auth/authFunctions";
 import { beats } from "./BeatsStore";
 import { getBeatAudioSource, preferredAudioFormat } from "../AudioFormatStore";
+import { isLinkExpiring, refreshBeatUrls } from "./freshBeatUrls";
 
 const selectedBeat = writable<Beat | null>(null);
 
@@ -82,7 +83,8 @@ async function preloadBeat(beat: Beat | null) {
 
             // warm the file that will actually play (WAV or MP3)
             const url = getBeatAudioSource(beat, get(preferredAudioFormat))?.url;
-            if (!url) return;
+            // an expired link would only fail; it gets refreshed when the track is picked
+            if (!url || isLinkExpiring(url, 0)) return;
 
             const end = PRELOAD_RANGE_BYTES - 1;
 
@@ -165,9 +167,23 @@ function selectNewBeat(beat: Beat) {
     void preloadNeighbors();
 }
 
+/**
+ * Loads a track into the player. Audio links only last an hour, so one that
+ * has expired (or is about to) is swapped for a fresh one first, instead of
+ * failing and needing a page refresh.
+ */
 export async function setAudioUrl(beat: Beat) {
     try {
-        audioPlayerUrl.set(getBeatAudioSource(beat, get(preferredAudioFormat))?.url ?? null);
+        let source = getBeatAudioSource(beat, get(preferredAudioFormat));
+
+        if (source && isLinkExpiring(source.url)) {
+            const fresh = await refreshBeatUrls(beat);
+            // another track was picked while we waited
+            if (get(selectedBeat)?.id !== beat.id) return;
+            if (fresh) source = getBeatAudioSource(fresh, get(preferredAudioFormat));
+        }
+
+        audioPlayerUrl.set(source?.url ?? null);
     } catch (err) {
         audioPlayerUrl.set(null);
     }

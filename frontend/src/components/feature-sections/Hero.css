@@ -1,21 +1,98 @@
-.hero_container {
+/*
+    Hero: the private vault first. Centered copy and login, then a
+    link out to the Chord Builder.
+*/
+
+/* ========================= */
+/* LAYOUT                    */
+/* ========================= */
+
+.hero {
+    --hero-accent: 96, 165, 255; /* the same blue as the login page */
+    --hero-stack-gap: 14px; /* between Log in and the tool cards, and between the cards */
+
     position: relative;
     overflow: hidden;
     isolation: isolate;
 
-    margin: auto;
-    padding: 200px 0 170px;
+    padding: 160px 0 110px;
 }
 
-.hero_insideContainer {
+.hero_inner {
     position: relative;
-    z-index: 2;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     max-width: var(--site-width);
     margin: auto;
     padding: 0 25px;
+    box-sizing: border-box;
 
     text-align: center;
+}
+
+/* ========================= */
+/* BACKDROP                  */
+/* ========================= */
+
+.hero_backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* faint grid, faded out toward the edges */
+.hero_grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: center top;
+    mask-image: radial-gradient(ellipse 65% 45% at 50% 25%, black 10%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 65% 45% at 50% 25%, black 10%, transparent 75%);
+}
+
+.hero_orb {
+    position: absolute;
+    left: 50%;
+    border-radius: 50%;
+    filter: blur(90px);
+    translate: -50% 0;
+}
+
+.hero_orb_a {
+    top: -12%;
+    width: min(900px, 110vw);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgba(var(--hero-accent), 0.11), transparent);
+    animation: hero_drift 18s ease-in-out infinite alternate;
+}
+
+/* teal glow low behind the copy (same colors and strength as the login page) */
+.hero_orb_b {
+    top: 35%;
+    width: min(1100px, 120vw);
+    aspect-ratio: 1.6;
+    background: radial-gradient(closest-side, rgba(64, 224, 200, 0.09), transparent);
+    animation: hero_drift 22s ease-in-out infinite alternate-reverse;
+}
+
+/* blend into the page above and below */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, var(--color-bg) 0%, transparent 16%),
+        linear-gradient(0deg, var(--color-bg) 0%, transparent 18%);
 }
 
 /* ========================= */
@@ -27,8 +104,8 @@
     align-items: center;
     gap: 8px;
 
-    margin: 0 auto 28px;
-    padding: 6px 14px;
+    margin-bottom: 28px;
+    padding: 4px 14px 4px 4px;
 
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
@@ -36,215 +113,255 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 
-    color: rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 9.5pt;
-    line-height: 1.2;
+    line-height: 1;
     letter-spacing: 0.02em;
-}
-
-.hero_eyebrowDot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #7ee2a8;
-    box-shadow: 0 0 0 0 rgba(126, 226, 168, 0.6);
-    animation: hero_pulse 2.4s ease-out infinite;
-}
-
-.hero_title {
-    line-height: 1.04;
-    letter-spacing: -0.02em;
-    text-shadow: 0 0 30px rgba(34, 34, 34, 0.8);
-}
-
-.hero_titleLine {
-    display: block;
-}
-
-.hero_subtext {
-    max-width: 540px;
-    margin: 28px auto 0;
-
-    color: rgba(255, 255, 255, 0.65);
-    font-size: 12pt;
-}
-
-.hero_buttonContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-
-    margin: 40px auto 0;
-}
-
-.hero_primaryButton {
-    width: 150px;
-}
-
-/* glass-style secondary action, matches BoxButton "glass" */
-.hero_secondaryButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 150px;
-    box-sizing: border-box;
-    padding: 8px 14px;
-
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.07);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    color: #f7f7f7;
-    font-size: 12pt;
-    font-weight: 500;
-    line-height: 1.25;
 
     transition:
         background-color 0.25s ease,
         border-color 0.25s ease;
 }
 
-.hero_secondaryButton:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.22);
+.hero_eyebrow:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hero_eyebrowIcon {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #9cc8ff, #3b82f6);
+    color: white;
+}
+
+.hero_eyebrowIcon svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Google Sans leaves more room under its letters than above, so plain
+   centered text looks high in the pill. Trimming the line box to the
+   letters themselves (cap height to baseline) centers them exactly. */
+.hero_eyebrowText {
+    display: block;
+    text-box: trim-both cap alphabetic;
+}
+
+/* browsers without text-box trimming: a very small nudge instead */
+@supports not (text-box: trim-both cap alphabetic) {
+    .hero_eyebrowText {
+        padding-top: 0.05em;
+    }
+}
+
+.hero_eyebrowArrow {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+}
+
+.hero_eyebrow:hover .hero_eyebrowArrow {
+    transform: translateX(3px);
+}
+
+.hero_title {
+    max-width: 1150px;
+
+    font-size: clamp(66px, 8vw, 112px);
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+}
+
+.hero_titleLine {
+    display: block;
+}
+
+.hero_titleAccent {
+    padding-bottom: 0.08em; /* room for descenders under background-clip */
+    background: linear-gradient(95deg, #dcebff 0%, #8dbbff 45%, #4f8dff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero_subtext {
+    max-width: 580px;
+    margin: 26px auto 0;
+
+    color: rgba(255, 255, 255, 0.64);
+    font-size: 13pt;
+    line-height: 1.55;
+}
+
+/* Log in, with "How it works" as a text link underneath */
+.hero_actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 36px;
+}
+
+/* Log in (or Open your vault): the standard compact button */
+.hero_primaryButton {
+    width: 170px;
+}
+
+/* "How it works": white text with a small down arrow */
+.hero_howLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    color: #fff;
+    font-size: 10.5pt;
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+
+    transition: text-decoration-color 0.2s ease;
+}
+
+.hero_howLink:hover {
+    color: #fff;
+    text-decoration-color: rgba(255, 255, 255, 0.5);
+}
+
+.hero_howLink:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.hero_howLink svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+}
+
+.hero_howLink:hover svg {
+    transform: translateY(2px);
+}
+
+/* ========================= */
+/* TOOL LINKS                */
+/* ========================= */
+
+/* Chord Builder and Theory side by side; each card sets --tool-rgb */
+/* Chord Builder and Theory, under the login. On phones the space above the
+   cards matches the space between them (--hero-stack-gap). */
+.hero_tools {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--hero-stack-gap);
+
+    width: 100%;
+    max-width: 880px;
+    margin-top: 56px;
+}
+
+.hero_tool {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 14px 18px 14px 14px;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+
+    text-align: left;
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.hero_tool:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.hero_toolIcon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    background: rgba(var(--tool-rgb), 0.14);
+    color: rgb(var(--tool-rgb));
+}
+
+.hero_toolIcon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.hero_toolText {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.hero_toolTitle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 12pt;
+    font-weight: 500;
+}
+
+.hero_toolSub {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10pt;
+    line-height: 1.4;
+}
+
+.hero_toolArrow {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-left: auto;
+    color: rgba(255, 255, 255, 0.6);
+    transition:
+        transform 0.25s ease,
+        color 0.25s ease;
+}
+
+.hero_tool:hover .hero_toolArrow {
+    color: white;
+    transform: translateX(3px);
 }
 
 .hero_githubLink {
     width: fit-content;
-    margin: 45px auto 0;
-}
-
-/* ========================= */
-/* GLOW ORBS                 */
-/* ========================= */
-
-.hero_glow {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.hero_orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.16;
-    will-change: transform;
-}
-
-.hero_orb_one {
-    top: 18%;
-    left: 22%;
-    width: 420px;
-    height: 420px;
-    background: #6d5dfc;
-    animation: hero_drift_one 22s ease-in-out infinite alternate;
-}
-
-.hero_orb_two {
-    top: 30%;
-    right: 18%;
-    width: 380px;
-    height: 380px;
-    background: #2bb3c0;
-    animation: hero_drift_two 26s ease-in-out infinite alternate;
-}
-
-.hero_orb_three {
-    bottom: 10%;
-    left: 42%;
-    width: 320px;
-    height: 320px;
-    background: #c0487e;
-    opacity: 0.1;
-    animation: hero_drift_three 30s ease-in-out infinite alternate;
-}
-
-/* ========================= */
-/* VIDEO + FADES             */
-/* ========================= */
-
-.hero_video {
-    position: absolute;
-    z-index: -2;
-    top: 50%;
-    left: 50%;
-
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-
-    opacity: 0.8;
-    transform: translate(-50%, -50%);
-}
-
-.hero_topFade,
-.hero_bottomFade {
-    position: absolute;
-    left: 0;
-    z-index: -1;
-
-    width: 100%;
-    height: 180px;
-    pointer-events: none;
-}
-
-.hero_topFade {
-    top: 0;
-    background: linear-gradient(
-        180deg,
-        #222 0%,
-        #222 25%,
-        rgba(34, 34, 34, 0.85) 45%,
-        rgba(34, 34, 34, 0) 100%
-    );
-}
-
-.hero_bottomFade {
-    bottom: 0;
-    background: linear-gradient(
-        0deg,
-        #222 0%,
-        #222 25%,
-        rgba(34, 34, 34, 0.85) 45%,
-        rgba(34, 34, 34, 0) 100%
-    );
+    margin-top: 32px;
 }
 
 /* ========================= */
 /* KEYFRAMES                 */
 /* ========================= */
 
-@keyframes hero_drift_one {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(120px, 60px) scale(1.15); }
-}
-
-@keyframes hero_drift_two {
-    from { transform: translate(0, 0) scale(1.1); }
-    to   { transform: translate(-140px, -40px) scale(0.95); }
-}
-
-@keyframes hero_drift_three {
-    from { transform: translate(0, 0) scale(0.9); }
-    to   { transform: translate(-80px, -70px) scale(1.2); }
-}
-
-@keyframes hero_pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(126, 226, 168, 0.6); }
-    70%  { box-shadow: 0 0 0 8px rgba(126, 226, 168, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(126, 226, 168, 0); }
+@keyframes hero_drift {
+    from { transform: translate(-4%, -3%) scale(1); }
+    to   { transform: translate(4%, 4%) scale(1.08); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero_orb,
-    .hero_eyebrowDot {
+    .hero_orb {
         animation: none;
     }
 }
@@ -254,76 +371,68 @@
 /* ========================= */
 
 @media (max-width: 1600px) {
-    .hero_container {
-        padding: 150px 0 140px;
-    }
-
-    .hero_title {
-        font-size: 65pt;
-    }
-}
-
-@media (max-width: 1200px) {
-    .hero_title {
-        font-size: 45pt;
-    }
-}
-
-@media (max-width: 700px) {
-    .hero_subtext {
-        max-width: none;
-        font-size: 11pt;
-    }
-
-    .hero_topFade,
-    .hero_bottomFade {
-        height: 130px;
-    }
-
-    .hero_orb {
-        filter: blur(70px);
-    }
-
-    .hero_orb_one {
-        width: 260px;
-        height: 260px;
-        left: 0;
-    }
-
-    .hero_orb_two {
-        width: 240px;
-        height: 240px;
-        right: 0;
-    }
-
-    .hero_orb_three {
-        width: 200px;
-        height: 200px;
+    .hero {
+        padding: 140px 0 100px;
     }
 }
 
 @media (max-width: 650px) {
-    .hero_container {
-        padding: 120px 0 130px;
+    .hero {
+        padding: 115px 0 70px;
+    }
+
+    /* phones: as big as fits, so "locked in a vault." (about 6.7em wide)
+       fills the line inside the 20px side padding. If it ever runs out of
+       room it wraps onto another centered line rather than overflowing. */
+    .hero_inner {
+        padding: 0 20px;
     }
 
     .hero_title {
-        font-size: 38pt;
+        font-size: clamp(38px, calc((100vw - 40px) / 6.3), 68px);
+        letter-spacing: -0.05em;
+    }
+
+    .hero_eyebrow {
+        margin-bottom: 24px;
+    }
+
+    .hero_subtext {
+        font-size: 11pt;
+    }
+
+    .hero_tools {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 560px;
     }
 }
 
 @media (max-width: 500px) {
-    .hero_title {
-        font-size: 32pt;
-    }
-
-    .hero_buttonContainer {
-        flex-direction: column;
-    }
-
-    .hero_primaryButton,
-    .hero_secondaryButton {
+    /* phones: just Log in, larger and the full width of the content */
+    .hero_actions {
         width: 100%;
-        max-width: 260px;
+    }
+
+    .hero_primaryButton {
+        width: 100%;
+    }
+
+    .hero_primaryButton .boxab {
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-size: 13pt;
+    }
+
+    .hero_howLink {
+        display: none;
+    }
+
+    /* phones: Log in and the two cards evenly spaced */
+    .hero_tools {
+        margin-top: var(--hero-stack-gap);
+    }
+
+    .hero_toolSub {
+        font-size: 9.5pt;
     }
 }

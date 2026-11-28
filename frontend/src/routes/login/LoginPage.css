@@ -19,7 +19,7 @@
 }
 
 .loginPage_glass {
-    --loginPage-gold: 212, 168, 92;
+    --loginPage-accent: 96, 165, 255;
 
     position: relative;
     z-index: 3;
@@ -38,7 +38,7 @@
         0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
-/* slow-rotating gold sheen traced around the card's edge */
+/* slow-rotating blue sheen traced around the card's edge */
 .loginPage_glass::before {
     content: "";
     position: absolute;
@@ -51,10 +51,10 @@
     background: conic-gradient(
         from var(--loginPage-angle),
         transparent 0deg,
-        rgba(var(--loginPage-gold), 0.9) 40deg,
+        rgba(var(--loginPage-accent), 0.9) 40deg,
         transparent 110deg,
         transparent 180deg,
-        rgba(var(--loginPage-gold), 0.45) 220deg,
+        rgba(var(--loginPage-accent), 0.45) 220deg,
         transparent 290deg
     );
 
@@ -69,7 +69,7 @@
     animation: loginPage-spin 8s linear infinite;
 }
 
-/* soft warm glow behind the card */
+/* soft blue glow behind the card */
 .loginPage_glass::after {
     content: "";
     position: absolute;
@@ -79,7 +79,7 @@
     pointer-events: none;
     background: radial-gradient(
         closest-side,
-        rgba(var(--loginPage-gold), 0.28),
+        rgba(var(--loginPage-accent), 0.28),
         transparent
     );
     filter: blur(40px);
@@ -100,15 +100,15 @@
     display: grid;
     place-items: center;
     border-radius: 50%;
-    color: rgb(var(--loginPage-gold));
+    color: rgb(var(--loginPage-accent));
     background: radial-gradient(
         circle at 30% 25%,
-        rgba(var(--loginPage-gold), 0.28),
-        rgba(var(--loginPage-gold), 0.06) 70%
+        rgba(var(--loginPage-accent), 0.28),
+        rgba(var(--loginPage-accent), 0.06) 70%
     );
-    border: 1px solid rgba(var(--loginPage-gold), 0.4);
+    border: 1px solid rgba(var(--loginPage-accent), 0.4);
     box-shadow:
-        0 0 24px rgba(var(--loginPage-gold), 0.25),
+        0 0 24px rgba(var(--loginPage-accent), 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
@@ -156,13 +156,61 @@
 
 
 
-.loginPage_video {
+/* ---------- backdrop (mirrors the home hero, in blue and teal) ---------- */
+
+.loginPage_backdrop {
     position: absolute;
     inset: 0;
     z-index: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    pointer-events: none;
+}
+
+/* faint grid, faded out toward the edges */
+.loginPage_grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: center center;
+    mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, black 10%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, black 10%, transparent 75%);
+}
+
+.loginPage_orb {
+    position: absolute;
+    left: 50%;
+    border-radius: 50%;
+    filter: blur(90px);
+    translate: -50% 0;
+}
+
+.loginPage_orb_a {
+    top: -8%;
+    width: min(900px, 110vw);
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgba(96, 165, 255, 0.18), transparent);
+    animation: loginPage-drift 18s ease-in-out infinite alternate;
+}
+
+.loginPage_orb_b {
+    top: 40%;
+    width: min(1100px, 120vw);
+    aspect-ratio: 1.6;
+    background: radial-gradient(closest-side, rgba(64, 224, 200, 0.09), transparent);
+    animation: loginPage-drift 22s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes loginPage-drift {
+    from { transform: translate(-4%, -3%) scale(1); }
+    to   { transform: translate(4%, 4%) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loginPage_orb {
+        animation: none;
+    }
 }
 
 .loginPage_topFade,

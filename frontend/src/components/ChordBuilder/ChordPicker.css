@@ -1,6 +1,8 @@
 /* small chord editor that drops down from the clicked chord */
 .cbp_panel {
-    width: min(340px, calc(100vw - 40px));
+    /* border-box: the padding counts inside the width, so it never runs past a phone's edge */
+    box-sizing: border-box;
+    width: min(340px, calc(100vw - 32px));
     padding: 14px 14px 12px;
 
     border: 1px solid rgba(255, 255, 255, 0.12);

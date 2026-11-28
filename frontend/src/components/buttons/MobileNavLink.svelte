@@ -1,10 +1,16 @@
-<script lang='ts'>
+<script lang="ts">
+    import "./MobileNavLink.css";
 
-    import './MobileNavLink.css'
-
-    export let title: string
-    export let isActive: boolean = false
+    export let title: string;
+    export let isActive: boolean = false;
 </script>
 
-
-<button class="mnl_link" class:mnl_active={isActive} on:click>{title}</button>
+<button
+    class="mnl_link"
+    class:mnl_active={isActive}
+    aria-current={isActive ? "page" : undefined}
+    on:click
+>
+    {#if isActive}<span class="mnl_dot" aria-hidden="true"></span>{/if}
+    {title}
+</button>

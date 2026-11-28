@@ -7,6 +7,7 @@ import helmet from "helmet";
 
 import auth from "./routes/Auth/auth";
 import secure from "./routes/Secure/secure";
+import publicRoutes from "./routes/Public/public";
 
 import { generalRateLimiter } from "./middlewares/rateLimiters";
 import { errorHandler } from "./middlewares/errorHandler";
@@ -47,6 +48,7 @@ app.use(cookieParser());
 
 app.use("/auth", auth);
 app.use("/secure", secure);
+app.use("/public", publicRoutes); // page-view tracking
 
 // ERRORS
 app.use(errorHandler);

@@ -32,6 +32,14 @@ export const QUALITIES = {
     dim7: { label: "Diminished 7", intervals: [0, 3, 6, 9] },
     "7b9": { label: "7 Flat 9", intervals: [0, 4, 7, 10, 13] },
     "13": { label: "Dominant 13", intervals: [0, 4, 7, 10, 14, 21] },
+    // used by transcribed progressions
+    "5": { label: "Power chord", intervals: [0, 7] }, // root + 5th, no 3rd
+    "1": { label: "Root only", intervals: [0] }, // a single note (no 3rd, no 5th)
+    "6/9": { label: "Major 6/9", intervals: [0, 4, 7, 9, 14] },
+    m11: { label: "Minor 11", intervals: [0, 3, 7, 10, 14, 17] },
+    "11": { label: "Dominant 11", intervals: [0, 4, 7, 10, 14, 17] },
+    m7add11: { label: "Minor 7 add 11", intervals: [0, 3, 7, 10, 17] },
+    add11: { label: "Add 11", intervals: [0, 4, 7, 17] },
 } as const;
 
 export type Quality = keyof typeof QUALITIES;
@@ -42,6 +50,9 @@ export type Chord = {
     start: number; // beat position in the loop (0-based)
     beats: number; // how long the chord lasts
     notes?: number[] | null; // hand-edited MIDI notes; null = auto voicing
+    // bass note of a transcribed inversion (e.g. "F#" for Esus2/F#), so it keeps
+    // its written name; cleared as soon as the notes are edited
+    slashBass?: Root | null;
 };
 
 export const BEATS_PER_BAR = 4;
@@ -72,19 +83,21 @@ export function scalePitchClasses(root: Root, scale: ScaleId) {
 }
 
 export function chordName(chord: Pick<Chord, "root" | "quality">) {
+    if (chord.quality === "1") return chord.root; // a lone note is just its name
     return `${chord.root}${chord.quality}`;
 }
 
-// MIDI 60 = middle C (C4)
-const VOICING_LOW = 53; // F3: keeps chords in a warm mid range
+// MIDI 60 = middle C, "C3" in the piano roll's Ableton-style labels
+const VOICING_LOW = 60; // chords sit from C3 up to B3, extensions above
 
-// highest note anything may use: E5 (the piano roll's top row)
-export const MAX_NOTE = 76;
-const BASS_OCTAVE_C = 36; // C2
+// highest note anything may use: MIDI 96, C6 in Ableton naming. The piano
+// roll shows up to C5 and grows an octave for anything above it
+export const MAX_NOTE = 96;
+export const BASS_OCTAVE_C = 48; // the bass note sits in the C2 octave, just under the chord
 
 /**
- * Close voicing kept between F3 and ~F4, so moving between chords
- * stays smooth instead of jumping around the keyboard.
+ * Close voicing kept between C3 and B3 (Ableton labels), so moving between
+ * chords stays smooth instead of jumping around the keyboard.
  */
 export function chordNotes(chord: Pick<Chord, "root" | "quality">) {
     const rootPc = ROOTS.indexOf(chord.root);
@@ -160,7 +173,8 @@ export function detectChord(notes: number[]) {
 }
 
 /** Display name; hand-edited chords are re-detected, with slash bass if needed. */
-export function chordLabel(chord: Pick<Chord, "root" | "quality" | "notes">) {
+export function chordLabel(chord: Pick<Chord, "root" | "quality" | "notes" | "slashBass">) {
+    if (chord.slashBass) return `${chordName(chord)}/${chord.slashBass}`;
     if (!chord.notes) return chordName(chord);
 
     // hand-edited notes: name whatever they spell (extensions, alterations, slash chords)
@@ -169,9 +183,16 @@ export function chordLabel(chord: Pick<Chord, "root" | "quality" | "notes">) {
 
 const NOTE_NAMES =["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
-/** e.g. 60 -> "C4" */
+/**
+ * Octave names follow Ableton (and Logic/Cubase): middle C, MIDI note 60, is
+ * "C3". So the piano roll's labels match what you see after exporting the MIDI
+ * into Ableton. (Scientific naming would call it C4; FL Studio calls it C5.)
+ * e.g. 60 -> "C3", 36 -> "C1"
+ */
+export const MIDDLE_C_OCTAVE = 3;
+
 export function noteName(midi: number) {
-    return `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - 1}`;
+    return `${NOTE_NAMES[midi % 12]}${Math.floor(midi / 12) - (5 - MIDDLE_C_OCTAVE)}`;
 }
 
 export function isBlackKey(midi: number) {
@@ -207,6 +228,13 @@ const SPOKEN_QUALITY: Record<Quality, string> = {
     dim7: "diminished 7th",
     "7b9": "dominant 7th, flat 9",
     "13": "dominant 13th",
+    "5": "power chord",
+    "1": "(root note only)",
+    "6/9": "major 6/9",
+    m11: "minor 11th",
+    "11": "dominant 11th",
+    m7add11: "minor 7th add 11",
+    add11: "major add 11",
 };
 
 /** "C#" -> "C sharp", "Eb" -> "E flat" */
@@ -217,7 +245,8 @@ export const spokenNote = (name: string) => name.replace("#", " sharp").replace(
  * C/E -> "C major over E". Hand-edited chords that don't match a known type
  * are read out as their notes.
  */
-export function chordSpokenName(chord: Pick<Chord, "root" | "quality" | "notes">) {
+export function chordSpokenName(chord: Pick<Chord, "root" | "quality" | "notes" | "slashBass">) {
+    if (chord.slashBass) return `${spokenNote(chord.root)} ${SPOKEN_QUALITY[chord.quality]} over ${spokenNote(chord.slashBass)}`;
     if (!chord.notes) return `${spokenNote(chord.root)} ${SPOKEN_QUALITY[chord.quality]}`;
 
     const sorted = [...chord.notes].sort((a, b) => a - b);

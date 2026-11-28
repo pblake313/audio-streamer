@@ -1,15 +1,15 @@
 <script lang="ts">
     // $app/stores (not $app/state): $app/state is only reactive on Svelte 5
     import { page } from "$app/stores";
+    import { SITE_URL } from "../../helpers/siteUrl";
 
     /*
         Title, description, and link-preview tags (Open Graph + Twitter)
         for a page. Preview images and canonical links must be absolute
-        URLs, so they're built from VITE_FRONTEND_URL. Set it to the live
-        site URL before building for production.
+        URLs, so they're built from VITE_FRONTEND_URL (helpers/siteUrl.ts).
+        Set it to the live site URL before building for production.
     */
     const SITE_NAME = "Audio Streamer · PATTSWAY";
-    const SITE_URL = (import.meta.env.VITE_FRONTEND_URL || "https://demo.pattsway.com").replace(/\/+$/, "");
 
     const DEFAULT_DESCRIPTION =
         "A secure music streaming platform that allows producers and musicians to organize, review, compare, and test their mixes from anywhere.";
@@ -28,8 +28,19 @@
     export let noindex = false;
 
     $: fullTitle = title === SITE_NAME ? title : `${title} · PATTSWAY`;
-    $: url = `${SITE_URL}${$page.url.pathname}`;
+    // the page's one true address when the current URL might differ (another
+    // spelling, extra query); defaults to the current path
+    export let canonicalPath: string | null = null;
+
+    // schema.org structured data (one object, or several), for search engines
+    export let jsonLd: object | object[] | null = null;
+
+    $: url = `${SITE_URL}${canonicalPath ?? $page.url.pathname}`;
     $: imageUrl = image.startsWith("http") ? image : `${SITE_URL}${image}`;
+    // "<" escaped so nothing in the data can close the script tag early
+    $: jsonLdScript = jsonLd
+        ? `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</` + `script>`
+        : "";
 </script>
 
 <svelte:head>
@@ -64,4 +75,8 @@
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:image:alt" content={imageAlt} />
+
+    {#if jsonLdScript}
+        {@html jsonLdScript}
+    {/if}
 </svelte:head>

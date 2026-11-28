@@ -1,52 +1,249 @@
+/* ========================= */
+/* LAYOUT                    */
+/* ========================= */
+
 .footer_container {
     position: relative;
     overflow: hidden;
     background: #222;
 }
 
+/* hairline used above the footer and above the bottom bar,
+   spanning the footer's content width */
+.footer_container {
+    --footer-line: rgba(255, 255, 255, 0.14);
+}
+
+.footer_insideContainer::before,
+.footer_bottom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 1px;
+    background: var(--footer-line);
+}
+
+/* inset by the container's side padding, so it lines up with the content */
+.footer_insideContainer::before {
+    left: 25px;
+    right: 25px;
+}
+
+.footer_bottom::before {
+    left: 0;
+    right: 0;
+}
+
 .footer_insideContainer {
-    padding: 0px 25px;
-    margin: auto;
-    max-width: var(--site-width);
     position: relative;
     z-index: 1;
-    margin-bottom: 25px;
-}
 
-.footer_containLogo {
-    opacity: 0.03;
-    transition: .7s;
-}
-.footer_containLogo:hover {
-    opacity: 1;
-}
-
-
-.footer_eyebrow{
-    font-size: 10pt;
-    opacity: .6;
-    margin-bottom: 15px;
-
-}
-.footer_socials{
-    display: flex;
-    width: fit-content;
+    /* content-box, like the nav and page sections, so the content lines up */
+    max-width: var(--site-width);
     margin: auto;
-    margin-top: 35px;
-    margin-bottom: 25px;
-    gap: 15px;
-    align-items: center;
+    padding: 72px 25px 0;
 }
-.footer_padForPlayer{
+
+.footer_main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 48px 80px;
+}
+
+/* ========================= */
+/* ABOUT                     */
+/* ========================= */
+
+.footer_about {
+    max-width: 340px;
+}
+
+/* PATTSWAY wordmark at the top of the about column */
+.footer_logo {
+    display: block;
+    width: 230px;
+    max-width: 100%;
+    margin-bottom: 14px;
+}
+
+.footer_logo svg {
+    display: block;
+}
+
+.footer_blurb {
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10.5pt;
+    line-height: 1.6;
+}
+
+.footer_github {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 22px;
+    padding: 7px 14px;
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 10pt;
+
+    transition:
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.footer_github:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: white;
+}
+
+/* ========================= */
+/* LINK COLUMNS              */
+/* ========================= */
+
+.footer_columns {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: 40px 72px;
+}
+
+.footer_columnTitle {
+    margin-bottom: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.footer_column ul {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.footer_column a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10.5pt;
+    transition: color 0.2s ease;
+}
+
+.footer_column a:hover {
+    color: white;
+}
+
+.footer_column a svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+}
+
+/* ========================= */
+/* BOTTOM BAR                */
+/* ========================= */
+
+.footer_bottom {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-top: 64px;
+    padding: 22px 0 26px;
+}
+
+.footer_copyright {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 9.5pt;
+    line-height: 1.4;
+}
+
+.footer_top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 0;
+    border: none;
+    background: none;
+
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 9.5pt;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.footer_top:hover {
+    color: white;
+}
+
+.footer_top svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.25s ease;
+}
+
+.footer_top:hover svg {
+    transform: translateY(-2px);
+}
+
+.footer_top:focus-visible,
+.footer_column a:focus-visible,
+.footer_github:focus-visible,
+.footer_logo:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.footer_padForPlayer {
     padding-bottom: 100px;
 }
-@media (max-width: 600px) {
-    .footer_insideContainer{
-        padding: 0px 15px;
+
+/* ========================= */
+/* RESPONSIVE                */
+/* ========================= */
+
+@media (max-width: 900px) {
+    .footer_main {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .footer_columns {
+        gap: 32px 56px;
     }
 }
-@media (pointer: coarse) {
-    .footer_containLogo{
-        opacity: 1;
+
+@media (max-width: 600px) {
+    .footer_insideContainer {
+        padding: 56px 15px 0;
+    }
+
+    .footer_insideContainer::before {
+        left: 15px;
+        right: 15px;
+    }
+
+    .footer_columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .footer_bottom {
+        padding-bottom: 20px;
     }
 }

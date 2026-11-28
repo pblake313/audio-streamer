@@ -1,15 +1,7 @@
 // A random starting point: a key plus a common progression that fits it.
 
-import {
-    BEATS_PER_BAR,
-    QUALITIES,
-    ROOTS,
-    SCALES,
-    type Chord,
-    type Quality,
-    type Root,
-    type ScaleId,
-} from "./chords";
+import { BEATS_PER_BAR, ROOTS, SCALES, type Chord, type Root, type ScaleId } from "./chords";
+import { chordsAtComplexity, type Complexity } from "./complexity";
 
 // scale degrees, 0-based (0 = I/i)
 type KeyScale = "major" | "minor";
@@ -36,22 +28,6 @@ const PROGRESSIONS: Record<KeyScale, number[][]> = {
 
 const pick = <T>(items: readonly T[]) => items[Math.floor(Math.random() * items.length)];
 
-/** Stacks thirds on a scale degree and names the result, e.g. degree 1 of C major -> Dm7. */
-function diatonicChord(keyPc: number, scale: SevenNoteScale, degree: number, sevenths: boolean) {
-    const steps = SCALES[scale].intervals;
-    const stack = sevenths ? [0, 2, 4, 6] : [0, 2, 4];
-
-    const pcs = stack.map((s) => (keyPc + steps[(degree + s) % steps.length]) % 12);
-    const rootPc = pcs[0];
-    const shape = pcs.map((pc) => (pc - rootPc + 12) % 12).sort((a, b) => a - b).join(",");
-
-    const quality = (Object.keys(QUALITIES) as Quality[]).find(
-        (q) => [...QUALITIES[q].intervals].sort((a, b) => a - b).join(",") === shape,
-    );
-
-    return { root: ROOTS[rootPc], quality: quality ?? (sevenths ? "m7" : "m") };
-}
-
 // scales with 7 notes can stack thirds directly
 type SevenNoteScale = Exclude<ScaleId, "none" | "majorPentatonic" | "minorPentatonic" | "blues">;
 
@@ -59,11 +35,11 @@ type SevenNoteScale = Exclude<ScaleId, "none" | "majorPentatonic" | "minorPentat
  * Random chords that fit a key, one per bar.
  * Major/minor use well-known progressions; other modes get random degrees
  * starting on the tonic; pentatonic/blues borrow chords from their parent
- * major/minor key.
+ * major/minor key. `complexity` sets how rich the chords are ("random" =
+ * triads or 7ths by coin flip).
  */
-export function randomChordsInKey(keyRoot: Root, scale: ScaleId, bars: number): Chord[] {
+export function randomChordsInKey(keyRoot: Root, scale: ScaleId, bars: number, complexity: Complexity = "random"): Chord[] {
     const keyPc = ROOTS.indexOf(keyRoot);
-    const sevenths = Math.random() < 0.5;
 
     const harmony: SevenNoteScale =
         scale === "majorPentatonic" ? "major"
@@ -76,18 +52,23 @@ export function randomChordsInKey(keyRoot: Root, scale: ScaleId, bars: number): 
             ? pick(PROGRESSIONS[harmony])
             : [0, ...Array.from({ length: 3 }, () => 1 + Math.floor(Math.random() * 6))];
 
+    const steps = [...SCALES[harmony].intervals];
+
     // cycle the 4-chord pattern if there are more bars
-    return Array.from({ length: bars }, (_, bar) => ({
-        ...diatonicChord(keyPc, harmony, degrees[bar % degrees.length], sevenths),
+    const perBar = Array.from({ length: bars }, (_, bar) => degrees[bar % degrees.length]);
+    const chords = chordsAtComplexity(keyPc, steps, perBar, complexity, harmony === "major");
+
+    return chords.map((chord, bar) => ({
+        ...chord,
         start: bar * BEATS_PER_BAR,
         beats: BEATS_PER_BAR,
     }));
 }
 
 /** A random key (major or minor) with a progression that fits it. */
-export function randomProgression(bars: number) {
+export function randomProgression(bars: number, complexity: Complexity = "random") {
     const keyRoot: Root = pick(ROOTS);
     const scale: KeyScale = Math.random() < 0.5 ? "major" : "minor";
 
-    return { keyRoot, scale, chords: randomChordsInKey(keyRoot, scale, bars) };
+    return { keyRoot, scale, chords: randomChordsInKey(keyRoot, scale, bars, complexity) };
 }
